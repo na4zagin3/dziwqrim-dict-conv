@@ -9,6 +9,7 @@ import Data.Csv qualified as Csv
 import Data.Map (Map)
 import Data.Map qualified as Map
 import Data.Maybe qualified as Maybe
+import Data.Maybe (fromMaybe)
 import Data.Vector (Vector)
 import Data.Text (Text)
 import Data.Text qualified as T
@@ -22,6 +23,7 @@ import Lib.Row
 data Entry = Entry
   { e_字 :: !Text
   , e_shapeVariants :: !ShapeVariants
+  , e_部畫 :: !(Maybe Shape部畫)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -31,6 +33,7 @@ entriesFromRows = fmap entryFromRow
     entryFromRow r = Entry
                      { e_字 = r_字 r
                      , e_shapeVariants = r_shapeVariants r
+                     , e_部畫 = r_部畫 r
                      }
 
 variantToTex label [] pre = Nothing
@@ -56,11 +59,20 @@ shapeVariantsToTex s = mconcat
       , ("或", s_异 s, "") -- TODO
       ]
 
+shape部畫ToTex :: Shape部畫 -> Text
+shape部畫ToTex s = mconcat
+  [ "（"
+  , s_部 s
+  , "部"
+  , T.pack . show . s_畫 $ s
+  , "畫）"
+  ]
 
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
     -- , "  + 0（夊部0畫）\n"
+    , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
     -- , "  \\begin{Sound}\n"

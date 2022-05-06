@@ -33,9 +33,16 @@ data ShapeVariants = ShapeVariants
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data Shape部畫 = Shape部畫
+  { s_部 :: !Text
+  , s_畫 :: !Int
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Row = Row
   { r_字 :: !Text
   , r_shapeVariants :: !ShapeVariants
+  , r_部畫 :: !(Maybe Shape部畫)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -99,6 +106,18 @@ p_r_shapeVariant c s = do
             , s_comment = ""
             }
 
+p_r_部畫 :: Text -> Text -> Either String (Maybe Shape部畫)
+p_r_部畫 "n" "n" = Right Nothing
+p_r_部畫 p s = do
+  (sn, r) <- TR.decimal s :: Either String (Int, Text)
+  () <- if T.null r
+    then Right ()
+    else Left $ printf "trailing garbage: %s" r
+  return . Just $ Shape部畫
+    { s_部 = p
+    , s_畫 = sn
+    }
+
 parseRow :: Map Text Text -> Either String Row
 parseRow m = do
   f_字 <- p_r_字 $ m M.! "字"
@@ -107,6 +126,7 @@ parseRow m = do
             [] -> Left "Lacks 四角 for the head character"
             [f_親] -> Right f_親
             _ -> Left "Multiple 四角 for the head character"
+
   f_選 <- left ("選: " <>) $ p_r_shapeVariant (m M.! "選") (m M.! "四角選")
   f_簡 <- left ("簡: " <>) $ p_r_shapeVariant (m M.! "簡") (m M.! "四簡")
   f_日 <- left ("日: " <>) $ p_r_shapeVariant (m M.! "日") (m M.! "四日")
@@ -118,7 +138,11 @@ parseRow m = do
         , s_日 = f_日
         , s_异 = f_异
         }
+
+  f_部畫 <- left ("部畫: " <>) $ p_r_部畫 (m M.! "部") (m M.! "畫")
+
   return $ Row
     { r_字 = f_字
     , r_shapeVariants = f_shapeVariants
+    , r_部畫 = f_部畫
     }
