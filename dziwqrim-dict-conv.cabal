@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
+-- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 70c154ca53224b1dcf216e5bf9deb20526e904ae050f697cc64ea6de619b607e
+-- hash: 04bb3817f4db649c1f7bdeb015efb868df8aaded124866d5972da77de86fd4e1
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -28,12 +28,21 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Lib.Entry
+      Lib.Row
   other-modules:
       Paths_dziwqrim_dict_conv
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      HaTeX
+    , base >=4.7 && <5
+    , bytestring
+    , cassava >0.5 && <0.6
+    , containers
+    , text
+    , transformers
+    , vector
   default-language: Haskell2010
 
 executable dziwqrim-dict-conv-exe
@@ -44,8 +53,15 @@ executable dziwqrim-dict-conv-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HaTeX
+    , base >=4.7 && <5
+    , bytestring
+    , cassava >0.5 && <0.6
+    , containers
     , dziwqrim-dict-conv
+    , text
+    , transformers
+    , vector
   default-language: Haskell2010
 
 test-suite dziwqrim-dict-conv-test
@@ -57,6 +73,14 @@ test-suite dziwqrim-dict-conv-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HaTeX
+    , base >=4.7 && <5
+    , bytestring
+    , cassava >0.5 && <0.6
+    , containers
+    , doctest
     , dziwqrim-dict-conv
+    , text
+    , transformers
+    , vector
   default-language: Haskell2010

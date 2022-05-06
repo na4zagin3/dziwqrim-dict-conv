@@ -21,6 +21,17 @@ description:         Please see the README on GitHub at <https://github.com/na4z
 
 dependencies:
 - base >= 4.7 && < 5
+# Datatypes
+- containers
+- transformers
+- vector
+# String
+- bytestring
+- text
+# CSV
+- cassava > 0.5 && < 0.6
+# TeX
+- HaTeX
 
 library:
   source-dirs: src
@@ -46,3 +57,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - dziwqrim-dict-conv
+    - doctest
