@@ -10,11 +10,29 @@
 \usepackage{enumitem}
 \usepackage{titlesec}
 
+\usepackage[marginpar=2cm]{geometry}
+
 \setmainfont{TeXGyreTermes}
 \setsansfont{TeXGyreHeros}
 
 \setmainjfont{Noto Serif CJK SC}
 \setsansjfont{Noto Sans CJK SC}
+
+\newcommand{\textJapn}[1]{{%
+    \newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]%
+    \newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]%
+    #1%
+  }}
+\newcommand{\textHant}[1]{{%
+    \newjfontfamily\fontMainHans{Noto Serif CJK SC}[]%
+    \newjfontfamily\fontSansHans{Noto Sans CJK SC}[]%
+    #1%
+  }}
+\newcommand{\textHans}[1]{{%
+    \newjfontfamily\fontMainHans{Noto Serif CJK SC}[]%
+    \newjfontfamily\fontSansHans{Noto Sans CJK SC}[]%
+    #1%
+  }}
 
 \newlength{\EntryDescriptionLineLength}
 \newlength{\EntryDescriptionLineHeight}
