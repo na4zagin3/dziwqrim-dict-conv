@@ -1,5 +1,6 @@
 # Working files
 .~*#
+*~
 
 # TeX temporary files
 *.aux
@@ -11,3 +12,7 @@
 
 # Emacs LaTeX mode
 auto/
+
+# Haskell
+.stack-work/
+dist-newstyle/
