@@ -43,6 +43,8 @@ data Row = Row
   { r_字 :: !Text
   , r_shapeVariants :: !ShapeVariants
   , r_部畫 :: !(Maybe Shape部畫)
+  , r_隋音 :: !Text
+  , r_義 :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -118,6 +120,14 @@ p_r_部畫 p s = do
     , s_畫 = sn
     }
 
+p_r_隋音 :: Text -> Either String Text
+p_r_隋音 "" = Left "Missing 隋音"
+p_r_隋音 t = Right t
+
+p_r_義 :: Text -> Either String (Maybe Text)
+p_r_義 "" = Right Nothing
+p_r_義 t = Right $ Just t
+
 parseRow :: Map Text Text -> Either String Row
 parseRow m = do
   f_字 <- p_r_字 $ m M.! "字"
@@ -141,8 +151,13 @@ parseRow m = do
 
   f_部畫 <- left ("部畫: " <>) $ p_r_部畫 (m M.! "部") (m M.! "畫")
 
+  f_隋音 <- p_r_隋音 $ m M.! "隋音"
+  f_義 <- p_r_義 $ m M.! "義"
+
   return $ Row
     { r_字 = f_字
     , r_shapeVariants = f_shapeVariants
     , r_部畫 = f_部畫
+    , r_隋音 = f_隋音
+    , r_義 = f_義
     }

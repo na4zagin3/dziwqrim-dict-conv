@@ -9,7 +9,7 @@ import Data.Csv qualified as Csv
 import Data.Map (Map)
 import Data.Map qualified as Map
 import Data.Maybe qualified as Maybe
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, catMaybes)
 import Data.Vector (Vector)
 import Data.Text (Text)
 import Data.Text qualified as T
@@ -19,11 +19,21 @@ import GHC.Generics (Generic)
 
 import Lib.Row
 
+data Entry音義 = Entry音義
+  { e_隋音 :: !Text
+  , e_義 :: !(Maybe Text)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Entry音 = Entry音
+  deriving (Read, Show, Eq, Ord, Generic)
+
 -- Entry
 data Entry = Entry
   { e_字 :: !Text
   , e_shapeVariants :: !ShapeVariants
   , e_部畫 :: !(Maybe Shape部畫)
+  , e_音義 :: ![Entry音義]
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -34,6 +44,10 @@ entriesFromRows = fmap entryFromRow
                      { e_字 = r_字 r
                      , e_shapeVariants = r_shapeVariants r
                      , e_部畫 = r_部畫 r
+                     , e_音義 = [Entry音義
+                                 { e_隋音 = r_隋音 r
+                                 , e_義 = r_義 r
+                                 }]
                      }
 
 variantToTex label [] pre = Nothing
@@ -75,9 +89,18 @@ entryToTex e = mconcat
     , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
-    -- , "  \\begin{Sound}\n"
+    , "  \\begin{Sound}\n"
+    , T.intercalate "\n" tex音Items
     -- , "    \\SoundItem{toŋ}《P3798》都宗反，端冬平，上平聲二冬\n"
-    -- , "  \\end{Sound}\n"
+    , "  \\end{Sound}\n"
     , "\\end{Entry}\n"
+    , if null tex義Items
+      then ""
+      else "\\begin{Sense}" <> T.intercalate "\n" tex義Items <> "\\end{Sense}"
     ]
   where
+    tex音Items = map (\sp -> "\\SoundItem{" <> e_隋音 sp <> "}") $ e_音義 e
+    tex義Items = catMaybes . map render義Item $ e_音義 e
+    render義Item sp = do
+      s <- e_義 sp
+      return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> s
