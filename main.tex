@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[a5paper]{article}
 
 \usepackage{hyperref}
 
@@ -62,10 +62,10 @@
 }{}
 
 \newenvironment{Sound}{\begin{itemize}}{\end{itemize}}
-\newcommand{\SoundItem}[1]{\item[/\textsf{#1}/:]}
+\newcommand{\SoundItem}[1]{\item[/\textbf{\zyepheng{#1}}/:]}
 
 \newenvironment{Sense}{\begin{itemize}}{\end{itemize}}
-\newcommand{\SenseItem}[1]{\item[\{\textbf{\textsf{#1}}\}:]}
+\newcommand{\SenseItem}[1]{\item[\{\textbf{\zyepheng{#1}}\}:]}
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
 
@@ -93,7 +93,7 @@
   \end{Sound}
 \end{Entry}
 
-\PartHeader{中符 tuŋ}{中仲忠}
+\PartHeader{中符 tuŋ}{\refEntry{中}仲忠}
 
 \begin{Entry}{中}{中}
   + 0（丨部3畫）
