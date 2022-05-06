@@ -1,0 +1,13 @@
+# Working files
+.~*#
+
+# TeX temporary files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.pdf
+
+# Emacs LaTeX mode
+auto/
