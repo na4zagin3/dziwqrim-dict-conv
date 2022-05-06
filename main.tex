@@ -1,0 +1,112 @@
+\documentclass{article}
+
+\usepackage{hyperref}
+
+\usepackage{luatexja}
+\usepackage{luatexja-fontspec}
+
+\usepackage{calc}
+\usepackage{qrcode}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\setmainfont{TeXGyreTermes}
+\setsansfont{TeXGyreHeros}
+
+\setmainjfont{Noto Serif CJK SC}
+\setsansjfont{Noto Sans CJK SC}
+
+\newlength{\EntryDescriptionLineLength}
+\newlength{\EntryDescriptionLineHeight}
+
+\providecommand\phantomsection{}
+
+\titleformat{\section}[display]
+{%format
+  \bfseries\large
+}{%label
+  %(\thesection)%
+}{%sep
+  0pt
+}{%before-code
+  \centering\MakeUppercase
+}
+\titlespacing*{\section}{0pt}{*4}{0pt}
+
+\newcommand{\PartHeader}[3]{%
+  \section{#1}%
+  \begin{center}
+    \centering #2
+  \end{center}
+  \vspace{0.5em plus 0.2em minus 0.05em}
+}
+\newenvironment{Entry}[2]{%
+  \noindent
+  \setlength{\EntryDescriptionLineHeight}{2\baselineskip}%
+  \setlength{\EntryDescriptionLineLength}{\linewidth-2\EntryDescriptionLineHeight}%
+  \parshape 3
+  \EntryDescriptionLineHeight \EntryDescriptionLineLength
+  \EntryDescriptionLineHeight \EntryDescriptionLineLength
+  0cm \linewidth%
+  %
+  \makebox[0pt][r]{%
+    \fontseries{bx}\fontsize{2\baselineskip}{2\baselineskip}\selectfont%
+    \raisebox{-1ex}[0pt][0pt]{#1}%
+    \hspace*{0.1em}%
+  }%
+  \makebox[0pt][l]{\raisebox{-1ex}[0pt][0pt]{%
+      \hspace{\EntryDescriptionLineLength+0.2\EntryDescriptionLineHeight}\qrcode[height=0.8\EntryDescriptionLineHeight]{https://www.chise.org/ids-find?components=#2}}}%
+  \phantomsection%
+  \addcontentsline{toc}{subsection}{#1}%
+  \label{entry-#1}
+}{}
+
+\newenvironment{Sound}{\begin{itemize}}{\end{itemize}}
+\newcommand{\SoundItem}[1]{\item[/\textsf{#1}/:]}
+
+\newenvironment{Sense}{\begin{itemize}}{\end{itemize}}
+\newcommand{\SenseItem}[1]{\item[\{\textbf{\textsf{#1}}\}:]}
+
+\newcommand{\zyepheng}[1]{\textsf{#1}}
+
+\newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
+\newcommand{\refEntry}[1]{\hyperref[entry-#1]{#1}}
+
+\begin{document}
+\PartHeader{冬符 toŋ}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
+
+\begin{Entry}{冬}{冬}
+  + 0（夊部0畫）
+  \\
+  \Sikrok{2730}{3}
+  \begin{Sound}
+    \SoundItem{toŋ}《P3798》都宗反，端冬平，上平聲二冬
+  \end{Sound}
+\end{Entry}
+
+\begin{Entry}{佟}{佟}
+  + 23人（人部5畫）
+  \\
+  \Sikrok{2723}{3}
+  \begin{Sound}
+    \SoundItem{doŋ}《P3798》徒冬反，定冬平
+  \end{Sound}
+\end{Entry}
+
+\PartHeader{中符 tuŋ}{中仲忠}
+
+\begin{Entry}{中}{中}
+  + 0（丨部3畫）
+  \\
+  \Sikrok{5000}{6}
+  \begin{Sound}
+    \SoundItem{tryuŋ}《切二》陟隆反, 《廣韵》陟隆切, 知東平, 上平聲一東（中間）
+    \SoundItem{tryûŋ}《P3696(1)r》陟仲反, 知送去, 去聲一送（射中, 撃中）
+    \SoundItem{dryûŋ}《集韵》直衆切
+  \end{Sound}
+  \begin{Sense}
+    \SenseItem{tryuŋ}義略。
+    \SenseItem{tryûŋ}義略。
+  \end{Sense}
+\end{Entry}
+\end{document}
