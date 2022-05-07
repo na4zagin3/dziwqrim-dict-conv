@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 04bb3817f4db649c1f7bdeb015efb868df8aaded124866d5972da77de86fd4e1
+-- hash: faf0e64dd8b66394a579d70deedf4602485a352fbe24f63e056723a519f1b416
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
     , bytestring
     , cassava >0.5 && <0.6
     , containers
+    , nonempty-vector
     , text
     , transformers
     , vector
@@ -59,6 +60,7 @@ executable dziwqrim-dict-conv-exe
     , cassava >0.5 && <0.6
     , containers
     , dziwqrim-dict-conv
+    , nonempty-vector
     , text
     , transformers
     , vector
@@ -80,6 +82,7 @@ test-suite dziwqrim-dict-conv-test
     , containers
     , doctest
     , dziwqrim-dict-conv
+    , nonempty-vector
     , text
     , transformers
     , vector

@@ -29,10 +29,10 @@ convertCsvToTex inPath outPath = do
   Right rawRows <- readCsvFile inPath
   let rows = [(2 :: Int)..]
   let parsedResults =  zip rows .map (uncurry parseRow) . zip rows . V.toList $ rawRows
-  let (errors, parsedRows) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ parsedResults
-  mapM_ putStrLn errors
-  let sections = sectionsFromRows $ parsedRows
-  mapM_ putStrLn errors
+  let (errors1, parsedRows) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ parsedResults
+  mapM_ putStrLn errors1
+  let (errors2, sections) = sectionsFromRows $ parsedRows
+  mapM_ putStrLn errors2
   let outText = T.unlines . map sectionToTex $ sections
   T.writeFile outPath outText
 
