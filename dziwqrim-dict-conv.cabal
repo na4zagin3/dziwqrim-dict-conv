@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: faf0e64dd8b66394a579d70deedf4602485a352fbe24f63e056723a519f1b416
+-- hash: 8a3acd7aec8dba78b045e564d4a273126c495dad1b0bf81301ccf8be1726cfe3
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Lib
       Lib.Entry
+      Lib.PathTree
       Lib.Row
   other-modules:
       Paths_dziwqrim_dict_conv
