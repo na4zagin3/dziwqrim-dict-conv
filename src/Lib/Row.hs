@@ -39,10 +39,32 @@ data Shape部畫 = Shape部畫
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data Part = Part
+  { p_玉篇部首位 :: !Text
+  , p_部外 :: !Text
+  , p_諧符 :: !Text
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Parts = Parts
+  { p_諧符部 :: !Text
+  , p_諧符位 :: !Int
+  , p_variant :: !Bool
+  , p_parts :: ![Part]
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Position = Position
+  { pos_row :: !Int
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Row = Row
-  { r_字 :: !Text
+  { r_position :: !Position
+  , r_字 :: !Text
   , r_shapeVariants :: !ShapeVariants
   , r_部畫 :: !(Maybe Shape部畫)
+  , r_parts :: !Parts
   , r_隋音 :: !Text
   , r_義 :: !(Maybe Text)
   }
@@ -120,6 +142,23 @@ p_r_部畫 p s = do
     , s_畫 = sn
     }
 
+p_r_parts :: Text -> Text -> [(Text, Text)] -> Either String Parts
+p_r_parts ki kp psRaw = do
+  (kin, r) <- TR.decimal ki :: Either String (Int, Text)
+  () <- if T.null r
+    then Right ()
+    else Left $ printf "trailing garbage: %s" r
+  let (f_variant, ps) = case psRaw of
+        [] -> (False, [])
+        ("0", "⌥"):ps -> (True, ps)
+        ps -> (False, ps)
+  return $ Parts
+    { p_諧符部 = kp
+    , p_諧符位 = kin
+    , p_variant = f_variant
+    , p_parts = [] -- TODO
+    }
+
 p_r_隋音 :: Text -> Either String Text
 p_r_隋音 "" = Left "Missing 隋音"
 p_r_隋音 t = Right t
@@ -128,8 +167,8 @@ p_r_義 :: Text -> Either String (Maybe Text)
 p_r_義 "" = Right Nothing
 p_r_義 t = Right $ Just t
 
-parseRow :: Map Text Text -> Either String Row
-parseRow m = do
+parseRow :: Int -> Map Text Text -> Either String Row
+parseRow row m = do
   f_字 <- p_r_字 $ m M.! "字"
   f_親_pl <- left ("親: " <>) $ p_r_shapeVariant (m M.! "字") (m M.! "四角")
   f_親 <- case f_親_pl of
@@ -154,10 +193,18 @@ parseRow m = do
   f_隋音 <- p_r_隋音 $ m M.! "隋音"
   f_義 <- p_r_義 $ m M.! "義"
 
+  f_parts <- p_r_parts (m M.! "諧符位") (m M.! "諧符部")
+             [ (m M.! "玉篇部首位1", m M.! "部外1")
+             , (m M.! "玉篇部首位2", m M.! "部外2")
+             , (m M.! "玉篇部首位3", m M.! "部外3")
+             ]
+
   return $ Row
-    { r_字 = f_字
+    { r_position = Position { pos_row = row }
+    , r_字 = f_字
     , r_shapeVariants = f_shapeVariants
     , r_部畫 = f_部畫
     , r_隋音 = f_隋音
     , r_義 = f_義
+    , r_parts = f_parts
     }

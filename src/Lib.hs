@@ -19,7 +19,7 @@ import Data.Text.IO qualified as T
 import Text.Printf (printf)
 import GHC.Generics (Generic)
 
-import Lib.Entry (entriesFromRows, entryToTex)
+import Lib.Entry (sectionsFromRows, sectionToTex)
 import Lib.Row (parseRow)
 -- import Control.Monad.Trans.Writer.Strict (Writer)
 -- type Dictionary = List
@@ -27,12 +27,13 @@ import Lib.Row (parseRow)
 convertCsvToTex :: FilePath -> FilePath -> IO ()
 convertCsvToTex inPath outPath = do
   Right rawRows <- readCsvFile inPath
-  let parsedResults = zip [(2 :: Int)..] . map parseRow . V.toList $ rawRows
+  let rows = [(2 :: Int)..]
+  let parsedResults =  zip rows .map (uncurry parseRow) . zip rows . V.toList $ rawRows
   let (errors, parsedRows) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ parsedResults
   mapM_ putStrLn errors
-  let entries = entriesFromRows $ parsedRows
+  let sections = sectionsFromRows $ parsedRows
   mapM_ putStrLn errors
-  let outText = T.unlines . map entryToTex $ entries
+  let outText = T.unlines . map sectionToTex $ sections
   T.writeFile outPath outText
 
 
