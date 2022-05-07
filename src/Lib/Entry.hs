@@ -127,6 +127,7 @@ variantToTex label shapes pre = Just $ mconcat
 shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
     [ "  ", renderSikrok . s_四角 . s_親 $ s
+    , "\\quad "
     , T.intercalate "，又" variantDescs
     ]
   where
