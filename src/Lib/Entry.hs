@@ -3,15 +3,11 @@
 {-# LANGUAGE ImportQualifiedPost #-}
 module Lib.Entry where
 
-import Control.Arrow (first, left)
-import Data.ByteString.Lazy qualified as BL
-import Data.Csv qualified as Csv
+import Control.Arrow (first)
 import Data.Either (partitionEithers)
 import Data.Foldable qualified as Foldable
 import Data.Function (on)
 import Data.List qualified as L
-import Data.Map (Map)
-import Data.Map qualified as M
 import Data.Map.Strict qualified as MS
 import Data.Maybe (fromMaybe, catMaybes)
 import Data.Maybe qualified as Maybe
@@ -19,9 +15,6 @@ import Data.Set (Set)
 import Data.Set qualified as S
 import Data.Text (Text)
 import Data.Text qualified as T
-import Data.Text.Read as TR
-import Data.Vector (Vector)
-import Data.Vector qualified as V
 import Data.Vector.NonEmpty (NonEmptyVector)
 import Data.Vector.NonEmpty qualified as NEV
 import GHC.Generics (Generic)
@@ -121,7 +114,8 @@ mergeEntry a b = do
     , e_音義 = f_音義
     }
 
-variantToTex label [] pre = Nothing
+variantToTex :: Text -> [ShapeVariant] -> Text -> Maybe Text
+variantToTex _ [] _ = Nothing
 variantToTex label shapes pre = Just $ mconcat
     [ label
     , "作"

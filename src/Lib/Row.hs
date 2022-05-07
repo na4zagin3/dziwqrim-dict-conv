@@ -4,12 +4,9 @@
 module Lib.Row where
 
 import Control.Arrow (left)
-import Data.ByteString.Lazy qualified as BL
-import Data.Csv qualified as Csv
 import Data.Map (Map)
 import Data.Map qualified as M
 import Data.Maybe (catMaybes)
-import Data.Vector (Vector)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Read as TR
@@ -112,16 +109,16 @@ p_r_四角 t = do
 -- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([(\"1000\",\"0\"),(\"1010\",\"0\")])"
 
 p_r_shapeVariant :: Text -> Text -> Either String [ShapeVariant]
-p_r_shapeVariant c s = do
-  s <- fmap catMaybes . mapM p_r_四角 $ T.split (`T.elem` "/|") s
-  case (c, s) of
+p_r_shapeVariant cs ssRaw = do
+  ss <- fmap catMaybes . mapM p_r_四角 $ T.split (`T.elem` "/|") ssRaw
+  case (cs, ss) of
     ("", []) -> Right $ []
     (_, []) -> Left "missing 四角"
     ("", _) -> Left "missing 字 for 四角"
-    (c, ss) ->
-      if T.length c == length ss
-        then Right $ map f $ zip (T.unpack c) ss
-        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" c (show s)
+    (_, _) ->
+      if T.length cs == length ss
+        then Right $ map f $ zip (T.unpack cs) ss
+        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" cs (show ss)
         where
           f (c, s) = ShapeVariant
             { s_字 = T.singleton c
@@ -179,8 +176,8 @@ p_r_parts ki kp psRaw = do
     then Right ()
     else Left $ printf "trailing garbage: %s" r
   let (f_variant, ps) = case psRaw of
-        ("0", "⌥"):ps -> (True, ps)
-        ps -> (False, ps)
+        ("0", "⌥"):psT -> (True, psT)
+        psT -> (False, psT)
   f_parts <- mapM (uncurry p_r_part) $ filter (/= ("0", "0")) ps
   return $ Parts
     { p_諧符部 = T.take 1 kp
