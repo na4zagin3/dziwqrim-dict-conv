@@ -205,16 +205,17 @@ entryToTex e = mconcat
       s <- e_義 sp
       return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> s
 
-unfoldTreeToTex :: (Ord a) => PathTree a Text -> Text
-unfoldTreeToTex t = fromMaybe "" (PT.root t) <> childrenStr
+unfoldTreeToTex :: (Ord a) => Bool -> PathTree a Text -> Text
+unfoldTreeToTex isRoot t = fromMaybe "" (PT.root t) <> brackettedChildrenStr
   where
     children = M.toList $ PT.children t
-    childrenStr = if null children
-      then ""
-      else "（" <> mconcat (map (unfoldTreeToTex . snd) $ children) <> "）"
+    childrenStr = mconcat (map (unfoldTreeToTex False . snd) $ children)
+    brackettedChildrenStr = if null children || isRoot
+      then childrenStr
+      else "（" <> childrenStr <> "）"
 
 entriesToHeadingsTex :: (Ord a) => PathTree a [Entry] -> Text
-entriesToHeadingsTex pt = unfoldTreeToTex $ fmap renderEntries pt
+entriesToHeadingsTex pt = unfoldTreeToTex True $ fmap renderEntries pt
   where
     renderEntries es = T.concat $ map renderEntry es
     renderEntry e = "\\refEntry{" <> e_字 e <> "}"
