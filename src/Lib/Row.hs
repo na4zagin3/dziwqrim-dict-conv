@@ -40,9 +40,8 @@ data Shape部畫 = Shape部畫
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Part = Part
-  { p_玉篇部首位 :: !Text
+  { p_玉篇部首位 :: !(Int, Int)
   , p_部外 :: !Text
-  , p_諧符 :: !Text
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -103,13 +102,13 @@ p_r_四角 t = do
 --
 -- Examples
 --
--- >>> p_r_shape "中" "50006"
+-- >>> p_r_shapeVariant "中" "50006"
 -- Right [ShapeVariant {s_字 = "\20013", s_四角 = ("5000","6"), s_comment = ""}]
--- >>> p_r_shape "吶㕯" "64027/40227"
+-- >>> p_r_shapeVariant "吶㕯" "64027/40227"
 -- Right [ShapeVariant {s_字 = "\21558", s_四角 = ("6402","7"), s_comment = ""},ShapeVariant {s_字 = "\13679", s_四角 = ("4022","7"), s_comment = ""}]
--- >>> p_r_shape "皐臯" "26409|26409"
+-- >>> p_r_shapeVariant "皐臯" "26409|26409"
 -- Right [ShapeVariant {s_字 = "\30352", s_四角 = ("2640","9"), s_comment = ""},ShapeVariant {s_字 = "\33263", s_四角 = ("2640","9"), s_comment = ""}]
--- >>> p_r_shape "一二三" "10000|10100"
+-- >>> p_r_shapeVariant "一二三" "10000|10100"
 -- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([(\"1000\",\"0\"),(\"1010\",\"0\")])"
 
 p_r_shapeVariant :: Text -> Text -> Either String [ShapeVariant]
@@ -142,6 +141,37 @@ p_r_部畫 p s = do
     , s_畫 = sn
     }
 
+p_r_part :: Text -> Text -> Either String Part
+p_r_part pIRaw pE = do
+  (n, r) <- TR.decimal pIRaw :: Either String (Int, Text)
+  pI <- case r of
+    "" -> Right (n, 0)
+    ".999" -> Right (n, 1)
+    _ -> Left $ printf "trailing garbage: %s" r
+  Right $ Part
+    { p_玉篇部首位 = pI
+    , p_部外 = pE
+    }
+
+-- | Parse parts info
+--
+-- Examples
+--
+-- >>> p_r_parts "26" "充" []
+-- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = []})
+--
+-- >>> p_r_parts "26" "充" [("0", "0")]
+-- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = []})
+--
+-- >>> p_r_parts "26" "充" [("0", "⌥")]
+-- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = True, p_parts = []})
+--
+-- >>> p_r_parts "26" "充" [("269", "金")]
+-- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = [Part {p_玉篇部首位 = (269,0), p_部外 = "\37329"}]})
+--
+-- >>> p_r_parts "32" "竹筑" [("73.999", "巩")]
+-- Right (Parts {p_諧符部 = "\31481", p_諧符位 = 32, p_variant = False, p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}]})
+
 p_r_parts :: Text -> Text -> [(Text, Text)] -> Either String Parts
 p_r_parts ki kp psRaw = do
   (kin, r) <- TR.decimal ki :: Either String (Int, Text)
@@ -149,14 +179,14 @@ p_r_parts ki kp psRaw = do
     then Right ()
     else Left $ printf "trailing garbage: %s" r
   let (f_variant, ps) = case psRaw of
-        [] -> (False, [])
         ("0", "⌥"):ps -> (True, ps)
         ps -> (False, ps)
+  f_parts <- mapM (uncurry p_r_part) $ filter (/= ("0", "0")) ps
   return $ Parts
-    { p_諧符部 = kp
+    { p_諧符部 = T.take 1 kp
     , p_諧符位 = kin
     , p_variant = f_variant
-    , p_parts = [] -- TODO
+    , p_parts = f_parts
     }
 
 p_r_隋音 :: Text -> Either String Text

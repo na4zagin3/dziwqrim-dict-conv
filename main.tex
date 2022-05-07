@@ -12,8 +12,8 @@
 
 \usepackage[marginpar=2cm]{geometry}
 
-\setmainfont{TeXGyreTermes}
-\setsansfont{TeXGyreHeros}
+\setmainfont{Junicode}
+\setsansfont{Noto Sans}
 
 \setmainjfont{Noto Serif CJK SC}
 \setsansjfont{Noto Sans CJK SC}
@@ -33,6 +33,12 @@
     \newjfontfamily\fontSansHans{Noto Sans CJK SC}[]%
     #1%
   }}
+
+% When the current style is m,
+% attempting to change to bx,
+% use bx if availabke,
+% otherwise use b.
+\DeclareFontShapeChangeRule{m}{bx}{bx}{b}
 
 \newlength{\EntryDescriptionLineLength}
 \newlength{\EntryDescriptionLineHeight}
@@ -86,6 +92,9 @@
 \newcommand{\SenseItem}[1]{\item[\{\textbf{\zyepheng{#1}}\}:]}
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
+
+\newcommand{\SoundPart}[2]{+ {\ltjsetparameter{jacharrange={-9}}#1}#2}
+\newcommand{\SoundPartN}[1]{+ {\ltjsetparameter{jacharrange={-9}}#1}}
 
 \newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
 \newcommand{\refEntry}[1]{\hyperref[entry-#1]{#1}}

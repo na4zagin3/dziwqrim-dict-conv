@@ -153,6 +153,26 @@ shape部畫ToTex s = mconcat
   , "畫）"
   ]
 
+soundPartToTex :: Part -> Text
+soundPartToTex Part{ p_玉篇部首位 = (i, p), p_部外 = e} = T.pack $ printf "\\SoundPart{%d%s}{%s}" i (primes p) e
+  where
+    primes :: Int -> String
+    primes 0 = ""
+    primes 1 = "′"
+    primes 2 = "″"
+    primes 3 = "‴"
+    primes 4 = "⁗"
+    primes n = error $ "Unsupported number of primes: " <> show n
+
+soundPartsToTex :: Parts -> Text
+soundPartsToTex sps = case sps of
+    Parts{ p_variant = False, p_parts = [] } -> "\\SoundPartN{0}"
+    Parts{ p_variant = True, p_parts = [] } -> "\\SoundPartN{0′}"
+    Parts{ p_variant = False, p_parts = ps } -> texSoundParts ps
+    Parts{ p_variant = True, p_parts = ps } -> "\\SoundPartN{0′} " <> texSoundParts ps
+  where
+    texSoundParts ps = T.intercalate " " $ map soundPartToTex ps
+
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
@@ -161,7 +181,7 @@ entryToTex e = mconcat
     , "}"
     , "\n\n"
     , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
-    -- , "  + 0（夊部0畫）\n"
+    , soundPartsToTex $ e_parts e
     , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
