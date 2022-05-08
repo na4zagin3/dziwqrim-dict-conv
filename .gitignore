@@ -9,6 +9,9 @@
 *.log
 *.out
 *.pdf
+*.idx
+*.ilg
+*.ind
 
 # Emacs LaTeX mode
 auto/
