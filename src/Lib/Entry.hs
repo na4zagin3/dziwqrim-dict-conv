@@ -143,14 +143,17 @@ shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
     [ renderSikrokToTex . s_四角 . s_親 $ s
     , "\\quad "
-    , T.intercalate "，又" variantDescs
+    , T.intercalate "，又" $ variantDescs <> maybeToList variantDescsPost
     ]
   where
-    variantDescs = Maybe.catMaybes $ map (\(l, c, p) -> variantToTex l c p)
-      [ ("選\\footnote{what is 選?}", s_選 s, "")
-      , ("簡", s_簡 s, "\\textHans") -- TODO Special case where Simplified and Japanese shapes are identical
-      , ("日", s_日 s, "\\textJapn")
-      , ("或", s_异 s, "") -- TODO
+    variantDescs = Maybe.catMaybes $ map (\(l, c, p) -> variantToTex l c p) $
+      [ ("選\\footnote{what is 選?}", s_選 s, "") ]
+      <> variantSimpJapn (s_簡 s) (s_日 s)
+    variantDescsPost = variantToTex (if null variantDescs then "又" else "") (s_异 s) ""
+    variantSimpJapn [simp] [japn] | simp == japn = [("簡・日", [simp], "\\textHans")]
+    variantSimpJapn simp japn =
+      [ ("簡", simp, "\\textHans")
+      , ("日", japn, "\\textJapn")
       ]
 
 shape部畫ToTex :: Shape部畫 -> Text
