@@ -344,9 +344,11 @@ entryToTex e = mconcat
     , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
     , "  "
     , T.intercalate "%\n  " $ generateIndicesTex e
+    , "%\n"
     , "  "
     , soundPartsToTex True $ e_parts e
     , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
+    , "\n"
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
     , "  \\begin{Sound}\n"
