@@ -13,6 +13,7 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Read as TR
 import GHC.Generics (Generic)
+import Lib.Rhymes (list_平水)
 import Text.Printf (printf)
 
 
@@ -77,7 +78,10 @@ data Pronunciation漢辭海 = Pronunciation漢辭海
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Pronunciation辭源韵 = Pronunciation辭源韵
-  { pr_辭源韵_韵 :: !Text
+  { pr_辭源韵_調 :: !Text
+  , pr_辭源韵_韵目 :: !Text
+  , pr_辭源韵_韵字 :: !Text
+  , pr_辭源韵_用例 :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -297,11 +301,27 @@ p_r_漢辭海 c v t = Right . Just $ Pronunciation漢辭海
   , pr_漢辭海_調 = t
   }
 
+maybeToEither :: a -> Maybe b -> Either a b
+maybeToEither x Nothing = Left x
+maybeToEither _ (Just x) = Right x
+
 p_r_辭源韵 :: Text -> Either String (Maybe Pronunciation辭源韵)
 p_r_辭源韵 "" = Right Nothing
-p_r_辭源韵 i = Right . Just $ Pronunciation辭源韵
-  { pr_辭源韵_韵 = i
-  }
+p_r_辭源韵 i = do
+  let (imRaw, com) = T.breakOn "：" i
+  (f_調, f_韵目, f_韵字) <- maybeToEither ("Unknown 平水韻韻目: " <> T.unpack imRaw) $ M.lookup imRaw list_平水
+  let parseCom "" = Just Nothing
+      parseCom c = do
+        c' <- T.stripPrefix "：“" c
+        c'' <- T.stripSuffix "”" c'
+        return $ Just c''
+  com' <- maybeToEither ("Ill-formatted comment at 辭源韵: " <> T.unpack com) $ parseCom com
+  Right . Just $ Pronunciation辭源韵
+    { pr_辭源韵_調 = f_調
+    , pr_辭源韵_韵目 = f_韵目
+    , pr_辭源韵_韵字 = f_韵字
+    , pr_辭源韵_用例 = com'
+    }
 
 p_r_義 :: Text -> Either String (Maybe Text)
 p_r_義 "" = Right Nothing

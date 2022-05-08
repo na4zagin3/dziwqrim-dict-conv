@@ -225,6 +225,16 @@ pronunciation漢辭海ToTex Pronunciation漢辭海
   , pr_漢辭海_調 = t
   } = c <> v <> t
 
+pronunciation辭源韵ToTex :: Pronunciation辭源韵 -> Text
+pronunciation辭源韵ToTex Pronunciation辭源韵
+  { pr_辭源韵_韵字 = v
+  , pr_辭源韵_用例 = Just com
+  } = v <> "（" <> com <> "）"
+pronunciation辭源韵ToTex Pronunciation辭源韵
+  { pr_辭源韵_韵字 = v
+  , pr_辭源韵_用例 = Nothing
+  } = v
+
 pronunciation反切集ToTex :: Pronunciation反切集 -> [Text]
 pronunciation反切集ToTex Pronunciation反切集
   { pr_切韵反切 = pC
@@ -239,8 +249,8 @@ pronunciationToTex Pronunciation
   -- ,
     pr_反切集 = pc
   , pr_漢辭海 = h
-  -- , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
-  } = T.intercalate "，" $ pronunciation反切集ToTex pc <> (maybeToList $ fmap pronunciation漢辭海ToTex h)
+  , pr_辭源韵 = i
+  } = T.intercalate "，" $ pronunciation反切集ToTex pc <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList $ fmap pronunciation辭源韵ToTex i)
 
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
