@@ -8,6 +8,8 @@ import Data.Either (partitionEithers)
 import Data.Foldable qualified as Foldable
 import Data.Function (on)
 import Data.List qualified as L
+import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty qualified as NEL
 import Data.Map qualified as M
 import Data.Map.Strict qualified as MS
 import Data.Maybe (fromMaybe, catMaybes, fromMaybe)
@@ -27,6 +29,7 @@ import Lib.PathTree qualified as PT
 
 data Entry音義 = Entry音義
   { e_隋音 :: !Text
+  , e_pronunciation :: !Pronunciation
   , e_義 :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -95,6 +98,7 @@ entriesFromRows rs = (errors, L.sortBy (compare `on` e_position) groupedEntries)
                      , e_parts = r_parts r
                      , e_音義 = [Entry音義
                                  { e_隋音 = r_隋音 r
+                                 , e_pronunciation = r_pronunciation r
                                  , e_義 = r_義 r
                                  }]
                      }
@@ -176,6 +180,61 @@ soundPartsToTex sps = case sps of
   where
     texSoundParts ps = T.intercalate " " $ map soundPartToTex ps
 
+booksToTex :: NonEmpty Text -> Text
+booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
+
+
+-- | Parse a 反切 as TeX
+--
+-- Examples
+--
+-- >>> pronunciation反切ToTex (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
+-- "\\Book{\21453\20999}\12394\12375"
+
+pronunciation反切ToTex :: Pronunciation反切 -> Maybe Text
+pronunciation反切ToTex Pronunciation反切
+  { pr_反切 = Nothing
+  , pr_反切_suffix = _
+  , pr_反切_comment = Nothing
+  , pr_反切_books = _
+  } = Nothing
+pronunciation反切ToTex Pronunciation反切
+  { pr_反切 = Nothing
+  , pr_反切_suffix = _
+  , pr_反切_comment = Just com
+  , pr_反切_books = bs
+  } = Just $ booksToTex bs <> com
+pronunciation反切ToTex Pronunciation反切
+  { pr_反切 = Just pc
+  , pr_反切_suffix = suf
+  , pr_反切_comment = Nothing
+  , pr_反切_books = bs
+  } = Just $ booksToTex bs <> pc <> suf
+
+pronunciation反切ToTex Pronunciation反切
+  { pr_反切 = Just pc
+  , pr_反切_suffix = suf
+  , pr_反切_comment = Just com
+  , pr_反切_books = bs
+  } = Just $ booksToTex bs <> pc <> suf <> "（" <> com <> "）"
+
+pronunciation反切集ToTex :: Pronunciation反切集 -> [Text]
+pronunciation反切集ToTex Pronunciation反切集
+  { pr_切韵反切 = pC
+  , pr_王韵反切 = pU
+  , pr_廣韵反切 = pK
+  , pr_集韵反切 = pDz
+  } = catMaybes $ map (>>= pronunciation反切ToTex) [pC, pU, pK, pDz]
+
+pronunciationToTex :: Pronunciation -> Text
+pronunciationToTex Pronunciation
+  { -- pr_韵部 :: !Text
+  -- ,
+    pr_反切集 = pc
+  -- , pr_漢辭海 :: !(Maybe Pronunciation漢辭海)
+  -- , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
+  } = T.intercalate "，" $ pronunciation反切集ToTex pc
+
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
@@ -199,7 +258,7 @@ entryToTex e = mconcat
     , "\\end{Entry}\n"
     ]
   where
-    tex音Items = map (\sp -> "\\SoundItem{" <> e_隋音 sp <> "}") $ e_音義 e
+    tex音Items = map (\sp -> "\\SoundItem{" <> e_隋音 sp <> "}" <> (pronunciationToTex $ e_pronunciation sp)) $ e_音義 e
     tex義Items = catMaybes . map render義Item $ e_音義 e
     render義Item sp = do
       s <- e_義 sp

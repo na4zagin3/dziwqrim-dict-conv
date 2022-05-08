@@ -4,14 +4,16 @@
 module Lib.Row where
 
 import Control.Arrow (left)
+import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty qualified as NEL
 import Data.Map (Map)
 import Data.Map qualified as M
 import Data.Maybe (catMaybes)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Read as TR
-import Text.Printf (printf)
 import GHC.Generics (Generic)
+import Text.Printf (printf)
 
 
 data ShapeVariant = ShapeVariant
@@ -50,6 +52,44 @@ data Parts = Parts
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data Pronunciation反切 = Pronunciation反切
+  { pr_反切 :: !(Maybe Text)
+  , pr_反切_suffix :: !Text
+  , pr_反切_comment :: !(Maybe Text)
+  , pr_反切_books :: !(NonEmpty Text)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Pronunciation反切集 = Pronunciation反切集
+  { pr_切韵反切 :: !(Maybe Pronunciation反切)
+  , pr_王韵反切 :: !(Maybe Pronunciation反切)
+  , pr_廣韵反切 :: !(Maybe Pronunciation反切)
+  , pr_集韵反切 :: !(Maybe Pronunciation反切)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+-- TODO make stricter
+data Pronunciation漢辭海 = Pronunciation漢辭海
+  { pr_漢辭海_聲 :: !Text
+  , pr_漢辭海_韵 :: !Text
+  , pr_漢辭海_調 :: !Text
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Pronunciation辭源韵 = Pronunciation辭源韵
+  { pr_辭源韵_韵 :: !Text
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
+data Pronunciation = Pronunciation
+  { -- pr_韵部 :: !Text
+  -- ,
+    pr_反切集 :: !(Pronunciation反切集)
+  , pr_漢辭海 :: !(Maybe Pronunciation漢辭海)
+  , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Position = Position
   { pos_row :: !Int
   }
@@ -63,6 +103,7 @@ data Row = Row
   , r_parts :: !Parts
   , r_隋音 :: !Text
   , r_義 :: !(Maybe Text)
+  , r_pronunciation :: !Pronunciation
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -190,6 +231,78 @@ p_r_隋音 :: Text -> Either String Text
 p_r_隋音 "" = Left "Missing 隋音"
 p_r_隋音 t = Right t
 
+p_r_反切本 :: Text -> Either String (NonEmpty Text)
+p_r_反切本 "藤田本" = Right $ NEL.singleton "藤田????"
+p_r_反切本 pCBooksRaw = do
+  let f b | T.take 1 b `elem` ["①", "②", "③"] = Right $ T.drop 1 b
+          | otherwise = Left $ "Unknown book format: " <> T.unpack b
+  books <- mapM f $ T.split (== '、') pCBooksRaw
+  return $ NEL.fromList books
+
+-- | Parse a 反切
+--
+-- Examples
+-- >> p_r_反切 "反" (NEL.singleton "切韻") "なし"
+-- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = "\21453\20999" :| []})
+-- >> p_r_反切 "反" (NEL.singleton "切韻") "（）"
+-- >> p_r_反切 "反" (NEL.singleton "切韻") "（コメント）"
+-- >> p_r_反切 "反" (NEL.singleton "切韻") "而鋭（コメント）"
+p_r_反切 :: Text -> NonEmpty Text -> Text -> Either String (Maybe Pronunciation反切)
+p_r_反切 _ _ "" = Right Nothing
+p_r_反切 suf books "なし" = Right . Just $ Pronunciation反切
+    { pr_反切 = Nothing
+    , pr_反切_suffix = suf
+    , pr_反切_comment = Nothing
+    , pr_反切_books = books
+    }
+p_r_反切 suf books pc | T.take 1 pc == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
+    { pr_反切 = Nothing
+    , pr_反切_suffix = suf
+    , pr_反切_comment = Just . T.drop 1 . T.dropEnd 1 $ pc
+    , pr_反切_books = books
+    }
+p_r_反切 suf books pc | T.length pc == 2 = Right . Just $ Pronunciation反切
+    { pr_反切 = Just pc
+    , pr_反切_suffix = suf
+    , pr_反切_comment = Nothing
+    , pr_反切_books = books
+    }
+p_r_反切 suf books pc | T.take 1 (T.drop 2 pc) == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
+    { pr_反切 = Nothing
+    , pr_反切_suffix = suf
+    , pr_反切_comment = Just . T.drop 3 . T.dropEnd 1 $ pc
+    , pr_反切_books = books
+    }
+p_r_反切 _ _ pc = Left $ "Unknown 反切 format: " <> T.unpack pc
+
+p_r_反切集 :: Text -> Text -> Text -> Text -> Text -> Either String Pronunciation反切集
+p_r_反切集 pC pCBooksRaw pU pK pDz = do
+  pCBooks <- p_r_反切本 pCBooksRaw
+  f_pr_切韵反切 <- p_r_反切 "反" pCBooks pC
+  f_pr_王韵反切 <- p_r_反切 "反" (NEL.singleton "王韵") pU
+  f_pr_廣韵反切 <- p_r_反切 "切" (NEL.singleton "廣韵") pK
+  f_pr_集韵反切 <- p_r_反切 "切" (NEL.singleton "集韵") pDz
+  Right $ Pronunciation反切集
+    { pr_切韵反切 = f_pr_切韵反切
+    , pr_王韵反切 = f_pr_王韵反切
+    , pr_廣韵反切 = f_pr_廣韵反切
+    , pr_集韵反切 = f_pr_集韵反切
+    }
+
+p_r_漢辭海 :: Text -> Text -> Text -> Either String (Maybe Pronunciation漢辭海)
+p_r_漢辭海 "n" "n" "n" = Right Nothing
+p_r_漢辭海 c v t = Right . Just $ Pronunciation漢辭海
+  { pr_漢辭海_聲 = c
+  , pr_漢辭海_韵 = v
+  , pr_漢辭海_調 = t
+  }
+
+p_r_辭源韵 :: Text -> Either String (Maybe Pronunciation辭源韵)
+p_r_辭源韵 "" = Right Nothing
+p_r_辭源韵 i = Right . Just $ Pronunciation辭源韵
+  { pr_辭源韵_韵 = i
+  }
+
 p_r_義 :: Text -> Either String (Maybe Text)
 p_r_義 "" = Right Nothing
 p_r_義 t = Right $ Just t
@@ -226,6 +339,16 @@ parseRow row m = do
              , (m M.! "玉篇部首位3", m M.! "部外3")
              ]
 
+
+  f_r_漢辭海 <- p_r_漢辭海 (m M.! "漢辭海聲") (m M.! "漢辭海韵") (m M.! "漢辭海調")
+  f_r_辭源韵 <- p_r_辭源韵 (m M.! "辭源韵")
+  f_r_反切集 <- p_r_反切集 (m M.! "切韵反切") (m M.! "切韵本") (m M.! "王韵反切") (m M.! "廣韵反切") (m M.! "集韵反切")
+  let f_pronunciation = Pronunciation
+        { pr_漢辭海 = f_r_漢辭海
+        , pr_辭源韵 = f_r_辭源韵
+        , pr_反切集 = f_r_反切集
+        }
+  -- { pr_韵部 :: !Text
   return $ Row
     { r_position = Position { pos_row = row }
     , r_字 = f_字
@@ -234,4 +357,5 @@ parseRow row m = do
     , r_隋音 = f_隋音
     , r_義 = f_義
     , r_parts = f_parts
+    , r_pronunciation = f_pronunciation
     }
