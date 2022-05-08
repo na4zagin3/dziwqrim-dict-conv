@@ -138,7 +138,7 @@ variantToTex label shapes pre = Just $ mconcat
 
 shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
-    [ "  ", renderSikrok . s_四角 . s_親 $ s
+    [ renderSikrok . s_四角 . s_親 $ s
     , "\\quad "
     , T.intercalate "，又" variantDescs
     ]
@@ -260,18 +260,19 @@ entryToTex e = mconcat
     , "}"
     , "\n\n"
     , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
+    , "  "
     , soundPartsToTex $ e_parts e
     , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
     , "  \\begin{Sound}\n"
-    , T.intercalate "\n" tex音Items
+    , "    "
+    , T.intercalate "\n    " tex音Items
     , "\n"
-    -- , "    \\SoundItem{toŋ}《P3798》都宗反，端冬平，上平聲二冬\n"
     , "  \\end{Sound}\n"
     , if null tex義Items
       then ""
-      else "\\begin{Sense}\n" <> T.intercalate "\n" tex義Items <> "\n\\end{Sense}"
+      else "\\begin{Sense}\n    " <> T.intercalate "\n    " tex義Items <> "\n\\end{Sense}"
     , "\\end{Entry}\n"
     ]
   where
