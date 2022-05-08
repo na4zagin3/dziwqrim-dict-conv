@@ -4,11 +4,19 @@
 
 \usepackage{luatexja}
 \usepackage{luatexja-fontspec}
+\usepackage{luatexja-ruby}
 
 \usepackage{calc}
 \usepackage{qrcode}
 \usepackage{enumitem}
 \usepackage{titlesec}
+\usepackage{imakeidx}
+
+\indexsetup{level=\section,toclevel=section}
+\makeindex[name=radical,title={部首索引},options={-L}]
+\makeindex[name=sikrok,title={四角号碼索引},options={-L}]
+\makeindex[name=phonetic,title={諧符索引},options={-L}]
+\makeindex[name=zyevio,title={中古音索引},options={-L}]
 
 \usepackage[marginpar=2cm]{geometry}
 
@@ -95,6 +103,7 @@
 
 \newcommand{\SoundPart}[2]{+ {\ltjsetparameter{jacharrange={-9}}#1}#2}
 \newcommand{\SoundPartN}[1]{+ {\ltjsetparameter{jacharrange={-9}}#1}}
+\newcommand{\SoundPartNI}[1]{+{\ltjsetparameter{jacharrange={-9}}#1}}
 
 \newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
 \newcommand{\refEntry}[1]{\hyperref[entry-#1]{#1}}
@@ -105,6 +114,32 @@
 
 \begin{document}
 \part{Examples}
+やること
+\begin{itemize}
+\item{} 諧符見出し
+  \begin{itemize}
+  \item{} 読みの付加
+  \end{itemize}
+\item{} 異体字情報
+  \begin{itemize}
+  \item{} 簡・日重複の扱い
+  \item{} 「或作」が最初に来ない場合の扱い
+  \end{itemize}
+\item{} 反切
+  \begin{itemize}
+  \item{} 重複の除去
+  \item{} コメントが文献情報で始まる場合の扱い。例《王韻》欄「《王三》不明,《王一》無本」
+  \item{} 項目見出しを行内に入れる
+  \item{} 項目間空白の削減
+  \end{itemize}
+\item{} 義
+  \begin{itemize}
+  \item{} 文献\kenten{以外}のラテン文字を隋拼扱い
+  \item{} 項目見出しを行内に入れる
+  \item{} 項目間空白の削減
+  \end{itemize}
+\end{itemize}
+
 \PartHeader{冬符 toŋ}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
 
 \begin{Entry}{冬}{冬}
@@ -117,6 +152,10 @@
 \end{Entry}
 
 \begin{Entry}{佟}{佟}
+  \index[radical]{人部!5畫!佟}%
+  \index[sikrok]{2723.3@\Sikrok{2723}{3}!佟}%
+  \index[phonetic]{冬+23}%
+  \index[zyevio]{doŋ!佟}%
   + 23人（人部5畫）
   \\
   \Sikrok{2723}{3}
@@ -127,7 +166,13 @@
 
 \PartHeader{中符 tuŋ}{\refEntry{中}仲忠}
 
-\begin{Entry}{中}{\%E5\%86\%AC}
+\begin{Entry}{中}{\%E5\%86\%AC}%
+  \index[radical]{丨部!3畫!中}%
+  \index[sikrok]{5000.6@\Sikrok{5000}{6}}%
+  \index[phonetic]{中+0}%
+  \index[zyevio]{tryuŋ!中}%
+  \index[zyevio]{tryûŋ!中}%
+  \index[zyevio]{dryûŋ!中}%
   + 0（丨部3畫）
   \\
   \Sikrok{5000}{6}
@@ -142,6 +187,28 @@
   \end{Sense}
 \end{Entry}
 
+\clearpage{}
 \part{Generated}
 \input{test-data.tex}
+\part{Indices}
+やること
+\begin{itemize}
+\item{} 正しい照合順序を実装
+  \begin{itemize}
+  \item{} 見出し字
+  \item{} 部首
+  \item{} 諧符
+  \item{} 隋拼
+  \end{itemize}
+\item{} 見た目の調整
+  \begin{itemize}
+  \item{} 部見出し
+  \item{} 見出し字と頁数
+  \end{itemize}
+\end{itemize}
+
+\printindex[radical]
+\printindex[sikrok]
+\printindex[phonetic]
+\printindex[zyevio]
 \end{document}

@@ -136,14 +136,16 @@ variantToTex label shapes pre = Just $ mconcat
   where
     quoted = map (\x -> "“" <> pre <> "{" <> s_字 x <> "}”") shapes
 
+renderSikrokToTex :: (Text, Text) -> Text
+renderSikrokToTex (sm, ss) = "\\Sikrok{" <> sm <> "}{" <> ss <> "}"
+
 shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
-    [ renderSikrok . s_四角 . s_親 $ s
+    [ renderSikrokToTex . s_四角 . s_親 $ s
     , "\\quad "
     , T.intercalate "，又" variantDescs
     ]
   where
-    renderSikrok (sm, ss) = "\\Sikrok{" <> sm <> "}{" <> ss <> "}"
     variantDescs = Maybe.catMaybes $ map (\(l, c, p) -> variantToTex l c p)
       [ ("選\\footnote{what is 選?}", s_選 s, "")
       , ("簡", s_簡 s, "\\textHans") -- TODO Special case where Simplified and Japanese shapes are identical
@@ -160,8 +162,11 @@ shape部畫ToTex s = mconcat
   , "畫）"
   ]
 
-soundPartToTex :: Part -> Text
-soundPartToTex Part{ p_玉篇部首位 = (i, p), p_部外 = e} = T.pack $ printf "\\SoundPart{%d%s}{%s}" i (primes p) e
+soundPartToTex :: Bool -> Part -> Text
+soundPartToTex mainText Part{ p_玉篇部首位 = (i, p), p_部外 = e} =
+    if mainText
+    then T.pack $ printf "\\SoundPart{%d%s}{%s}" i (primes p) e
+    else T.pack $ printf "\\SoundPartNI{%d%s}" i (primes p)
   where
     primes :: Int -> String
     primes 0 = ""
@@ -171,14 +176,16 @@ soundPartToTex Part{ p_玉篇部首位 = (i, p), p_部外 = e} = T.pack $ printf
     primes 4 = "⁗"
     primes n = error $ "Unsupported number of primes: " <> show n
 
-soundPartsToTex :: Parts -> Text
-soundPartsToTex sps = case sps of
-    Parts{ p_variant = False, p_parts = [] } -> "\\SoundPartN{0}"
-    Parts{ p_variant = True, p_parts = [] } -> "\\SoundPartN{0′}"
+soundPartsToTex :: Bool -> Parts -> Text
+soundPartsToTex mainText sps = case sps of
+    Parts{ p_variant = False, p_parts = [] } -> command <> "{0}"
+    Parts{ p_variant = True, p_parts = [] } -> command <> "{0′}"
     Parts{ p_variant = False, p_parts = ps } -> texSoundParts ps
-    Parts{ p_variant = True, p_parts = ps } -> "\\SoundPartN{0′} " <> texSoundParts ps
+    Parts{ p_variant = True, p_parts = ps } -> command <> "{0′} " <> texSoundParts ps
   where
-    texSoundParts ps = T.intercalate " " $ map soundPartToTex ps
+    texSoundParts ps = concatParts $ map (soundPartToTex mainText) ps
+    concatParts = if mainText then T.intercalate " " else T.concat
+    command = if mainText then "\\SoundPartN" else "\\SoundPartNI"
 
 booksToTex :: NonEmpty Text -> Text
 booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
@@ -252,6 +259,78 @@ pronunciationToTex Pronunciation
   , pr_辭源韵 = i
   } = T.intercalate "，" $ pronunciation反切集ToTex pc <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList $ fmap pronunciation辭源韵ToTex i)
 
+indexTex :: Text -> [Text] -> Text
+indexTex name inds = "\\index[" <> name <> "]{" <> T.intercalate "!" inds <> "}"
+
+numberKey :: Int -> Text
+numberKey i = T.pack $ printf "%08d" i
+
+generateRadicalIndicesTex :: Entry -> [Text]
+generateRadicalIndicesTex e = [indexMaybeRadical $ e_部畫 e]
+  where
+    indexRadical Shape部畫{ s_部 = r, s_畫 = s}= indexTex "radical"
+      [ r <> "部"
+      , numberKey s <> "@" <> (T.pack $ show s) <> "畫"
+      , e_字 e
+      ]
+    indexMaybeRadical Nothing = indexTex "radical" [ "不明", e_字 e ]
+    indexMaybeRadical (Just r) = indexRadical r
+
+generateSikrokIndicesTex :: Entry -> [Text]
+generateSikrokIndicesTex e = concat
+  [ [ indexSikrok svParent ]
+  , map (indexSikrokVariant svParent) $ s_選 sv
+  , map (indexSikrokVariant svParent) $ s_簡 sv
+  , map (indexSikrokVariant svParent) $ s_日 sv
+  , map (indexSikrokVariant svParent) $ s_异 sv
+  ]
+  where
+    indexSikrok ShapeVariant{s_字 = z, s_四角 = sk@(skM, skS)} = indexTex "sikrok"
+      [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
+      , z
+      ]
+    sv = e_shapeVariants $ e
+    svParent = s_親 sv
+    indexSikrokVariant ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sk@(skM, skS)} = indexTex "sikrok"
+      [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
+      , z <> "（" <> zp <> "）"
+      ]
+
+generatePhoneticIndicesTex :: Entry -> [Text]
+generatePhoneticIndicesTex e = [indexPhonetic]
+  where
+    indexPhonetic = indexTex "phonetic"
+      [ keyStr <> "@" <> word
+      , z
+      ]
+    pps = e_parts $ e
+    keyPart Part{ p_玉篇部首位 = (i, p) } = [i, p]
+    keys = [p_諧符位 pps] <> concatMap keyPart (p_parts pps) <> [if p_variant pps then 1 else 0]
+    keyStr = T.intercalate " " . map numberKey $ keys
+    word = p_諧符部 pps <> soundPartsToTex False pps
+    z = s_字 svParent
+    svParent = s_親 sv
+    sv = e_shapeVariants $ e
+
+generateZyevioIndicesTex :: Entry -> [Text]
+generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
+  where
+    indexZyevio Entry音義{e_隋音 = p} = indexTex "zyevio"
+      [ p
+      , z
+      ]
+    z = s_字 svParent
+    svParent = s_親 sv
+    sv = e_shapeVariants $ e
+
+generateIndicesTex :: Entry -> [Text]
+generateIndicesTex e = concat
+  [ generateRadicalIndicesTex e
+  , generateSikrokIndicesTex e
+  , generatePhoneticIndicesTex e
+  , generateZyevioIndicesTex e
+  ]
+
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
@@ -261,7 +340,9 @@ entryToTex e = mconcat
     , "\n\n"
     , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
     , "  "
-    , soundPartsToTex $ e_parts e
+    , T.intercalate "%\n  " $ generateIndicesTex e
+    , "  "
+    , soundPartsToTex True $ e_parts e
     , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
