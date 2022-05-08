@@ -12,7 +12,7 @@ import Data.List.NonEmpty (NonEmpty)
 import Data.List.NonEmpty qualified as NEL
 import Data.Map qualified as M
 import Data.Map.Strict qualified as MS
-import Data.Maybe (fromMaybe, catMaybes, fromMaybe)
+import Data.Maybe (fromMaybe, catMaybes, fromMaybe, maybeToList)
 import Data.Maybe qualified as Maybe
 import Data.Set (Set)
 import Data.Set qualified as S
@@ -218,6 +218,13 @@ pronunciation反切ToTex Pronunciation反切
   , pr_反切_books = bs
   } = Just $ booksToTex bs <> pc <> suf <> "（" <> com <> "）"
 
+pronunciation漢辭海ToTex :: Pronunciation漢辭海 -> Text
+pronunciation漢辭海ToTex Pronunciation漢辭海
+  { pr_漢辭海_聲 = c
+  , pr_漢辭海_韵 = v
+  , pr_漢辭海_調 = t
+  } = c <> v <> t
+
 pronunciation反切集ToTex :: Pronunciation反切集 -> [Text]
 pronunciation反切集ToTex Pronunciation反切集
   { pr_切韵反切 = pC
@@ -231,9 +238,9 @@ pronunciationToTex Pronunciation
   { -- pr_韵部 :: !Text
   -- ,
     pr_反切集 = pc
-  -- , pr_漢辭海 :: !(Maybe Pronunciation漢辭海)
+  , pr_漢辭海 = h
   -- , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
-  } = T.intercalate "，" $ pronunciation反切集ToTex pc
+  } = T.intercalate "，" $ pronunciation反切集ToTex pc <> (maybeToList $ fmap pronunciation漢辭海ToTex h)
 
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
