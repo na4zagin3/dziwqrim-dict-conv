@@ -259,7 +259,7 @@ p_r_反切本 pCBooksRaw = do
 -- Right (Just (Pronunciation反切 {pr_反切 = Just "\32780\37613", pr_反切_suffix = "\21453", pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_books = "\20999\38907" :| []}))
 --
 -- >>> p_r_反切 "反" (NEL.singleton "切韻") "〓〓（《王三》未收）"
--- Right (Just (Pronunciation反切 {pr_反切 = Just "\12307\12307", pr_反切_suffix = "\21453", pr_反切_comment = Just "《王三》未收", pr_反切_books = "\20999\38907" :| []}))
+-- Right (Just (Pronunciation反切 {pr_反切 = Just "\12307\12307", pr_反切_suffix = "\21453", pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_books = "\20999\38907" :| []}))
 --
 p_r_反切 :: Text -> NonEmpty Text -> Text -> Either String (Maybe Pronunciation反切)
 p_r_反切 _ _ "" = Right Nothing
