@@ -139,9 +139,12 @@ variantToTex label shapes pre = Just $ mconcat
 renderSikrokToTex :: (Text, Text) -> Text
 renderSikrokToTex (sm, ss) = "\\Sikrok{" <> sm <> "}{" <> ss <> "}"
 
+renderSikroksToTex :: NonEmpty (Text, Text) -> Text
+renderSikroksToTex sks = T.intercalate "又" $ map renderSikrokToTex $ NEL.toList sks
+
 shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
-    [ renderSikrokToTex . s_四角 . s_親 $ s
+    [ renderSikroksToTex . s_四角 . s_親 $ s
     , "\\quad "
     , T.intercalate "，又" $ variantDescs <> maybeToList variantDescsPost
     ]
@@ -281,20 +284,23 @@ generateRadicalIndicesTex e = [indexMaybeRadical $ e_部畫 e]
 
 generateSikrokIndicesTex :: Entry -> [Text]
 generateSikrokIndicesTex e = concat
-  [ [ indexSikrok svParent ]
-  , map (indexSikrokVariant svParent) $ s_選 sv
-  , map (indexSikrokVariant svParent) $ s_簡 sv
-  , map (indexSikrokVariant svParent) $ s_日 sv
-  , map (indexSikrokVariant svParent) $ s_异 sv
+  [ [ indexSikroks svParent ]
+  , map (indexSikrokVariants svParent) $ s_選 sv
+  , map (indexSikrokVariants svParent) $ s_簡 sv
+  , map (indexSikrokVariants svParent) $ s_日 sv
+  , map (indexSikrokVariants svParent) $ s_异 sv
   ]
   where
-    indexSikrok ShapeVariant{s_字 = z, s_四角 = sk@(skM, skS)} = indexTex "sikrok"
+    indexSikroks ShapeVariant{s_字 = z, s_四角 = sks} = mconcat . map (indexSikrok z) $ NEL.toList sks
+    indexSikrok z sk@(skM, skS) = indexTex "sikrok"
       [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
       , z
       ]
     sv = e_shapeVariants $ e
     svParent = s_親 sv
-    indexSikrokVariant ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sk@(skM, skS)} = indexTex "sikrok"
+    indexSikrokVariants ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sks} =
+      mconcat . map (indexSikrokVariant zp z) $ NEL.toList sks
+    indexSikrokVariant zp z sk@(skM, skS) = indexTex "sikrok"
       [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
       , z <> "（" <> zp <> "）"
       ]

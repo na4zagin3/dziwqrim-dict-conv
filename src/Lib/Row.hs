@@ -19,7 +19,7 @@ import Text.Printf (printf)
 
 data ShapeVariant = ShapeVariant
   { s_字 :: !Text
-  , s_四角 :: !(Text, Text)
+  , s_四角 :: !(NonEmpty (Text, Text))
   , s_comment :: !Text
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -120,7 +120,7 @@ p_r_字 t = Right t
 -- Examples
 --
 -- >>> p_r_四角 "50006"
--- Right (Just ("5000","6"))
+-- Right ("5000","6")
 --
 -- >>> p_r_四角 "50006/50006"
 -- Left "trailing garbage: /50006"
@@ -128,8 +128,7 @@ p_r_字 t = Right t
 -- >>> p_r_四角 "123456"
 -- Left "123456 is too large"
 
-p_r_四角 :: Text -> Either String (Maybe (Text, Text))
-p_r_四角 "" = Right Nothing
+p_r_四角 :: Text -> Either String (Text, Text)
 p_r_四角 t = do
   (n, r) <- TR.decimal t :: Either String (Int, Text)
   () <- if T.null r
@@ -138,36 +137,46 @@ p_r_四角 t = do
   let (dm, ds) = divMod n 10
   if dm > 9999
     then Left $ printf "%s is too large" t
-    else Right $ Just (T.pack $ printf "%04d" dm, T.pack $ printf "%01d" ds)
+    else Right (T.pack $ printf "%04d" dm, T.pack $ printf "%01d" ds)
 
 -- | Parse shape variant information
 --
 -- Examples
 --
+-- >>> p_r_shapeVariant "" ""
+-- Right []
 -- >>> p_r_shapeVariant "中" "50006"
--- Right [ShapeVariant {s_字 = "\20013", s_四角 = ("5000","6"), s_comment = ""}]
+-- Right [ShapeVariant {s_字 = "\20013", s_四角 = ("5000","6") :| [], s_comment = ""}]
 -- >>> p_r_shapeVariant "吶㕯" "64027/40227"
--- Right [ShapeVariant {s_字 = "\21558", s_四角 = ("6402","7"), s_comment = ""},ShapeVariant {s_字 = "\13679", s_四角 = ("4022","7"), s_comment = ""}]
--- >>> p_r_shapeVariant "皐臯" "26409|26409"
--- Right [ShapeVariant {s_字 = "\30352", s_四角 = ("2640","9"), s_comment = ""},ShapeVariant {s_字 = "\33263", s_四角 = ("2640","9"), s_comment = ""}]
+-- Right [ShapeVariant {s_字 = "\21558", s_四角 = ("6402","7") :| [], s_comment = ""},ShapeVariant {s_字 = "\13679", s_四角 = ("4022","7") :| [], s_comment = ""}]
+-- >>> p_r_shapeVariant "大" "40030|40800"
+-- Right [ShapeVariant {s_字 = "\22823", s_四角 = ("4003","0") :| [("4080","0")], s_comment = ""}]
+-- >>> p_r_shapeVariant "皐臯" "26409/26409"
+-- Right [ShapeVariant {s_字 = "\30352", s_四角 = ("2640","9") :| [], s_comment = ""},ShapeVariant {s_字 = "\33263", s_四角 = ("2640","9") :| [], s_comment = ""}]
+-- >>> p_r_shapeVariant "一二三" "10000/10100"
+-- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\")],[(\"1010\",\"0\")]])"
 -- >>> p_r_shapeVariant "一二三" "10000|10100"
--- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([(\"1000\",\"0\"),(\"1010\",\"0\")])"
+-- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\"),(\"1010\",\"0\")]])"
+
 
 p_r_shapeVariant :: Text -> Text -> Either String [ShapeVariant]
 p_r_shapeVariant cs ssRaw = do
-  ss <- fmap catMaybes . mapM p_r_四角 $ T.split (`T.elem` "/|") ssRaw
-  case (cs, ss) of
+  let p_sk "" = Right []
+      p_sk str = mapM p_r_四角 $ T.split (`T.elem` "|") str
+  sss <- mapM p_sk $ T.split (`T.elem` "/") ssRaw
+  case (cs, sss) of
     ("", []) -> Right $ []
+    ("", [[]]) -> Right $ []
     (_, []) -> Left "missing 四角"
     ("", _) -> Left "missing 字 for 四角"
     (_, _) ->
-      if T.length cs == length ss
-        then Right $ map f $ zip (T.unpack cs) ss
-        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" cs (show ss)
+      if T.length cs == length sss
+        then Right $ map f $ zip (T.unpack cs) sss
+        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" cs (show sss)
         where
-          f (c, s) = ShapeVariant
+          f (c, ss) = ShapeVariant
             { s_字 = T.singleton c
-            , s_四角 = s
+            , s_四角 = NEL.fromList ss
             , s_comment = ""
             }
 
