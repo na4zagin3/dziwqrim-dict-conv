@@ -277,9 +277,10 @@ pronunciationToTex Pronunciation
   , pr_漢辭海 = h
   -- , pr_辭源韵 = i
   , pr_略韵 = li
-  } = T.intercalate "。" cs <> "。"
+  , pr_字音補注 = n
+  } = T.intercalate "。" cs <> "。" <> fromMaybe "" n
   where
-    fqs = T.intercalate "，" (pronunciation反切集ToTex pc)
+    fqs = T.intercalate "。" (pronunciation反切集ToTex pc)
     cs = [fqs] <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li)
 
 indexTex :: Text -> [Text] -> Text
