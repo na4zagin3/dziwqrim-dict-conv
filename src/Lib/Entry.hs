@@ -4,6 +4,7 @@
 module Lib.Entry where
 
 import Control.Arrow (first)
+import Codec.QRCode qualified as QR
 import Data.Either (partitionEithers)
 import Data.Foldable qualified as Foldable
 import Data.Function (on)
@@ -346,7 +347,7 @@ entryToTex e = mconcat
     , T.intercalate "; " . map (\p -> T.pack $ printf "%d(%s)" (pos_row p) (pos_ver p)) . S.toList $ e_position e
     , "}"
     , "\n\n"
-    , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
+    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}\n"
     , "  "
     , T.intercalate "%\n  " $ generateIndicesTex e
     , "%\n"
@@ -372,6 +373,7 @@ entryToTex e = mconcat
     render義Item sp = do
       s <- e_義 sp
       return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> escapeTex s
+    qrText = qrImageToTex . encodeToQr $ e_字 e
 
 escapeTex :: Text -> Text
 escapeTex s = T.concatMap f s
@@ -418,3 +420,17 @@ sectionToTex s = mconcat
     , T.intercalate "\n" . map entryToTex . concatMap snd . PT.toList $ sec_entries s
     , "\n\n"
     ]
+
+-- QR
+qrImageToTex :: QR.QRImage -> Text
+qrImageToTex img = matStr
+  where
+    mat = QR.toMatrix 'k' 'w' img
+    matStr = "{" <> T.intercalate "}{" mat <> "}"
+
+encodeToQr :: Text -> QR.QRImage
+encodeToQr text = case QR.encodeText qropt QR.Utf8WithECI text of
+               Just img -> img
+               Nothing -> error $ printf "Failed to generate QR code for \"%s\"." text
+  where
+    qropt = QR.defaultQRCodeOptions QR.H

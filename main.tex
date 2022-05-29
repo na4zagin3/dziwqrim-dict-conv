@@ -6,8 +6,9 @@
 \usepackage{luatexja-fontspec}
 \usepackage{luatexja-ruby}
 
+\usepackage{adjustbox}
 \usepackage{calc}
-\usepackage{qrcode}
+\usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage{imakeidx}
@@ -86,18 +87,22 @@
     \raisebox{-1ex}[0pt][0pt]{#1}%
     \hspace*{0.1em}%
   }%
-  \makebox[0pt][l]{\raisebox{-1ex}[0pt][0pt]{%
-      \hspace{\EntryDescriptionLineLength+0.1\EntryDescriptionLineHeight}\qrcode[height=0.9\EntryDescriptionLineHeight]{https://www.chise.org/ids-find?components=#2}}}%
+  \makebox[0pt][l]{%
+    \raisebox{-0ex}[0pt][0pt]{%
+      \hspace{\EntryDescriptionLineLength+0.1\EntryDescriptionLineHeight}%
+      \adjustbox{height=0.9\EntryDescriptionLineHeight,valign=t}{\pxpic[mode=px,colors={k=black,w=white}]{#2}}%
+    }%
+  }%
   \phantomsection%
   \addcontentsline{toc}{subsection}{#1}%
   \label{entry-#1}%
 }{\vspace{0.2em plus 0.5em minus 0.1em}}
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
-\newcommand{\SoundItem}[1]{\item[]/\textbf{\zyepheng{#1}}/:}
+\newcommand{\SoundItem}[1]{\item[]/{\zyepheng{#1}}/: }
 
-\newenvironment{Sense}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1em]}{\end{itemize}}
-\newcommand{\SenseItem}[1]{\item[]\{\textbf{\zyepheng{#1}}\}:}
+\newenvironment{Sense}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
+\newcommand{\SenseItem}[1]{\item[]{\large\{\zyepheng{#1}\}}: }
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
 
@@ -225,18 +230,18 @@
   \end{itemize}
 \end{itemize}
 
-\PartHeader{冬符 toŋ}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
+\PartHeader{冬聲 toŋ}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
 
-\begin{Entry}{冬}{冬}
+\begin{Entry}{冬}{{k}}
   + 0（夊部0畫）
   \\
   \Sikrok{2730}{3}
   \begin{Sound}
-    \SoundItem{toŋ}《P3798》都宗反，端冬平，上平聲二冬
+    \SoundItem{toŋ}《P3798》都/宗[ha]反，端-冬平，上平聲二冬
   \end{Sound}
 \end{Entry}
 
-\begin{Entry}{佟}{佟}
+\begin{Entry}{佟}{{k}}
   \index[radical]{人部!5畫!佟}%
   \index[sikrok]{2723.3@\Sikrok{2723}{3}!佟}%
   \index[phonetic]{冬+23}%
@@ -249,9 +254,9 @@
   \end{Sound}
 \end{Entry}
 
-\PartHeader{中符 tuŋ}{\refEntry{中}仲忠}
+\PartHeader{中聲 tuŋ}{\refEntry{中}仲忠}
 
-\begin{Entry}{中}{\%E5\%86\%AC}%
+\begin{Entry}{中}{{w}}%
   \index[radical]{丨部!3畫!中}%
   \index[sikrok]{5000.6@\Sikrok{5000}{6}}%
   \index[phonetic]{中+0}%
