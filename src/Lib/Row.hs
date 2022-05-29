@@ -98,6 +98,7 @@ data Pronunciation = Pronunciation
 
 data Position = Position
   { pos_row :: !Int
+  , pos_ver :: !Text
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -164,8 +165,8 @@ p_r_四角 t = do
 p_r_shapeVariant :: Text -> Text -> Either String [ShapeVariant]
 p_r_shapeVariant cs ssRaw = do
   let p_sk "" = Right []
-      p_sk str = mapM p_r_四角 $ T.split (`T.elem` "|") str
-  sss <- mapM p_sk $ T.split (`T.elem` "/") ssRaw
+      p_sk str = mapM p_r_四角 $ T.split (`T.elem` "/") str
+  sss <- mapM p_sk $ T.split (`T.elem` "|") ssRaw
   case (cs, sss) of
     ("", []) -> Right $ []
     ("", [[]]) -> Right $ []
@@ -368,8 +369,8 @@ maybeToRight :: a -> Maybe b -> Either a b
 maybeToRight _ (Just x) = Right x
 maybeToRight y Nothing  = Left y
 
-parseValidRow :: (HasCallStack) => Int -> Map Text Text -> Either String Row
-parseValidRow row m = do
+parseValidRow :: (HasCallStack) => Int -> Text -> Map Text Text -> Either String Row
+parseValidRow row version m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
 
   f_字 <- p_r_字 =<< lookupField "字"
@@ -416,7 +417,7 @@ parseValidRow row m = do
         }
   -- { pr_韵部 :: !Text
   return $ Row
-    { r_position = Position { pos_row = row }
+    { r_position = Position { pos_row = row , pos_ver = version }
     , r_字 = f_字
     , r_shapeVariants = f_shapeVariants
     , r_部畫 = f_部畫
@@ -430,6 +431,6 @@ parseRow :: (HasCallStack) => Int -> Map Text Text -> Either String (Maybe Row)
 parseRow row m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
   version <- lookupField "状態"
-  if version == "3"
-    then fmap Just $ parseValidRow row m
+  if version `elem` ["3", "4", "5"]
+    then fmap Just $ parseValidRow row version m
     else return Nothing

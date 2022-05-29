@@ -343,7 +343,7 @@ entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
     , "\\Position{"
-    , T.intercalate "; " . map (T.pack . printf "%d" . pos_row) . S.toList $ e_position e
+    , T.intercalate "; " . map (\p -> T.pack $ printf "%d(%s)" (pos_row p) (pos_ver p)) . S.toList $ e_position e
     , "}"
     , "\n\n"
     , "\\begin{Entry}{", e_字 e, "}{", e_字 e, "}\n"
