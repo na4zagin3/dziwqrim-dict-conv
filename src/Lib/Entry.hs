@@ -340,6 +340,18 @@ generateIndicesTex e = concat
   , generateZyevioIndicesTex e
   ]
 
+entryToQrContent :: Entry -> Text
+entryToQrContent e = mconcat . L.nub $ mconcat contents
+  where
+    sv = e_shapeVariants $ e
+    contents =
+             [ [e_字 e]
+             , map s_字 $ s_日 sv
+             , map s_字 $ s_選 sv
+             , map s_字 $ s_异 sv
+             , map s_字 $ s_簡 sv
+             ]
+
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
@@ -347,7 +359,7 @@ entryToTex e = mconcat
     , T.intercalate "; " . map (\p -> T.pack $ printf "%d(%s)" (pos_row p) (pos_ver p)) . S.toList $ e_position e
     , "}"
     , "\n\n"
-    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}\n"
+    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}%\n"
     , "  "
     , T.intercalate "%\n  " $ generateIndicesTex e
     , "%\n"
@@ -373,7 +385,7 @@ entryToTex e = mconcat
     render義Item sp = do
       s <- e_義 sp
       return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> escapeTex s
-    qrText = qrImageToTex . encodeToQr $ e_字 e
+    qrText = qrImageToTex . encodeToQr $ entryToQrContent e
 
 escapeTex :: Text -> Text
 escapeTex s = T.concatMap f s
