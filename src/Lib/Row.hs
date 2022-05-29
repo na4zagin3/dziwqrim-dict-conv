@@ -92,7 +92,8 @@ data Pronunciation = Pronunciation
   -- ,
     pr_反切集 :: !(Pronunciation反切集)
   , pr_漢辭海 :: !(Maybe Pronunciation漢辭海)
-  , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
+  -- , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
+  , pr_略韵 :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -361,6 +362,10 @@ p_r_辭源韵 i = do
     , pr_辭源韵_用例 = com'
     }
 
+p_r_略韵 :: Text -> Either String (Maybe Text)
+p_r_略韵 "" = Right Nothing
+p_r_略韵 t = Right $ Just t
+
 p_r_義 :: Text -> Either String (Maybe Text)
 p_r_義 "" = Right Nothing
 p_r_義 t = Right $ Just t
@@ -408,12 +413,14 @@ parseValidRow row version m = do
 
 
   f_r_漢辭海 <- join $ p_r_漢辭海 <$> lookupField "漢辭海聲" <*> lookupField "漢辭海韵" <*> lookupField "漢辭海調"
-  f_r_辭源韵 <- join $ p_r_辭源韵 <$> lookupField "辭源韵"
+  -- f_r_辭源韵 <- join $ p_r_辭源韵 <$> lookupField "辭源韵"
+  f_r_略韵 <- join $ p_r_略韵 <$> lookupField "略韵"
+
   f_r_反切集 <- join $ p_r_反切集 <$> lookupField "切韵反切" <*> lookupField "切韵本" <*> lookupField "王韵反切" <*> lookupField "廣韵反切" <*> lookupField "集韵反切"
   let f_pronunciation = Pronunciation
         { pr_漢辭海 = f_r_漢辭海
-        , pr_辭源韵 = f_r_辭源韵
         , pr_反切集 = f_r_反切集
+        , pr_略韵 = f_r_略韵
         }
   -- { pr_韵部 :: !Text
   return $ Row

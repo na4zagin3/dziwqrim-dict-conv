@@ -204,32 +204,40 @@ booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
 -- >>> pronunciation反切ToTex (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
 -- Just "\\Book{\21453\20999}\12394\12375"
 
-pronunciation反切ToTex :: Pronunciation反切 -> Maybe Text
-pronunciation反切ToTex Pronunciation反切
+pronunciation反切ToTex :: Bool -> Pronunciation反切 -> Maybe Text
+pronunciation反切ToTex showBook fq =
+    addBooks $ pronunciation反切ContentToTex fq
+  where
+    addBooks = if showBook
+      then fmap (booksToTex (pr_反切_books fq) <>)
+      else id
+
+pronunciation反切ContentToTex :: Pronunciation反切 -> Maybe Text
+pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
   , pr_反切_suffix = _
   , pr_反切_comment = Nothing
   , pr_反切_books = _
   } = Nothing
-pronunciation反切ToTex Pronunciation反切
+pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
   , pr_反切_suffix = _
   , pr_反切_comment = Just com
-  , pr_反切_books = bs
-  } = Just $ booksToTex bs <> com
-pronunciation反切ToTex Pronunciation反切
+  , pr_反切_books = _
+  } = Just com
+pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just pc
   , pr_反切_suffix = suf
   , pr_反切_comment = Nothing
-  , pr_反切_books = bs
-  } = Just $ booksToTex bs <> pc <> suf
+  , pr_反切_books = _
+  } = Just $ pc <> suf
 
-pronunciation反切ToTex Pronunciation反切
+pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just pc
   , pr_反切_suffix = suf
   , pr_反切_comment = Just com
-  , pr_反切_books = bs
-  } = Just $ booksToTex bs <> pc <> suf <> "（" <> com <> "）"
+  , pr_反切_books = _
+  } = Just $ pc <> suf <> "（" <> com <> "）"
 
 pronunciation漢辭海ToTex :: Pronunciation漢辭海 -> Text
 pronunciation漢辭海ToTex Pronunciation漢辭海
@@ -254,7 +262,12 @@ pronunciation反切集ToTex Pronunciation反切集
   , pr_王韵反切 = pU
   , pr_廣韵反切 = pK
   , pr_集韵反切 = pDz
-  } = catMaybes $ map (>>= pronunciation反切ToTex) [pC, pU, pK, pDz]
+  } = catMaybes
+      [ pronunciation反切ToTex True =<< pC
+      , pronunciation反切ToTex False =<< pU
+      , pronunciation反切ToTex False =<< pK
+      , pronunciation反切ToTex True =<< pDz
+      ]
 
 pronunciationToTex :: Pronunciation -> Text
 pronunciationToTex Pronunciation
@@ -262,8 +275,12 @@ pronunciationToTex Pronunciation
   -- ,
     pr_反切集 = pc
   , pr_漢辭海 = h
-  , pr_辭源韵 = i
-  } = T.intercalate "，" $ pronunciation反切集ToTex pc <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList $ fmap pronunciation辭源韵ToTex i)
+  -- , pr_辭源韵 = i
+  , pr_略韵 = li
+  } = T.intercalate "。" cs <> "。"
+  where
+    fqs = T.intercalate "，" (pronunciation反切集ToTex pc)
+    cs = [fqs] <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li)
 
 indexTex :: Text -> [Text] -> Text
 indexTex name inds = "\\index[" <> name <> "]{" <> T.intercalate "!" inds <> "}"
