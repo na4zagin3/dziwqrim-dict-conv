@@ -4,15 +4,17 @@
 module Lib.Row where
 
 import Control.Arrow (left)
+import Control.Monad (join)
 import Data.List.NonEmpty (NonEmpty)
 import Data.List.NonEmpty qualified as NEL
 import Data.Map (Map)
 import Data.Map qualified as M
-import Data.Maybe (catMaybes)
+import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Read as TR
 import GHC.Generics (Generic)
+import GHC.Stack (HasCallStack)
 import Lib.Rhymes (list_平水)
 import Text.Printf (printf)
 
@@ -346,19 +348,25 @@ p_r_義 :: Text -> Either String (Maybe Text)
 p_r_義 "" = Right Nothing
 p_r_義 t = Right $ Just t
 
-parseRow :: Int -> Map Text Text -> Either String Row
-parseRow row m = do
-  f_字 <- p_r_字 $ m M.! "字"
-  f_親_pl <- left ("親: " <>) $ p_r_shapeVariant (m M.! "字") (m M.! "四角")
+maybeToRight :: a -> Maybe b -> Either a b
+maybeToRight _ (Just x) = Right x
+maybeToRight y Nothing  = Left y
+
+parseValidRow :: (HasCallStack) => Int -> Map Text Text -> Either String Row
+parseValidRow row m = do
+  let lookupField f = maybeToRight f $ M.lookup (fromString f) m
+
+  f_字 <- p_r_字 =<< lookupField "字"
+  f_親_pl <- left ("親: " <>) . join $ p_r_shapeVariant <$> lookupField "字" <*> lookupField "四角"
   f_親 <- case f_親_pl of
             [] -> Left "Lacks 四角 for the head character"
             [f_親] -> Right f_親
             _ -> Left "Multiple 四角 for the head character"
 
-  f_選 <- left ("選: " <>) $ p_r_shapeVariant (m M.! "選") (m M.! "四角選")
-  f_簡 <- left ("簡: " <>) $ p_r_shapeVariant (m M.! "簡") (m M.! "四簡")
-  f_日 <- left ("日: " <>) $ p_r_shapeVariant (m M.! "日") (m M.! "四日")
-  f_异 <- left ("异: " <>) $ p_r_shapeVariant (m M.! "异") (m M.! "四异")
+  f_選 <- left ("選: " <>) . join $ p_r_shapeVariant <$> lookupField "選" <*> lookupField "四角選"
+  f_簡 <- left ("簡: " <>) . join $ p_r_shapeVariant <$> lookupField "簡" <*> lookupField "四簡"
+  f_日 <- left ("日: " <>) . join $ p_r_shapeVariant <$> lookupField "日" <*> lookupField "四日"
+  f_异 <- left ("异: " <>) . join $ p_r_shapeVariant <$> lookupField "异" <*> lookupField "四异"
   let f_shapeVariants = ShapeVariants
         { s_親 = f_親
         , s_選 = f_選
@@ -367,21 +375,24 @@ parseRow row m = do
         , s_异 = f_异
         }
 
-  f_部畫 <- left ("部畫: " <>) $ p_r_部畫 (m M.! "部") (m M.! "畫")
+  f_部畫 <- left ("部畫: " <>) . join $ p_r_部畫 <$> lookupField "部" <*> lookupField "畫"
 
-  f_隋音 <- p_r_隋音 $ m M.! "隋音"
-  f_義 <- p_r_義 $ m M.! "義"
+  f_隋音 <- join $ p_r_隋音 <$> lookupField "隋音"
+  f_義 <- join $ p_r_義 <$> lookupField "義"
 
-  f_parts <- p_r_parts (m M.! "諧符位") (m M.! "諧符部")
-             [ (m M.! "玉篇部首位1", m M.! "部外1")
-             , (m M.! "玉篇部首位2", m M.! "部外2")
-             , (m M.! "玉篇部首位3", m M.! "部外3")
-             ]
+  f_parts <- do
+    let partsFields =
+          mapM (\(i, c) -> (,) <$> lookupField i <*> lookupField c)
+            [ ("玉篇部首位1", "部外1")
+            , ("玉篇部首位2", "部外2")
+            , ("玉篇部首位3", "部外3")
+            ]
+    join $ p_r_parts <$> lookupField "諧符位" <*> lookupField"諧符部" <*> partsFields
 
 
-  f_r_漢辭海 <- p_r_漢辭海 (m M.! "漢辭海聲") (m M.! "漢辭海韵") (m M.! "漢辭海調")
-  f_r_辭源韵 <- p_r_辭源韵 (m M.! "辭源韵")
-  f_r_反切集 <- p_r_反切集 (m M.! "切韵反切") (m M.! "切韵本") (m M.! "王韵反切") (m M.! "廣韵反切") (m M.! "集韵反切")
+  f_r_漢辭海 <- join $ p_r_漢辭海 <$> lookupField "漢辭海聲" <*> lookupField "漢辭海韵" <*> lookupField "漢辭海調"
+  f_r_辭源韵 <- join $ p_r_辭源韵 <$> lookupField "辭源韵"
+  f_r_反切集 <- join $ p_r_反切集 <$> lookupField "切韵反切" <*> lookupField "切韵本" <*> lookupField "王韵反切" <*> lookupField "廣韵反切" <*> lookupField "集韵反切"
   let f_pronunciation = Pronunciation
         { pr_漢辭海 = f_r_漢辭海
         , pr_辭源韵 = f_r_辭源韵
@@ -398,3 +409,11 @@ parseRow row m = do
     , r_parts = f_parts
     , r_pronunciation = f_pronunciation
     }
+
+parseRow :: (HasCallStack) => Int -> Map Text Text -> Either String (Maybe Row)
+parseRow row m = do
+  let lookupField f = maybeToRight f $ M.lookup (fromString f) m
+  version <- lookupField "状態"
+  if version == "3"
+    then fmap Just $ parseValidRow row m
+    else return Nothing

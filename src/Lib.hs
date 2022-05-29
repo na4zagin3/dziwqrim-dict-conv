@@ -11,6 +11,7 @@ import Data.ByteString.Lazy qualified as BL
 import Data.Csv qualified as Csv
 import Data.Either (partitionEithers)
 import Data.Map (Map)
+import Data.Maybe (catMaybes)
 import Data.Vector (Vector)
 import Data.Vector qualified as V
 import Data.Text (Text)
@@ -31,11 +32,10 @@ convertCsvToTex inPath outPath = do
   let parsedResults =  zip rows .map (uncurry parseRow) . zip rows . V.toList $ rawRows
   let (errors1, parsedRows) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ parsedResults
   mapM_ putStrLn errors1
-  let (errors2, sections) = sectionsFromRows $ parsedRows
+  let (errors2, sections) = sectionsFromRows . catMaybes $ parsedRows
   mapM_ putStrLn errors2
   let outText = T.unlines . map sectionToTex $ sections
   T.writeFile outPath outText
-
 
 readCsvFile
   :: FilePath -> IO (Either String (Vector (Map Text Text)))
