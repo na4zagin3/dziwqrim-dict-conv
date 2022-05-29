@@ -173,12 +173,13 @@ p_r_shapeVariant cs ssRaw = do
     ("", _) -> Left "missing 字 for 四角"
     (_, _) ->
       if T.length cs == length sss
-        then Right $ map f $ zip (T.unpack cs) sss
+        then mapM f $ zip (T.unpack cs) sss
         else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" cs (show sss)
         where
-          f (c, ss) = ShapeVariant
+          f (_, []) = Left "missing 四角"
+          f (c, (s:ss)) = Right $ ShapeVariant
             { s_字 = T.singleton c
-            , s_四角 = NEL.fromList ss
+            , s_四角 = s NEL.:| ss
             , s_comment = ""
             }
 
@@ -246,13 +247,16 @@ p_r_隋音 :: Text -> Either String Text
 p_r_隋音 "" = Left "Missing 隋音"
 p_r_隋音 t = Right t
 
+p_r_反切本_item :: Text -> Either String Text
+p_r_反切本_item pCBookRaw | (T.take 1 pCBookRaw == "《") && (T.takeEnd 1 pCBookRaw == "》") = return . T.drop 1 . T.dropEnd 1 $ pCBookRaw
+p_r_反切本_item pCBookRaw | otherwise = Left $ printf "Malformatted 反切本: %s " pCBookRaw
+
 p_r_反切本 :: Text -> Either String (NonEmpty Text)
-p_r_反切本 "藤田本" = Right $ NEL.singleton "藤田????"
 p_r_反切本 pCBooksRaw = do
-  let f b | T.take 1 b `elem` ["①", "②", "③"] = Right $ T.drop 1 b
-          | otherwise = Left $ "Unknown book format: " <> T.unpack b
-  books <- mapM f $ T.split (== '、') pCBooksRaw
-  return $ NEL.fromList books
+  books <- mapM p_r_反切本_item $ T.split (== '、') pCBooksRaw
+  case books of
+    [] -> Left $ "Missing 反切本"
+    (x:xs) -> return $ x NEL.:| xs
 
 -- | Parse a 反切
 --
@@ -286,10 +290,22 @@ p_r_反切 suf books pc | T.take 1 pc == "（" && T.takeEnd 1 pc == "）" = Righ
     , pr_反切_comment = Just . T.drop 1 . T.dropEnd 1 $ pc
     , pr_反切_books = books
     }
+p_r_反切 _ books pc | T.length pc == 3 = Right . Just $ Pronunciation反切
+    { pr_反切 = Just $ T.take 2 pc
+    , pr_反切_suffix = T.drop 2 pc
+    , pr_反切_comment = Nothing
+    , pr_反切_books = books
+    }
 p_r_反切 suf books pc | T.length pc == 2 = Right . Just $ Pronunciation反切
     { pr_反切 = Just pc
     , pr_反切_suffix = suf
     , pr_反切_comment = Nothing
+    , pr_反切_books = books
+    }
+p_r_反切 _ books pc | T.take 1 (T.drop 3 pc) == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
+    { pr_反切 = Just $ T.take 2 pc
+    , pr_反切_suffix = T.take 1 . T.drop 2 $ pc
+    , pr_反切_comment = Just . T.drop 3 . T.dropEnd 1 $ pc
     , pr_反切_books = books
     }
 p_r_反切 suf books pc | T.take 1 (T.drop 2 pc) == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
@@ -383,11 +399,11 @@ parseValidRow row m = do
   f_parts <- do
     let partsFields =
           mapM (\(i, c) -> (,) <$> lookupField i <*> lookupField c)
-            [ ("玉篇部首位1", "部外1")
-            , ("玉篇部首位2", "部外2")
-            , ("玉篇部首位3", "部外3")
+            [ ("符外位1", "聲外1")
+            , ("符外位2", "聲外2")
+            , ("符外位3", "聲外3")
             ]
-    join $ p_r_parts <$> lookupField "諧符位" <*> lookupField"諧符部" <*> partsFields
+    join $ p_r_parts <$> lookupField "諧聲位" <*> lookupField "諧聲" <*> partsFields
 
 
   f_r_漢辭海 <- join $ p_r_漢辭海 <$> lookupField "漢辭海聲" <*> lookupField "漢辭海韵" <*> lookupField "漢辭海調"

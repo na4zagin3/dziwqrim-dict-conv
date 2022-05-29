@@ -371,7 +371,16 @@ entryToTex e = mconcat
     tex義Items = catMaybes . map render義Item $ e_音義 e
     render義Item sp = do
       s <- e_義 sp
-      return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> s
+      return $ "\\SenseItem{" <> e_隋音 sp <> "}" <> escapeTex s
+
+escapeTex :: Text -> Text
+escapeTex s = T.concatMap f s
+  where
+    f '&' = "\\&"
+    f '{' = "\\{"
+    f '}' = "\\}"
+    f '\\' = "\\textbackslash{}"
+    f c = T.singleton c
 
 unfoldTreeToTex :: (Ord a) => Bool -> PathTree a Text -> Text
 unfoldTreeToTex isRoot t = fromMaybe "" (PT.root t) <> brackettedChildrenStr
