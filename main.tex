@@ -116,25 +116,65 @@
 \part{Examples}
 やること
 \begin{itemize}
-\item{} 「状態」
-  \begin{itemize}
-  \item{} 状態 = 4, 5 に対応
-  \end{itemize}
 \item{} 諧聲符見出し
   \begin{itemize}
+  \item{} コメントの付加
+  \item{} \verb|?符→?聲|
+  \end{itemize}
+\item{} 諧聲符本文
+  \begin{itemize}
   \item{} 書式変更→諧聲符の追加
-  \item{} 読みの付加
+    \begin{itemize}
+    \item{} 本文
+\begin{verbatim}
+25' + 57 口
+25 + 358 牛
+\end{verbatim}
+    \item{} 索引
+\begin{verbatim}
+25' + 57
+25 + 358 
+\end{verbatim}
+    \end{itemize}
+  \item{} 「聲外分」（コンマ区切）
+    \begin{itemize}
+    \item{} 本文
+\begin{verbatim}
+例
+80 + 23
+聲外分=1
+
+→
+
+本文
+
+    (80 + 23 人)'
+
+索引
+
+    (80 + 23)'
+\end{verbatim}
+    \end{itemize}
   \end{itemize}
 \item{} 反切
   \begin{itemize}
   \item{} コメントが文献情報で始まる場合の扱い。例《王韻》欄「《王三》不明,《王一》無本」
+  \item{} 《王韻》も《廣韻》も記載するが、書名は省略
+  \item{} 「字音補注」も出す
+  \item{}  \verb|未收，力急反：“又其立反”| → \verb|未收（力急反：“又其立反”）|
   \end{itemize}
 \item{} 義
   \begin{itemize}
   \item{} 文献\kenten{以外}のラテン文字を隋拼扱い
   \end{itemize}
+\item{} QRコード
+  \begin{itemize}
+  \item{} 外部生成
+  \item{} 字字字
+  \end{itemize}
 \item{} フォント
   \begin{itemize}
+  \item{} en dash “–” を欧文扱いに
   \item{} 隋拼
     \begin{itemize}
     \item{} 隋拼
@@ -149,7 +189,34 @@
   \end{itemize}
 \item{} データ
   \begin{itemize}
-  \item{} Q列「状態」が3のもののみを用いる
+  \item{} 状態をオプションで取る
+  \end{itemize}
+\item{} 索引
+  \begin{itemize}
+  \item{} 四角
+    \begin{itemize}
+    \item{} 字形要素で纏めたものを再掲
+    \end{itemize}
+  \item{} 部首索引
+    \begin{itemize}
+    \item{} 新字体最優先、親字、異体字
+    \item{} ?部 +?画
+    \end{itemize}
+  \end{itemize}
+\item{} 柱
+  \begin{itemize}
+  \item{} 部は入れる
+  \item{} 字一覧はできたら
+  \end{itemize}
+\item{} 改頁
+  \begin{itemize}
+  \item{} 以下の改頁はできるだけ防ぐ。
+    \begin{itemize}
+    \item{} 節見出し中の改頁
+    \item{} 節見出し直後での改頁
+    \item{} 親字直後の改頁
+    \end{itemize}
+  \item{} 親字から字音まで一塊にしてみる?
   \end{itemize}
 \item{} 紙面
   \begin{itemize}
@@ -191,12 +258,12 @@
   \index[zyevio]{tryuŋ!中}%
   \index[zyevio]{tryûŋ!中}%
   \index[zyevio]{dryûŋ!中}%
-  + 0（丨部3畫）
+  + 0。丨部3畫。
   \\
-  \Sikrok{5000}{6}
+  \Sikrok{5000}{6}。
   \begin{Sound}
-    \SoundItem{tryuŋ}《切二》陟隆反, 《廣韵》陟隆切, 知東平, 上平聲一東（中間）
-    \SoundItem{tryûŋ}《P3696(1)r》陟仲反, 知送去, 去聲一送（射中, 撃中）
+    \SoundItem{tryuŋ}《切二》陟隆反, 《廣韵》陟隆切, 知東平。上平聲一東（中間）。
+    \SoundItem{tryûŋ}《P3696(1)r》陟仲反, 知送去。去聲一送（射中, 撃中）。
     \SoundItem{dryûŋ}《集韵》直衆切
   \end{Sound}
   \begin{Sense}
