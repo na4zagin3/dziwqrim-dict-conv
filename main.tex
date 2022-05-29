@@ -93,11 +93,11 @@
   \label{entry-#1}%
 }{\vspace{0.2em plus 0.5em minus 0.1em}}
 
-\newenvironment{Sound}{\begin{itemize}[nosep]}{\end{itemize}}
-\newcommand{\SoundItem}[1]{\item[/\textbf{\zyepheng{#1}}/:]}
+\newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
+\newcommand{\SoundItem}[1]{\item[]/\textbf{\zyepheng{#1}}/:}
 
-\newenvironment{Sense}{\begin{itemize}[nosep]}{\end{itemize}}
-\newcommand{\SenseItem}[1]{\item[\{\textbf{\zyepheng{#1}}\}:]}
+\newenvironment{Sense}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1em]}{\end{itemize}}
+\newcommand{\SenseItem}[1]{\item[]\{\textbf{\zyepheng{#1}}\}:}
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
 
@@ -123,12 +123,10 @@
 \item{} 反切
   \begin{itemize}
   \item{} コメントが文献情報で始まる場合の扱い。例《王韻》欄「《王三》不明,《王一》無本」
-  \item{} 項目見出しを行内に入れる
   \end{itemize}
 \item{} 義
   \begin{itemize}
   \item{} 文献\kenten{以外}のラテン文字を隋拼扱い
-  \item{} 項目見出しを行内に入れる
   \end{itemize}
 \item{} フォント
   \begin{itemize}
