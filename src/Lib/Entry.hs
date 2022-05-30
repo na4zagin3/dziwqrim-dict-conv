@@ -262,15 +262,21 @@ pronunciation辭源韵ToTex Pronunciation辭源韵
 pronunciation反切集ToTex :: Pronunciation反切集 -> [Text]
 pronunciation反切集ToTex Pronunciation反切集
   { pr_切韵反切 = pC
-  , pr_王韵反切 = pU
+  , pr_王韵反切 = pUs
   , pr_廣韵反切 = pK
   , pr_集韵反切 = pDz
-  } = catMaybes
-      [ pronunciation反切ToTex True =<< pC
-      , pronunciation反切ToTex False =<< pU
-      , pronunciation反切ToTex False =<< pK
-      , pronunciation反切ToTex True =<< pDz
+  } = map (T.intercalate "，") $ filter (not . null)
+      [ maybeToList $ pronunciation反切ToTex True =<< pC
+      , f "王韵" pUs
+      , f "廣韵" $ catMaybes [pK]
+      , maybeToList $ pronunciation反切ToTex True =<< pDz
       ]
+  where
+    f :: Text -> [Pronunciation反切] -> [Text]
+    f _ [] = []
+    f b [p] | pr_反切_books p == NEL.singleton b = maybeToList $ pronunciation反切ToTex False p
+            | otherwise = maybeToList $ pronunciation反切ToTex True p
+    f _ ps = catMaybes $ map (pronunciation反切ToTex True) ps
 
 pronunciationToTex :: Pronunciation -> Text
 pronunciationToTex Pronunciation
