@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8f9368043cba9d3a3ebe043d779b3288f5f36349546bb241aa037ab8ca55346a
+-- hash: 39b33bfa92d164f6daebb3c9ed48ce82f54db70caffb74c4ba038e6c77548f7e
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Lib
       Lib.Entry
+      Lib.Kanji
       Lib.PathTree
       Lib.Rhymes
       Lib.Row
@@ -38,6 +39,7 @@ library
       src
   build-depends:
       HaTeX
+    , attoparsec
     , base >=4.7 && <5
     , bytestring
     , cassava >0.5 && <0.6
@@ -58,6 +60,7 @@ executable dziwqrim-dict-conv-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HaTeX
+    , attoparsec
     , base >=4.7 && <5
     , bytestring
     , cassava >0.5 && <0.6
@@ -80,6 +83,7 @@ test-suite dziwqrim-dict-conv-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HaTeX
+    , attoparsec
     , base >=4.7 && <5
     , bytestring
     , cassava >0.5 && <0.6

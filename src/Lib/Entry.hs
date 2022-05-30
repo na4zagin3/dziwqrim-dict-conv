@@ -201,10 +201,10 @@ booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
 --
 -- Examples
 --
--- >>> pronunciation反切ToTex True (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
+-- >>> pronunciation反切ToTex True (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
 -- Just "\\Book{\21453\20999}\12394\12375"
 --
--- >>> pronunciation反切ToTex False (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
+-- >>> pronunciation反切ToTex False (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
 -- Just "\12394\12375"
 
 pronunciation反切ToTex :: Bool -> Pronunciation反切 -> Maybe Text
@@ -218,26 +218,22 @@ pronunciation反切ToTex showBook fq =
 pronunciation反切ContentToTex :: Pronunciation反切 -> Maybe Text
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
-  , pr_反切_suffix = _
   , pr_反切_comment = Nothing
   , pr_反切_books = _
   } = Nothing
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
-  , pr_反切_suffix = _
   , pr_反切_comment = Just com
   , pr_反切_books = _
   } = Just com
 pronunciation反切ContentToTex Pronunciation反切
-  { pr_反切 = Just pc
-  , pr_反切_suffix = suf
+  { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Nothing
   , pr_反切_books = _
   } = Just $ pc <> suf
 
 pronunciation反切ContentToTex Pronunciation反切
-  { pr_反切 = Just pc
-  , pr_反切_suffix = suf
+  { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Just com
   , pr_反切_books = _
   } = Just $ pc <> suf <> "（" <> com <> "）"
@@ -287,7 +283,7 @@ pronunciationToTex Pronunciation
   -- , pr_辭源韵 = i
   , pr_略韵 = li
   , pr_字音補注 = n
-  } = T.intercalate "。" $ filter (not . T.null) cs
+  } = T.intercalate "。" . (<> [""]) $ filter (not . T.null) cs
   where
     fqs :: [Text]
     fqs = pronunciation反切集ToTex pc

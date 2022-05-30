@@ -35,6 +35,8 @@ dependencies:
 - HaTeX
 # QR Code
 - qrcode-core
+# Parsing
+- attoparsec
 
 library:
   source-dirs: src
