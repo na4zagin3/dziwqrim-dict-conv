@@ -447,6 +447,7 @@ parseRow :: (HasCallStack) => Int -> Map Text Text -> Either String (Maybe Row)
 parseRow row m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
   version <- lookupField "状態"
-  if version `elem` ["3", "4", "5"]
-    then fmap Just $ parseValidRow row version m
+  f_字 <- p_r_字 =<< lookupField "字"
+  if version `elem` ["5"]
+    then left (printf "%s: %s" f_字) . fmap Just $ parseValidRow row version m
     else return Nothing
