@@ -201,8 +201,11 @@ booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
 --
 -- Examples
 --
--- >>> pronunciation反切ToTex (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
+-- >>> pronunciation反切ToTex True (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
 -- Just "\\Book{\21453\20999}\12394\12375"
+--
+-- >>> pronunciation反切ToTex False (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999"})
+-- Just "\12394\12375"
 
 pronunciation反切ToTex :: Bool -> Pronunciation反切 -> Maybe Text
 pronunciation反切ToTex showBook fq =

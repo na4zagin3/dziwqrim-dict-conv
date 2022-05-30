@@ -152,15 +152,15 @@ p_r_四角 t = do
 -- Right []
 -- >>> p_r_shapeVariant "中" "50006"
 -- Right [ShapeVariant {s_字 = "\20013", s_四角 = ("5000","6") :| [], s_comment = ""}]
--- >>> p_r_shapeVariant "吶㕯" "64027/40227"
+-- >>> p_r_shapeVariant "吶㕯" "64027|40227"
 -- Right [ShapeVariant {s_字 = "\21558", s_四角 = ("6402","7") :| [], s_comment = ""},ShapeVariant {s_字 = "\13679", s_四角 = ("4022","7") :| [], s_comment = ""}]
--- >>> p_r_shapeVariant "大" "40030|40800"
+-- >>> p_r_shapeVariant "大" "40030/40800"
 -- Right [ShapeVariant {s_字 = "\22823", s_四角 = ("4003","0") :| [("4080","0")], s_comment = ""}]
--- >>> p_r_shapeVariant "皐臯" "26409/26409"
+-- >>> p_r_shapeVariant "皐臯" "26409|26409"
 -- Right [ShapeVariant {s_字 = "\30352", s_四角 = ("2640","9") :| [], s_comment = ""},ShapeVariant {s_字 = "\33263", s_四角 = ("2640","9") :| [], s_comment = ""}]
--- >>> p_r_shapeVariant "一二三" "10000/10100"
--- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\")],[(\"1010\",\"0\")]])"
 -- >>> p_r_shapeVariant "一二三" "10000|10100"
+-- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\")],[(\"1010\",\"0\")]])"
+-- >>> p_r_shapeVariant "一二三" "10000/10100"
 -- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\"),(\"1010\",\"0\")]])"
 
 
@@ -262,7 +262,7 @@ p_r_反切本 pCBooksRaw = do
     (x:xs) -> return $ x NEL.:| xs
 
 keyword_反切 :: [Text]
-keyword_反切 = ["未收", "脱字"]
+keyword_反切 = ["未收", "脱字", "無本"]
 
 -- | Parse a 反切
 --
@@ -276,12 +276,11 @@ keyword_反切 = ["未收", "脱字"]
 -- >>> p_r_反切 "反" (NEL.singleton "切韻") "（コメント）"
 -- Right (Just (Pronunciation反切 {pr_反切 = Nothing, pr_反切_suffix = "\21453", pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_books = "\20999\38907" :| []}))
 --
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "而鋭（コメント）"
+-- >>> p_r_反切 "反" (NEL.singleton "切韻") "而鋭反（コメント）"
 -- Right (Just (Pronunciation反切 {pr_反切 = Just "\32780\37613", pr_反切_suffix = "\21453", pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_books = "\20999\38907" :| []}))
 --
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "〓〓（《王三》未收）"
+-- >>> p_r_反切 "反" (NEL.singleton "切韻") "〓〓反（《王三》未收）"
 -- Right (Just (Pronunciation反切 {pr_反切 = Just "\12307\12307", pr_反切_suffix = "\21453", pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_books = "\20999\38907" :| []}))
---
 p_r_反切 :: Text -> NonEmpty Text -> Text -> Either String (Maybe Pronunciation反切)
 p_r_反切 _ _ "" = Right Nothing
 p_r_反切 suf books "なし" = Right . Just $ Pronunciation反切
@@ -311,7 +310,7 @@ p_r_反切 suf books pc | pc `elem` keyword_反切 = Right . Just $ Pronunciatio
 p_r_反切 _ books pc | T.take 1 (T.drop 3 pc) == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
     { pr_反切 = Just $ T.take 2 pc
     , pr_反切_suffix = T.take 1 . T.drop 2 $ pc
-    , pr_反切_comment = Just . T.drop 3 . T.dropEnd 1 $ pc
+    , pr_反切_comment = Just . T.drop 4 . T.dropEnd 1 $ pc
     , pr_反切_books = books
     }
 p_r_反切 suf books pc | T.take 2 pc `elem` keyword_反切 && T.take 1 (T.drop 2 pc) == "（" && T.takeEnd 1 pc == "）" = Right . Just $ Pronunciation反切
