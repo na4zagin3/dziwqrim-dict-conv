@@ -241,6 +241,11 @@ p_r_part pIRaw pE = do
 --
 -- >>> p_r_parts "32" "竹筑" [("73.999", "巩")] "0" "0"
 -- Right (Parts {p_諧聲部 = "\31481", p_諧聲位 = (32,0), p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}], p_variants = fromList []})
+--
+-- >>> p_r_parts "1" "⿱圥囧" [("91", "言")] "0" "0"
+-- Right (Parts {p_諧聲部 = "\12273\22309\22247", p_諧聲位 = (1,0), p_parts = [Part {p_玉篇部首位 = (91,0), p_部外 = "\35328"}], p_variants = fromList []})
+-- >>> p_r_parts "1" "竹筑" [("1", "⿱圥囧")] "0" "0"
+-- Right (Parts {p_諧聲部 = "\31481", p_諧聲位 = (1,0), p_parts = [Part {p_玉篇部首位 = (1,0), p_部外 = "\12273\22309\22247"}], p_variants = fromList []})
 
 p_r_parts :: Text -> Text -> [(Text, Text)] -> Text -> Text -> Either String Parts
 p_r_parts ki kpsRaw ps vk vpsRaw = do
