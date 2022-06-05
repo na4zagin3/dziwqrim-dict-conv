@@ -465,7 +465,7 @@ parseValidRow row version m = do
       <$> lookupField "諧聲位"
       <*> lookupField "諧聲"
       <*> partsFields
-      <*> lookupField "聲分"
+      <*> lookupField "分"
       <*> lookupField "聲外分"
 
 
