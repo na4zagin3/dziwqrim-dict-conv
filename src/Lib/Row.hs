@@ -4,19 +4,22 @@
 module Lib.Row where
 
 import Control.Arrow (left)
-import Control.Monad (join)
+import Control.Monad (join, liftM)
 import Data.Attoparsec.Text (parseOnly)
 import Data.List.NonEmpty (NonEmpty)
 import Data.List.NonEmpty qualified as NEL
 import Data.Map (Map)
 import Data.Map qualified as M
 import Data.Maybe (fromMaybe)
+import Data.Set (Set)
+import Data.Set qualified as S
 import Data.String (fromString)
 import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.Read as TR
 import GHC.Generics (Generic)
 import GHC.Stack (HasCallStack)
+import Lib.Kanji (explodeKanji)
 import Lib.Kanji (p_fanqieField)
 import Lib.Rhymes (list_平水)
 import Text.Printf (printf)
@@ -52,10 +55,10 @@ data Part = Part
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Parts = Parts
-  { p_諧符部 :: !Text
-  , p_諧符位 :: !Int
-  , p_variant :: !Bool
+  { p_諧聲部 :: !Text
+  , p_諧聲位 :: !Int
   , p_parts :: ![Part]
+  , p_variants :: Set Int
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -217,35 +220,43 @@ p_r_part pIRaw pE = do
 --
 -- Examples
 --
--- >>> p_r_parts "26" "充" []
--- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = []})
+-- >>> p_r_parts "26" "充" [] "0" "0"
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList []})
 --
--- >>> p_r_parts "26" "充" [("0", "0")]
--- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = []})
+-- >>> p_r_parts "26" "充" [("0", "0")] "0" "0"
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList []})
 --
--- >>> p_r_parts "26" "充" [("0", "⌥")]
--- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = True, p_parts = []})
+-- >>> p_r_parts "26" "充" [("0", "0")] "⌥" "0"
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList [0]})
 --
--- >>> p_r_parts "26" "充" [("269", "金")]
--- Right (Parts {p_諧符部 = "\20805", p_諧符位 = 26, p_variant = False, p_parts = [Part {p_玉篇部首位 = (269,0), p_部外 = "\37329"}]})
+-- >>> p_r_parts "26" "充" [("269", "金")] "0" "0"
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [Part {p_玉篇部首位 = (269,0), p_部外 = "\37329"}], p_variants = fromList []})
 --
--- >>> p_r_parts "32" "竹筑" [("73.999", "巩")]
--- Right (Parts {p_諧符部 = "\31481", p_諧符位 = 32, p_variant = False, p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}]})
+-- >>> p_r_parts "32" "竹筑" [("73.999", "巩")] "0" "0"
+-- Right (Parts {p_諧聲部 = "\31481", p_諧聲位 = 32, p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}], p_variants = fromList []})
 
-p_r_parts :: Text -> Text -> [(Text, Text)] -> Either String Parts
-p_r_parts ki kp psRaw = do
-  (kin, r) <- TR.decimal ki :: Either String (Int, Text)
-  () <- if T.null r
-    then Right ()
-    else Left $ printf "trailing garbage: %s" r
-  let (f_variant, ps) = case psRaw of
-        ("0", "⌥"):psT -> (True, psT)
-        psT -> (False, psT)
+p_r_parts :: Text -> Text -> [(Text, Text)] -> Text -> Text -> Either String Parts
+p_r_parts ki kpsRaw ps vk vpsRaw = do
+  let parseDecimal s = do
+        (res, rem) <- TR.decimal s
+        if T.null rem
+          then Right res
+          else Left $ printf "trailing garbage: %s" rem
+  kin <- parseDecimal ki
+  vps' <- liftM S.fromList . mapM parseDecimal $ T.split (`T.elem` ",") vpsRaw
+  vps <- case vk of
+        x | x `elem` ["⌥", "分", "略", "异"] -> Right $ S.singleton 0 `S.union` vps'
+        "0" -> Right $ S.delete 0 vps'
+        _ -> Left $ printf "Unknown 聲分 (%s)" vk
   f_parts <- mapM (uncurry p_r_part) $ filter (/= ("0", "0")) ps
+  kps <- explodeKanji kpsRaw
+  kp <- case kps of
+    [] -> Left "Empty 諧聲部"
+    kp:_ -> Right kp
   return $ Parts
-    { p_諧符部 = T.take 1 kp
-    , p_諧符位 = kin
-    , p_variant = f_variant
+    { p_諧聲部 = kp
+    , p_諧聲位 = kin
+    , p_variants = vps
     , p_parts = f_parts
     }
 
@@ -412,7 +423,7 @@ maybeToRight y Nothing  = Left y
 
 parseValidRow :: (HasCallStack) => Int -> Text -> Map Text Text -> Either String Row
 parseValidRow row version m = do
-  let lookupField f = maybeToRight f $ M.lookup (fromString f) m
+  let lookupField f = maybeToRight (printf "missing field: %s" f) $ M.lookup (fromString f) m
 
   f_字 <- p_r_字 =<< lookupField "字"
   f_親_pl <- left ("親: " <>) . join $ p_r_shapeVariant <$> lookupField "字" <*> lookupField "四角"
@@ -445,7 +456,12 @@ parseValidRow row version m = do
             , ("符外位2", "聲外2")
             , ("符外位3", "聲外3")
             ]
-    join $ p_r_parts <$> lookupField "諧聲位" <*> lookupField "諧聲" <*> partsFields
+    join $ p_r_parts
+      <$> lookupField "諧聲位"
+      <*> lookupField "諧聲"
+      <*> partsFields
+      <*> lookupField "聲分"
+      <*> lookupField "聲外分"
 
 
   f_r_漢辭海 <- join $ p_r_漢辭海 <$> lookupField "漢辭海聲" <*> lookupField "漢辭海韵" <*> lookupField "漢辭海調"

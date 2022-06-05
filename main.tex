@@ -106,9 +106,10 @@
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
 
-\newcommand{\SoundPart}[2]{+ {\ltjsetparameter{jacharrange={-9}}#1}#2}
-\newcommand{\SoundPartN}[1]{+ {\ltjsetparameter{jacharrange={-9}}#1}}
-\newcommand{\SoundPartNI}[1]{+{\ltjsetparameter{jacharrange={-9}}#1}}
+\newcommand{\SoundParts}[1]{{\ltjsetparameter{jacharrange={-9}}#1}}
+\newcommand{\SoundPart}[2]{#1#2}
+\newcommand{\SoundPartN}[1]{#1}
+\newcommand{\SoundPartNI}[1]{#1}
 
 \newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
 \newcommand{\refEntry}[1]{\hyperref[entry-#1]{#1}}
@@ -125,41 +126,6 @@
   \begin{itemize}
   \item{} コメントの付加
   \item{} \verb|?符→?聲|
-  \end{itemize}
-\item{} 諧聲符本文
-  \begin{itemize}
-  \item{} 書式変更→諧聲符の追加
-    \begin{itemize}
-    \item{} 本文
-\begin{verbatim}
-25' + 57 口
-25 + 358 牛
-\end{verbatim}
-    \item{} 索引
-\begin{verbatim}
-25' + 57
-25 + 358 
-\end{verbatim}
-    \end{itemize}
-  \item{} 「聲外分」（コンマ区切）
-    \begin{itemize}
-    \item{} 本文
-\begin{verbatim}
-例
-80 + 23
-聲外分=1
-
-→
-
-本文
-
-    (80 + 23 人)'
-
-索引
-
-    (80 + 23)'
-\end{verbatim}
-    \end{itemize}
   \end{itemize}
 \item{} 反切
   \begin{itemize}
@@ -207,6 +173,7 @@
     \item{} 新字体最優先、親字、異体字
     \item{} ?部 +?画
     \end{itemize}
+  \item{} 頁数の代わりに諧聲符式を用いる
   \end{itemize}
 \item{} 柱
   \begin{itemize}
