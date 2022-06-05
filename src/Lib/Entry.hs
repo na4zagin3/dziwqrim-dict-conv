@@ -28,6 +28,7 @@ import Text.Printf (printf)
 import Lib.Row
 import Lib.PathTree (PathTree)
 import Lib.PathTree qualified as PT
+import Lib.PhoneticRadical (PhoneticRadical(..))
 
 data Entry音義 = Entry音義
   { e_隋音 :: !Text
@@ -53,6 +54,7 @@ data Entry = Entry
 data Section = Section
   { sec_諧符位 :: !(Int, Int)
   , sec_諧符部 :: !Text
+  , sec_phoneticRadical :: !(Maybe PhoneticRadical)
   , sec_entries :: !(PathTree Part [Entry])
   }
   deriving (Read, Show, Eq, Generic)
@@ -71,9 +73,10 @@ addEntryToTree e t = PT.insertWith (<>) path [e] t
   where
     path = p_parts $ e_parts e
 
-sectionsFromRows :: (Foldable f) => f Row -> ([String], [Section])
-sectionsFromRows rs = first concat . unzip . map renderSection $ MS.toList sectionMap
+sectionsFromRows :: (Foldable f) => [PhoneticRadical] -> f Row -> ([String], [Section])
+sectionsFromRows prs rs = first concat . unzip . map renderSection $ MS.toList sectionMap
   where
+    phoneticRadicalMap = M.fromList $ map (\pr -> (pr_index pr, pr)) prs
     sectionMap = groupBy (\r -> (p_諧聲位 $ r_parts r, p_諧聲部 $ r_parts r)) $ Foldable.toList rs
     renderSection (k, v) = (errors, section)
       where
@@ -81,6 +84,7 @@ sectionsFromRows rs = first concat . unzip . map renderSection $ MS.toList secti
         section = Section
                   { sec_諧符位 = fst k
                   , sec_諧符部 = snd k
+                  , sec_phoneticRadical = M.lookup (fst k) phoneticRadicalMap
                   , sec_entries = foldr addEntryToTree PT.empty f_entries
                   }
 
@@ -493,15 +497,19 @@ sectionToTex s = mconcat
     , sec_諧符部 s
     , "聲"
     , "}{"
-    -- reading
+    , T.intercalate ", " pronunciations
     , "}{"
-    -- comments
+    , fromMaybe "" comment
     , "}{"
     , entriesToHeadingsTex $ sec_entries s
     , "}"
     , T.intercalate "\n" . map entryToTex . concatMap snd . PT.toList $ sec_entries s
     , "\n\n"
     ]
+  where
+    phoneticRadical = sec_phoneticRadical s
+    comment = pr_comment <$> phoneticRadical
+    pronunciations = maybeToList =<< mapM pr_pronunciation phoneticRadical
 
 -- QR
 qrImageToTex :: QR.QRImage -> Text

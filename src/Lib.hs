@@ -22,17 +22,25 @@ import GHC.Generics (Generic)
 
 import Lib.Entry (sectionsFromRows, sectionToTex)
 import Lib.Row (parseRow)
+import Lib.PhoneticRadical (parsePhoneticRadical)
 -- import Control.Monad.Trans.Writer.Strict (Writer)
 -- type Dictionary = List
 
-convertCsvToTex :: FilePath -> FilePath -> IO ()
-convertCsvToTex inPath outPath = do
-  Right rawRows <- readCsvFile inPath
+contineShowingErrors :: [(Int, Either String a)] -> IO [a]
+contineShowingErrors res = do
+  let (errors, successes) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ res
+  mapM_ putStrLn errors
+  return successes
+
+convertCsvToTex :: FilePath -> FilePath -> FilePath -> IO ()
+convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
+
+  Right rawRows <- readCsvFile inRowPath
+  Right rawPhoneticRadicals <- readCsvFile inPhoneticRadicalPath
   let rows = [(2 :: Int)..]
-  let parsedResults =  zip rows .map (uncurry parseRow) . zip rows . V.toList $ rawRows
-  let (errors1, parsedRows) = partitionEithers . map (\(i, r) -> left (printf "%d: %s" i) r) $ parsedResults
-  mapM_ putStrLn errors1
-  let (errors2, sections) = sectionsFromRows . catMaybes $ parsedRows
+  parsedRows <- contineShowingErrors . zip rows . map (uncurry parseRow) . zip rows . V.toList $ rawRows
+  parsedPhoneticRadicals <- contineShowingErrors . zip rows . map (uncurry parsePhoneticRadical) . zip rows . V.toList $ rawPhoneticRadicals
+  let (errors2, sections) = sectionsFromRows parsedPhoneticRadicals . catMaybes $ parsedRows
   mapM_ putStrLn errors2
   let outText = T.unlines . map sectionToTex $ sections
   T.writeFile outPath outText

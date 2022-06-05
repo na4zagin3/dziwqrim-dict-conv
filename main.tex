@@ -8,6 +8,7 @@
 
 \usepackage{adjustbox}
 \usepackage{calc}
+\usepackage{ifthen}
 \usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
@@ -68,10 +69,17 @@
 
 \newcommand{\PartHeader}[5]{%
   \section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
-  #4%
-  \begin{center}
-    \centering #5
-  \end{center}
+  \ifthenelse{\equal{#4}{}}{%
+    \begin{center}
+      #5%
+    \end{center}
+  }{%
+    \begin{center}
+      {\small #4}%
+
+      #5%
+    \end{center}
+  }%
   \vspace{0.5em plus 0.2em minus 0.05em}
 }
 \newenvironment{Entry}[2]{%
@@ -123,10 +131,6 @@
 \part{Examples}
 やること
 \begin{itemize}
-\item{} 諧聲符見出し
-  \begin{itemize}
-  \item{} コメントの付加
-  \end{itemize}
 \item{} 反切
   \begin{itemize}
   \item{} 「切韵本」欄以下の違いは何？

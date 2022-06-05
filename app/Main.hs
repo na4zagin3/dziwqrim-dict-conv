@@ -7,7 +7,8 @@ import Lib
 main :: IO ()
 main = do
   args <- getArgs
-  let inPath = args !! 0
-  let outPath = args !! 1
-  print [inPath, outPath]
-  convertCsvToTex inPath outPath
+  let inRowPath = args !! 0
+  let inPhoneticRadicalPath = args !! 1
+  let outPath = args !! 2
+  print [inRowPath, inPhoneticRadicalPath, outPath]
+  convertCsvToTex inRowPath inPhoneticRadicalPath outPath

@@ -11,9 +11,9 @@ Haskellにより書かれているため、実行には[Haskell Stack](https://d
 LuaLaTeXはTeXLiveを使うのがよい。
 
 ## 生成方法
-スプレッドシートをプロジェクトディレクトリに `test-data.csv` の名で保存して、次のコマンドを実行する。
+スプレッドシートをプロジェクトディレクトリに `隋語常用漢字音表.csv` `諧聲.csv` の名で保存して、次のコマンドを実行する。
 
 ```
-$ stack build && stack exec dziwqrim-dict-conv-exe test-data.csv test-data.tex
+$ stack build && stack exec -- dziwqrim-dict-conv-exe 隋語常用漢字音表.csv 諧聲.csv test-data.tex
 $ matexmk -lualatex main.tex
 ```
