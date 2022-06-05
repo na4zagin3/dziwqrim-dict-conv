@@ -486,8 +486,14 @@ entriesToHeadingsTex pt = unfoldTreeToTex' True $ fmap renderEntries pt
 sectionToTex :: Section -> Text
 sectionToTex s = mconcat
     [ "\\PartHeader{"
+    , soundPartNumberToTex $ sec_諧符位 s
+    , "}{"
     , sec_諧符部 s
-    , "符"
+    , "聲"
+    , "}{"
+    -- reading
+    , "}{"
+    -- comments
     , "}{"
     , entriesToHeadingsTex $ sec_entries s
     , "}"

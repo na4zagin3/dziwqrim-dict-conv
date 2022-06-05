@@ -56,20 +56,21 @@
 
 \titleformat{\section}[display]
 {%format
-  \bfseries\large
+  \bfseries\large%
 }{%label
   %(\thesection)%
 }{%sep
   0pt
 }{%before-code
-  \centering\MakeUppercase
+  \centering
 }
 \titlespacing*{\section}{0pt}{*4}{0pt}
 
-\newcommand{\PartHeader}[2]{%
-  \section{#1}%
+\newcommand{\PartHeader}[5]{%
+  \section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
+  #4%
   \begin{center}
-    \centering #2
+    \centering #5
   \end{center}
   \vspace{0.5em plus 0.2em minus 0.05em}
 }
@@ -125,7 +126,6 @@
 \item{} 諧聲符見出し
   \begin{itemize}
   \item{} コメントの付加
-  \item{} \verb|?符→?聲|
   \end{itemize}
 \item{} 反切
   \begin{itemize}
@@ -197,7 +197,7 @@
   \end{itemize}
 \end{itemize}
 
-\PartHeader{冬聲 toŋ}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
+\PartHeader{27}{冬聲}{toŋ}{}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
 
 \begin{Entry}{冬}{{k}}
   + 0（夊部0畫）
@@ -221,7 +221,7 @@
   \end{Sound}
 \end{Entry}
 
-\PartHeader{中聲 tuŋ}{\refEntry{中}仲忠}
+\PartHeader{28}{中聲}{tuŋ}{}{\refEntry{中}仲忠}
 
 \begin{Entry}{中}{{w}}%
   \index[radical]{丨部!3畫!中}%
