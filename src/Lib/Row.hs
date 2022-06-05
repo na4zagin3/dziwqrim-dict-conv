@@ -248,12 +248,12 @@ p_r_parts ki kpsRaw ps vk vpsRaw = do
           else Left $ printf "trailing garbage: %s" rem
   kin <- left (printf "諧聲位: %s") $ p_r_partNumber ki
 
-  vps' <- left (printf "聲外分: %s") . liftM S.fromList . mapM parseDecimal $ T.split (`T.elem` ",") vpsRaw
+  vps' <- left (printf "聲外分: %s") . liftM S.fromList . mapM parseDecimal . filter (not . T.null) $ T.split (`T.elem` ",") vpsRaw
   vps <- case vk of
         x | x `elem` ["⌥", "分", "略", "异"] -> Right $ S.singleton 0 `S.union` vps'
-        "0" -> Right $ S.delete 0 vps'
+          | x `elem` ["", "0"] -> Right $ S.delete 0 vps'
         _ -> Left $ printf "Unknown 聲分 (%s)" vk
-  f_parts <- mapM (uncurry p_r_part) $ filter (/= ("0", "0")) ps
+  f_parts <- mapM (uncurry p_r_part) $ filter (not . (`elem` [("0", "0"), ("", "")])) ps
   kps <- explodeKanji kpsRaw
   kp <- case kps of
     [] -> Left "Empty 諧聲部"
