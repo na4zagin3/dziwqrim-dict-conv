@@ -317,7 +317,9 @@ pronunciationToTex Pronunciation
     fqs :: [Text]
     fqs = pronunciation反切集ToTex pc
     cs :: [Text]
-    cs = fqs <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li) <> (maybeToList n)
+    cs = fqs <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li) <> (maybeToList . fmap stripPeriod $ n)
+    stripPeriod x | T.takeEnd 1 x == "。" = T.dropEnd 1 x
+                  | otherwise = x
 
 indexTex :: Text -> [Text] -> Text
 indexTex name inds = "\\index[" <> name <> "]{" <> T.intercalate "!" inds <> "}"
