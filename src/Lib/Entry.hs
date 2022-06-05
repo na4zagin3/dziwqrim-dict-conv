@@ -156,12 +156,25 @@ shapeVariantsToTex s = mconcat
   where
     variantDescs = Maybe.catMaybes $ map (\(l, c, p) -> variantToTex l c p) $
       [ ("選用", s_選 s, "") ]
-      <> variantSimpJapn (s_簡 s) (s_日 s)
+      <> variantSimpJapn (s_簡 s) (s_日 s) (s_韓 s)
     variantDescsPost = variantToTex "或作" (s_异 s) ""
-    variantSimpJapn [simp] [japn] | simp == japn = [("簡・日作", [simp], "\\textHans")]
-    variantSimpJapn simp japn =
+    variantSimpJapn [simp] [japn] [kor] | simp == japn && japn == kor = [("簡・日・韓作", [simp], "\\textHans")]
+    variantSimpJapn [simp] [japn] kor | simp == japn =
+                                          [("簡・日作", [simp], "\\textHans")
+                                          , ("韓作", kor, "\\textKor")
+                                          ]
+    variantSimpJapn simp [japn] [kor] | japn == kor =
+                                          [("簡作", simp, "\\textHans")
+                                          , ("日・韓作", [japn], "\\textJapn")
+                                          ]
+    variantSimpJapn [simp] japn [kor] | simp == kor =
+                                          [("簡・韓作", [simp], "\\textHans")
+                                          , ("日作", japn, "\\textJapn")
+                                          ]
+    variantSimpJapn simp japn kor =
       [ ("簡作", simp, "\\textHans")
       , ("日作", japn, "\\textJapn")
+      , ("韓作", kor, "\\textKor")
       ]
 
 shape部畫ToTex :: Shape部畫 -> Text

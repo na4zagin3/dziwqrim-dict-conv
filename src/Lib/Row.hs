@@ -38,6 +38,7 @@ data ShapeVariants = ShapeVariants
   , s_選 :: ![ShapeVariant]
   , s_簡 :: ![ShapeVariant]
   , s_日 :: ![ShapeVariant]
+  , s_韓 :: ![ShapeVariant]
   , s_异 :: ![ShapeVariant]
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -451,12 +452,14 @@ parseValidRow row version m = do
   f_選 <- left ("選: " <>) . join $ p_r_shapeVariant <$> lookupField "選" <*> lookupField "四角選"
   f_簡 <- left ("簡: " <>) . join $ p_r_shapeVariant <$> lookupField "簡" <*> lookupField "四簡"
   f_日 <- left ("日: " <>) . join $ p_r_shapeVariant <$> lookupField "日" <*> lookupField "四日"
+  f_韓 <- left ("韓: " <>) . join $ p_r_shapeVariant <$> lookupField "韓" <*> lookupField "四韓"
   f_异 <- left ("异: " <>) . join $ p_r_shapeVariant <$> lookupField "异" <*> lookupField "四异"
   let f_shapeVariants = ShapeVariants
         { s_親 = f_親
         , s_選 = f_選
         , s_簡 = f_簡
         , s_日 = f_日
+        , s_韓 = f_韓
         , s_异 = f_异
         }
 
