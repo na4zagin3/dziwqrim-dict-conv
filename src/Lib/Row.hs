@@ -56,7 +56,7 @@ data Part = Part
 
 data Parts = Parts
   { p_諧聲部 :: !Text
-  , p_諧聲位 :: !Int
+  , p_諧聲位 :: !(Int, Int)
   , p_parts :: ![Part]
   , p_variants :: Set Int
   }
@@ -204,13 +204,17 @@ p_r_部畫 p s = do
     , s_畫 = sn
     }
 
-p_r_part :: Text -> Text -> Either String Part
-p_r_part pIRaw pE = do
+p_r_partNumber :: Text -> Either String (Int, Int)
+p_r_partNumber pIRaw = do
   (n, r) <- TR.decimal pIRaw :: Either String (Int, Text)
-  pI <- case r of
+  case r of
     "" -> Right (n, 0)
     ".999" -> Right (n, 1)
     _ -> Left $ printf "trailing garbage: %s" r
+
+p_r_part :: Text -> Text -> Either String Part
+p_r_part pIRaw pE = do
+  pI <- left (printf "符外位: (%s): %s" pE) $ p_r_partNumber pIRaw
   Right $ Part
     { p_玉篇部首位 = pI
     , p_部外 = pE
@@ -221,19 +225,19 @@ p_r_part pIRaw pE = do
 -- Examples
 --
 -- >>> p_r_parts "26" "充" [] "0" "0"
--- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList []})
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = (26,0), p_parts = [], p_variants = fromList []})
 --
 -- >>> p_r_parts "26" "充" [("0", "0")] "0" "0"
--- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList []})
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = (26,0), p_parts = [], p_variants = fromList []})
 --
 -- >>> p_r_parts "26" "充" [("0", "0")] "⌥" "0"
--- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [], p_variants = fromList [0]})
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = (26,0), p_parts = [], p_variants = fromList [0]})
 --
 -- >>> p_r_parts "26" "充" [("269", "金")] "0" "0"
--- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = 26, p_parts = [Part {p_玉篇部首位 = (269,0), p_部外 = "\37329"}], p_variants = fromList []})
+-- Right (Parts {p_諧聲部 = "\20805", p_諧聲位 = (26,0), p_parts = [Part {p_玉篇部首位 = (269,0), p_部外 = "\37329"}], p_variants = fromList []})
 --
 -- >>> p_r_parts "32" "竹筑" [("73.999", "巩")] "0" "0"
--- Right (Parts {p_諧聲部 = "\31481", p_諧聲位 = 32, p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}], p_variants = fromList []})
+-- Right (Parts {p_諧聲部 = "\31481", p_諧聲位 = (32,0), p_parts = [Part {p_玉篇部首位 = (73,1), p_部外 = "\24041"}], p_variants = fromList []})
 
 p_r_parts :: Text -> Text -> [(Text, Text)] -> Text -> Text -> Either String Parts
 p_r_parts ki kpsRaw ps vk vpsRaw = do
@@ -242,8 +246,9 @@ p_r_parts ki kpsRaw ps vk vpsRaw = do
         if T.null rem
           then Right res
           else Left $ printf "trailing garbage: %s" rem
-  kin <- parseDecimal ki
-  vps' <- liftM S.fromList . mapM parseDecimal $ T.split (`T.elem` ",") vpsRaw
+  kin <- left (printf "諧聲位: %s") $ p_r_partNumber ki
+
+  vps' <- left (printf "聲外分: %s") . liftM S.fromList . mapM parseDecimal $ T.split (`T.elem` ",") vpsRaw
   vps <- case vk of
         x | x `elem` ["⌥", "分", "略", "异"] -> Right $ S.singleton 0 `S.union` vps'
         "0" -> Right $ S.delete 0 vps'

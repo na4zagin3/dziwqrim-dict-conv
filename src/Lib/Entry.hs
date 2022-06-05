@@ -51,7 +51,7 @@ data Entry = Entry
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Section = Section
-  { sec_諧符位 :: !Int
+  { sec_諧符位 :: !(Int, Int)
   , sec_諧符部 :: !Text
   , sec_entries :: !(PathTree Part [Entry])
   }
@@ -169,11 +169,8 @@ shape部畫ToTex s = mconcat
   , "畫）"
   ]
 
-soundPartToTex :: Bool -> Part -> Text
-soundPartToTex mainText Part{ p_玉篇部首位 = (i, p), p_部外 = e} =
-    if mainText
-    then T.pack $ printf "\\SoundPart{%d%s}{%s}" i (primes p) e
-    else T.pack $ printf "\\SoundPartNI{%d%s}" i (primes p)
+soundPartNumberToTex :: (Int, Int) -> Text
+soundPartNumberToTex (i, p) = T.pack $ printf "%d%s" i (primes p)
   where
     primes :: Int -> String
     primes 0 = ""
@@ -182,6 +179,12 @@ soundPartToTex mainText Part{ p_玉篇部首位 = (i, p), p_部外 = e} =
     primes 3 = "‴"
     primes 4 = "⁗"
     primes n = error $ "Unsupported number of primes: " <> show n
+
+soundPartToTex :: Bool -> Part -> Text
+soundPartToTex mainText Part{ p_玉篇部首位 = k, p_部外 = e} =
+    if mainText
+    then T.pack $ printf "\\SoundPart{%s}{%s}" (soundPartNumberToTex k) e
+    else T.pack $ printf "\\SoundPartNI{%s}" (soundPartNumberToTex k)
 
 -- | Generate a text content for phonetic parts
 --
@@ -195,7 +198,7 @@ soundPartsToTex mainText sps = "\\SoundParts{" <> content <> "}"
   where
     content = parenthesize mainText texSoundPartsEither
     texSoundPartsEither = rightIndexes (p_variants sps) texSoundParts
-    texSoundParts = (T.pack $ printf "%d" $ p_諧聲位 sps) : (map (soundPartToTex mainText) $ p_parts sps)
+    texSoundParts = (soundPartNumberToTex $ p_諧聲位 sps) : (map (soundPartToTex mainText) $ p_parts sps)
     concatParts = if mainText then T.intercalate " " else T.concat
     command = if mainText then "\\SoundPartN" else "\\SoundPartNI"
 
@@ -374,7 +377,8 @@ generatePhoneticIndicesTex z pps = [indexPhonetic]
       , z
       ]
     keyPart Part{ p_玉篇部首位 = (i, p) } = [i, p]
-    numKeys = [p_諧聲位 pps] <> concatMap keyPart (p_parts pps)
+    keyPhonetic (i, p) = [i, p]
+    numKeys = (keyPhonetic $ p_諧聲位 pps) <> concatMap keyPart (p_parts pps)
     numKeyStr = T.intercalate " " . map numberKey $ numKeys
     keyStr = numKeyStr <> "-" <> mconcat (unfoldIndexSet "0" "1" ((+ 1) . length $ p_parts pps) $ p_variants pps)
     word = p_諧聲部 pps <> soundPartsToTex False pps
