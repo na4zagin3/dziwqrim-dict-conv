@@ -151,9 +151,10 @@ shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
     [ renderSikroksToTex . s_四角 . s_親 $ s
     , "\\quad "
-    , T.intercalate "，" $ variantDescs <> maybeToList variantDescsPost
+    , if T.null variantDesc then "" else variantDesc <> "。"
     ]
   where
+    variantDesc = T.intercalate "，" $ variantDescs <> maybeToList variantDescsPost
     variantDescs = Maybe.catMaybes $ map (\(l, c, p) -> variantToTex l c p) $
       [ ("選用", s_選 s, "") ]
       <> variantSimpJapn (s_簡 s) (s_日 s) (s_韓 s)
@@ -179,11 +180,10 @@ shapeVariantsToTex s = mconcat
 
 shape部畫ToTex :: Shape部畫 -> Text
 shape部畫ToTex s = mconcat
-  [ "（"
-  , s_部 s
+  [ s_部 s
   , "部"
   , T.pack . show . s_畫 $ s
-  , "畫）"
+  , "畫"
   ]
 
 soundPartNumberToTex :: (Int, Int) -> Text
@@ -446,7 +446,8 @@ entryToTex e = mconcat
     , "%\n"
     , "  "
     , soundPartsToTex True $ e_parts e
-    , fromMaybe "" . fmap shape部畫ToTex $ e_部畫 e
+    , "。"
+    , fromMaybe "" . fmap ((<> "。") . shape部畫ToTex) $ e_部畫 e
     , "\n"
     , "  \\\\\n"
     , "  ", shapeVariantsToTex $ e_shapeVariants e, "\n"
