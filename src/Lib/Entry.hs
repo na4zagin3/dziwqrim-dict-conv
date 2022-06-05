@@ -192,9 +192,9 @@ soundPartToTex mainText Part{ p_玉篇部首位 = k, p_部外 = e} =
 
 -- | Generate a text content for phonetic parts
 --
--- >>> putStrLn . T.unpack $ soundPartsToTex True $ Parts {p_諧聲部 = "夋", p_諧聲位 = 80, p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> putStrLn . T.unpack $ soundPartsToTex True $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- \SoundParts{(80 + \SoundPart{23}{人})′}
--- >>> putStrLn . T.unpack $ soundPartsToTex False $ Parts {p_諧聲部 = "夋", p_諧聲位 = 80, p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> putStrLn . T.unpack $ soundPartsToTex False $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- \SoundParts{(80+\SoundPartNI{23})′}
 --
 soundPartsToTex :: Bool -> Parts -> Text
@@ -373,7 +373,7 @@ unfoldIndexSet vf vt l is = map f . take l $ [0..]
 
 -- | Generate an index for phonetic parts
 --
--- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = 80, p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- ["\\index[phonetic]{00000080 00000023 00000000-01@\22795\\SoundParts{(80+\\SoundPartNI{23})\8242}!\20667}"]
 generatePhoneticIndicesTex :: Text -> Parts -> [Text]
 generatePhoneticIndicesTex z pps = [indexPhonetic]
