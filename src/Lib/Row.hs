@@ -164,6 +164,8 @@ p_r_四角 t = do
 -- Right [ShapeVariant {s_字 = "\22823", s_四角 = ("4003","0") :| [("4080","0")], s_comment = ""}]
 -- >>> p_r_shapeVariant "皐臯" "26409|26409"
 -- Right [ShapeVariant {s_字 = "\30352", s_四角 = ("2640","9") :| [], s_comment = ""},ShapeVariant {s_字 = "\33263", s_四角 = ("2640","9") :| [], s_comment = ""}]
+-- >>> p_r_shapeVariant "⿰叠毛" "12115/12114/72115/72114"
+-- Right [ShapeVariant {s_字 = "\12272\21472\27611", s_四角 = ("1211","5") :| [("1211","4"),("7211","5"),("7211","4")], s_comment = ""}]
 -- >>> p_r_shapeVariant "一二三" "10000|10100"
 -- Left "Inconsistent length of \23383 (\19968\20108\19977) and \22235\35282 ([[(\"1000\",\"0\")],[(\"1010\",\"0\")]])"
 -- >>> p_r_shapeVariant "一二三" "10000/10100"
@@ -171,23 +173,24 @@ p_r_四角 t = do
 
 
 p_r_shapeVariant :: Text -> Text -> Either String [ShapeVariant]
-p_r_shapeVariant cs ssRaw = do
+p_r_shapeVariant csStr ssRaw = do
   let p_sk "" = Right []
       p_sk str = mapM p_r_四角 $ T.split (`T.elem` "/") str
   sss <- mapM p_sk $ T.split (`T.elem` "|") ssRaw
+  cs <- left (printf "p_r_shapeVariant: %s") $ explodeKanji csStr
   case (cs, sss) of
-    ("", []) -> Right $ []
-    ("", [[]]) -> Right $ []
+    ([], []) -> Right $ []
+    ([], [[]]) -> Right $ []
     (_, []) -> Left "missing 四角"
-    ("", _) -> Left "missing 字 for 四角"
+    ([], _) -> Left "missing 字 for 四角"
     (_, _) ->
-      if T.length cs == length sss
-        then mapM f $ zip (T.unpack cs) sss
-        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" cs (show sss)
+      if length cs == length sss
+        then mapM f $ zip cs sss
+        else Left $ printf "Inconsistent length of 字 (%s) and 四角 (%s)" (show cs) (show sss)
         where
           f (_, []) = Left "missing 四角"
           f (c, (s:ss)) = Right $ ShapeVariant
-            { s_字 = T.singleton c
+            { s_字 = c
             , s_四角 = s NEL.:| ss
             , s_comment = ""
             }
