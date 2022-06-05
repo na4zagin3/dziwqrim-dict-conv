@@ -262,10 +262,10 @@ pronunciation反切集ToTex Pronunciation反切集
   , pr_廣韵反切 = pK
   , pr_集韵反切 = pDz
   } = map (T.intercalate "，") $ filter (not . null)
-      [ maybeToList $ pronunciation反切ToTex True =<< pC
+      [ f "" pC
       , f "王韵" pUs
-      , f "廣韵" $ catMaybes [pK]
-      , maybeToList $ pronunciation反切ToTex True =<< pDz
+      , f "廣韵" pK
+      , f "" pDz
       ]
   where
     f :: Text -> [Pronunciation反切] -> [Text]
