@@ -28,6 +28,13 @@
 \setmainjfont{Noto Serif CJK SC}
 \setsansjfont{Noto Sans CJK SC}
 
+% Make Greek and Cyrillic non-CJK
+\ltjsetparameter{jacharrange={-2}}
+
+% Make en-dash non-CJK
+\ltjdefcharrange{8}{`–}
+
+
 \newcommand{\textJapn}[1]{{%
     \newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]%
     \newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]%
