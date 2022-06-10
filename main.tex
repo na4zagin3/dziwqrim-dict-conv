@@ -94,20 +94,26 @@
 \cs_set:Nn \_zqdict_xr_section:nn {
   \tl_gset:Nn \g_zqdict_current_section_tl {{#1}{#2}}
 }
-\cs_set:Nn \_zqdict_xr_entry:nn {
-  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
+\cs_set:Nn \_zqdict_xr_entry_begin:nn {
+  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{begin}{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
+}
+\cs_set:Nn \_zqdict_xr_entry_end:nn {
+  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{end}{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
 }
 \cs_set:Nn \_zqdict_xr_end: {
   \tl_build_gend:N \g_zqdict_entries_tl
 }
-\cs_set:Nn \_zqdict_entry_get_headword:n {
+\cs_set:Nn \_zqdict_entry_get_type:n {
   \tl_item:nn {#1} {1}
 }
-\cs_set:Nn \_zqdict_entry_get_page:n {
+\cs_set:Nn \_zqdict_entry_get_headword:n {
   \tl_item:nn {#1} {2}
 }
-\cs_set:Nn \_zqdict_entry_get_section:n {
+\cs_set:Nn \_zqdict_entry_get_page:n {
   \tl_item:nn {#1} {3}
+}
+\cs_set:Nn \_zqdict_entry_get_section:n {
+  \tl_item:nn {#1} {4}
 }
 
 \cs_set:Nn \_zqdict_section_get_number:n {
@@ -117,9 +123,15 @@
   \tl_item:nn {#1} {2}
 }
 
-\cs_generate_variant:Nn \_zqdict_entry_get_section:n { o , x , V }
-\cs_generate_variant:Nn \_zqdict_section_get_number:n { o , x , V }
-\cs_generate_variant:Nn \_zqdict_section_get_part:n { o , x , V }
+\cs_generate_variant:Nn \_zqdict_entry_get_type:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_entry_get_headword:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_entry_get_page:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_entry_get_section:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_section_get_number:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_section_get_part:n { o , x , V , v }
+\cs_generate_variant:Nn \tl_if_eq:nnTF { xnTF }
+\cs_generate_variant:Nn \tl_if_eq:nnT { xnT }
+
 
 \AtBeginDocument {
   \iow_now:cx { @auxout } {
@@ -135,10 +147,17 @@
     \token_to_str:N \ExplSyntaxOff
   }
 }
-\NewDocumentCommand{\RecordEntry}{m}{
+\NewDocumentCommand{\RecordEntryBegin}{m}{
   \iow_shipout_x:cn { @auxout } {
     \token_to_str:N \ExplSyntaxOn
-    \token_to_str:N \_zqdict_xr_entry:nn { #1 } { \int_eval:n { \value { page } } }
+    \token_to_str:N \_zqdict_xr_entry_begin:nn { #1 } { \int_eval:n { \value { page } } }
+    \token_to_str:N \ExplSyntaxOff
+  }
+}
+\NewDocumentCommand{\RecordEntryEnd}{m}{
+  \iow_shipout_x:cn { @auxout } {
+    \token_to_str:N \ExplSyntaxOn
+    \token_to_str:N \_zqdict_xr_entry_end:nn { #1 } { \int_eval:n { \value { page } } }
     \token_to_str:N \ExplSyntaxOff
   }
 }
@@ -150,39 +169,63 @@
   }
 }
 
-\str_new:N \l_zqdict_item_part_str
-\str_new:N \l_zqdict_current_part_str
+\str_new:N \l_zqdict_item_entry_type_str
 
-\cs_set:Nn \_zqdict_render_entry_for_the_current_page:n {
-  \tl_set:Nx \l_tmpa_tl {
-    \_zqdict_entry_get_section:n {#1}
-  }
-  \str_set:Nx \l_zqdict_item_part_str {
-    \_zqdict_section_get_part:V \l_tmpa_tl
-  }
-  \int_compare:nNnT {\_zqdict_entry_get_page:n {#1}} = { \value {page} } {
-    \str_if_eq:VVTF \l_zqdict_item_part_str \l_zqdict_current_part_str {
-      \hspace{0.25em}
-    } {
-      \str_if_eq:VnF \l_zqdict_current_part_str {} {
-        \quad
-      }
-      \textbf{
-        {
-          \ltjsetparameter{jacharrange={-9}}
-          \_zqdict_section_get_number:V \l_tmpa_tl
-        }
-        \str_use:N \l_zqdict_item_part_str
-      }
-      \hspace{0.5em}
-      \str_set:NV \l_zqdict_current_part_str \l_zqdict_item_part_str
-    }
-    \_zqdict_entry_get_headword:n {#1}
-  }
-}
+\str_new:N \l_zqdict_current_part_str
+\tl_new:N \l_zqdict_current_entry_tl
+\str_new:N \l_zqdict_previous_part_str
+
 \NewDocumentCommand{\ShowEntriesForTheCurrentPage}{}{
-  \str_clear:N \l_zqdict_current_part_str
-  \tl_map_function:NN \g_zqdict_entries_tl \_zqdict_render_entry_for_the_current_page:n
+  \str_clear:N \l_zqdict_previous_part_str
+  \tl_map_inline:Nn \g_zqdict_entries_tl {
+    \str_set:Nx \l_zqdict_item_entry_type_str {
+      \_zqdict_entry_get_type:n {##1}
+    }
+
+    \tl_if_eq:xnT {\_zqdict_entry_get_type:n {##1}} {begin} {
+      \tl_set:Nn \l_zqdict_current_entry_tl {##1}
+    }
+
+    \tl_set:Nx \l_tmpa_tl {
+      \_zqdict_entry_get_section:V \l_zqdict_current_entry_tl
+    }
+    \str_set:Nx \l_zqdict_current_part_str {
+      \_zqdict_section_get_part:V \l_tmpa_tl
+    }
+    \bool_if:nT {
+      (
+        \str_if_eq_p:Vn \l_zqdict_item_entry_type_str { begin }
+        &&
+        \int_compare_p:nNn {\_zqdict_entry_get_page:V \l_zqdict_current_entry_tl} = { \value {page} }
+      ) || (
+        \str_if_eq_p:Vn \l_zqdict_item_entry_type_str { end }
+        &&
+        \int_compare_p:n {
+          \_zqdict_entry_get_page:V \l_zqdict_current_entry_tl
+          < \int_eval:n { \value {page} }
+          <= \_zqdict_entry_get_page:n {##1}
+        }
+      )
+    } {
+      \str_if_eq:VVTF \l_zqdict_current_part_str \l_zqdict_previous_part_str {
+        \hspace{0.25em}
+      } {
+        \str_if_eq:VnF \l_zqdict_previous_part_str {} {
+          \quad
+        }
+        \textbf{
+          {
+            \ltjsetparameter{jacharrange={-9}}
+            \_zqdict_section_get_number:V \l_tmpa_tl
+          }
+          \str_use:N \l_zqdict_current_part_str
+        }
+        \hspace{0.5em}
+        \str_set:NV \l_zqdict_previous_part_str \l_zqdict_current_part_str
+      }
+      \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
+    }
+  }
 }
 
 \ExplSyntaxOff
@@ -229,8 +272,11 @@
   \phantomsection%
   \addcontentsline{toc}{subsection}{#1}%
   \label{entry-#1}%
-  \RecordEntry{#1}%
-}{\vspace{0.2em plus 0.5em minus 0.1em}}
+  \RecordEntryBegin{#1}%
+}{%
+  \RecordEntryEnd{#1}%
+  \vspace{0.2em plus 0.5em minus 0.1em}%
+}
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
 \newcommand{\SoundItem}[1]{\item[]/{\zyepheng{#1}}/: }
