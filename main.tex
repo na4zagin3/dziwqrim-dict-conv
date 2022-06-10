@@ -6,13 +6,16 @@
 \usepackage{luatexja-fontspec}
 \usepackage{luatexja-ruby}
 
+\usepackage{expl3}
 \usepackage{adjustbox}
 \usepackage{calc}
+\usepackage{fancyhdr}
 \usepackage{ifthen}
 \usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
 \usepackage[xindy]{imakeidx}
+\usepackage{xparse}
 
 \indexsetup{level=\section,toclevel=section}
 \makeindex[name=radical,title={部首索引},options={-L}]
@@ -80,8 +83,116 @@
 }
 \titlespacing*{\section}{0pt}{*4}{0pt}
 
+\ExplSyntaxOn
+
+\tl_new:N \g_zqdict_entries_tl
+\tl_new:N \g_zqdict_current_section_tl
+
+\cs_set:Nn \_zqdict_xr_begin: {
+  \tl_build_gbegin:N \g_zqdict_entries_tl
+}
+\cs_set:Nn \_zqdict_xr_section:nn {
+  \tl_gset:Nn \g_zqdict_current_section_tl {{#1}{#2}}
+}
+\cs_set:Nn \_zqdict_xr_entry:nn {
+  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
+}
+\cs_set:Nn \_zqdict_xr_end: {
+  \tl_build_gend:N \g_zqdict_entries_tl
+}
+\cs_set:Nn \_zqdict_entry_get_headword:n {
+  \tl_item:nn {#1} {1}
+}
+\cs_set:Nn \_zqdict_entry_get_page:n {
+  \tl_item:nn {#1} {2}
+}
+\cs_set:Nn \_zqdict_entry_get_section:n {
+  \tl_item:nn {#1} {3}
+}
+
+\cs_set:Nn \_zqdict_section_get_number:n {
+  \tl_item:nn {#1} {1}
+}
+\cs_set:Nn \_zqdict_section_get_part:n {
+  \tl_item:nn {#1} {2}
+}
+
+\cs_generate_variant:Nn \_zqdict_entry_get_section:n { o , x , V }
+\cs_generate_variant:Nn \_zqdict_section_get_number:n { o , x , V }
+\cs_generate_variant:Nn \_zqdict_section_get_part:n { o , x , V }
+
+\AtBeginDocument {
+  \iow_now:cx { @auxout } {
+    \token_to_str:N \ExplSyntaxOn
+    \token_to_str:N \_zqdict_xr_begin:
+    \token_to_str:N \ExplSyntaxOff
+  }
+}
+\NewDocumentCommand{\RecordSection}{m m}{
+  \iow_shipout_x:cn { @auxout } {
+    \token_to_str:N \ExplSyntaxOn
+    \token_to_str:N \_zqdict_xr_section:nn { #1 } { #2 }
+    \token_to_str:N \ExplSyntaxOff
+  }
+}
+\NewDocumentCommand{\RecordEntry}{m}{
+  \iow_shipout_x:cn { @auxout } {
+    \token_to_str:N \ExplSyntaxOn
+    \token_to_str:N \_zqdict_xr_entry:nn { #1 } { \int_eval:n { \value { page } } }
+    \token_to_str:N \ExplSyntaxOff
+  }
+}
+\AtEndDocument {
+  \iow_now:cx { @auxout } {
+    \token_to_str:N \ExplSyntaxOn
+    \token_to_str:N \_zqdict_xr_end:
+    \token_to_str:N \ExplSyntaxOff
+  }
+}
+
+\str_new:N \l_zqdict_item_part_str
+\str_new:N \l_zqdict_current_part_str
+
+\cs_set:Nn \_zqdict_render_entry_for_the_current_page:n {
+  \tl_set:Nx \l_tmpa_tl {
+    \_zqdict_entry_get_section:n {#1}
+  }
+  \str_set:Nx \l_zqdict_item_part_str {
+    \_zqdict_section_get_part:V \l_tmpa_tl
+  }
+  \int_compare:nNnT {\_zqdict_entry_get_page:n {#1}} = { \value {page} } {
+    \str_if_eq:VVTF \l_zqdict_item_part_str \l_zqdict_current_part_str {
+      \hspace{0.25em}
+    } {
+      \str_if_eq:VnF \l_zqdict_current_part_str {} {
+        \quad
+      }
+      \textbf{
+        {
+          \ltjsetparameter{jacharrange={-9}}
+          \_zqdict_section_get_number:V \l_tmpa_tl
+        }
+        \str_use:N \l_zqdict_item_part_str
+      }
+      \hspace{0.5em}
+      \str_set:NV \l_zqdict_current_part_str \l_zqdict_item_part_str
+    }
+    \_zqdict_entry_get_headword:n {#1}
+  }
+}
+\NewDocumentCommand{\ShowEntriesForTheCurrentPage}{}{
+  \str_clear:N \l_zqdict_current_part_str
+  \tl_map_function:NN \g_zqdict_entries_tl \_zqdict_render_entry_for_the_current_page:n
+}
+
+\ExplSyntaxOff
+
+\pagestyle{fancy}
+\rhead{\small\ShowEntriesForTheCurrentPage}
+
 \newcommand{\PartHeader}[5]{%
   \section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
+  \RecordSection{#1}{#2}%
   \ifthenelse{\equal{#4}{}}{%
     \begin{center}
       #5%
@@ -95,7 +206,7 @@
   }%
   \vspace{0.5em plus 0.2em minus 0.05em}
 }
-\newenvironment{Entry}[2]{%
+\NewDocumentEnvironment{Entry}{m m} {
   \noindent
   \setlength{\EntryDescriptionLineHeight}{2\baselineskip}%
   \setlength{\EntryDescriptionLineLength}{\linewidth-2\EntryDescriptionLineHeight}%
@@ -118,6 +229,7 @@
   \phantomsection%
   \addcontentsline{toc}{subsection}{#1}%
   \label{entry-#1}%
+  \RecordEntry{#1}%
 }{\vspace{0.2em plus 0.5em minus 0.1em}}
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
@@ -189,8 +301,7 @@
   \end{itemize}
 \item{} 柱
   \begin{itemize}
-  \item{} 部は入れる
-  \item{} 字一覧はできたら
+  \item{} 外側にする
   \end{itemize}
 \item{} 改頁
   \begin{itemize}
