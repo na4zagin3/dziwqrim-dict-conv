@@ -387,7 +387,7 @@ unfoldIndexSet vf vt l is = map f . take l $ [0..]
 -- | Generate an index for phonetic parts
 --
 -- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
--- ["\\index[phonetic]{00000080 00000023 00000000-01@\22795\\SoundParts{(80+\\SoundPartNI{23})\8242}!\20667}"]
+-- ["\\index[phonetic]{00000080 00000000 00000023 00000000-01@\22795\\SoundParts{(80+\\SoundPartNI{23})\8242}!\20667}"]
 generatePhoneticIndicesTex :: Text -> Parts -> [Text]
 generatePhoneticIndicesTex z pps = [indexPhonetic]
   where
