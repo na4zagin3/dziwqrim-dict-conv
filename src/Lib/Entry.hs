@@ -52,7 +52,7 @@ data Entry = Entry
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Section = Section
-  { sec_諧符位 :: !(Int, Int)
+  { sec_諧符位 :: !PhoneticPartNumber
   , sec_諧符部 :: !Text
   , sec_phoneticRadical :: !(Maybe PhoneticRadical)
   , sec_entries :: !(PathTree Part [Entry])
@@ -78,6 +78,7 @@ sectionsFromRows prs rs = first concat . unzip . map renderSection $ MS.toList s
   where
     phoneticRadicalMap = M.fromList $ map (\pr -> (pr_index pr, pr)) prs
     sectionMap = groupBy (\r -> (p_諧聲位 $ r_parts r, p_諧聲部 $ r_parts r)) $ Foldable.toList rs
+    renderSection :: ((PhoneticPartNumber, Text), NEV.NonEmptyVector Row) -> ([String], Section)
     renderSection (k, v) = (errors, section)
       where
         (errors, f_entries) = entriesFromRows $ NEV.toList v
@@ -186,8 +187,12 @@ shape部畫ToTex s = mconcat
   , "畫"
   ]
 
-soundPartNumberToTex :: (Int, Int) -> Text
-soundPartNumberToTex (i, p) = T.pack $ printf "%d%s" i (primes p)
+soundPartNumberToTex :: PhoneticPartNumber -> Text
+soundPartNumberToTex (PhoneticPartNumber (i, 0)) = T.pack $ printf "%d" i
+soundPartNumberToTex (PhoneticPartNumber (i, p)) = T.pack $ printf "%d.%03d" i p
+
+partNumberToTex :: (Int, Int) -> Text
+partNumberToTex (i, p) = T.pack $ printf "%d%s" i (primes p)
   where
     primes :: Int -> String
     primes 0 = ""
@@ -200,14 +205,14 @@ soundPartNumberToTex (i, p) = T.pack $ printf "%d%s" i (primes p)
 soundPartToTex :: Bool -> Part -> Text
 soundPartToTex mainText Part{ p_玉篇部首位 = k, p_部外 = e} =
     if mainText
-    then T.pack $ printf "\\SoundPart{%s}{%s}" (soundPartNumberToTex k) e
-    else T.pack $ printf "\\SoundPartNI{%s}" (soundPartNumberToTex k)
+    then T.pack $ printf "\\SoundPart{%s}{%s}" (partNumberToTex k) e
+    else T.pack $ printf "\\SoundPartNI{%s}" (partNumberToTex k)
 
 -- | Generate a text content for phonetic parts
 --
--- >>> putStrLn . T.unpack $ soundPartsToTex True $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> putStrLn . T.unpack $ soundPartsToTex True $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- \SoundParts{(80 + \SoundPart{23}{人})′}
--- >>> putStrLn . T.unpack $ soundPartsToTex False $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> putStrLn . T.unpack $ soundPartsToTex False $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- \SoundParts{(80+\SoundPartNI{23})′}
 --
 soundPartsToTex :: Bool -> Parts -> Text
@@ -386,7 +391,7 @@ unfoldIndexSet vf vt l is = map f . take l $ [0..]
 
 -- | Generate an index for phonetic parts
 --
--- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
 -- ["\\index[phonetic]{00000080 00000000 00000023 00000000-01@\22795\\SoundParts{(80+\\SoundPartNI{23})\8242}!\20667}"]
 generatePhoneticIndicesTex :: Text -> Parts -> [Text]
 generatePhoneticIndicesTex z pps = [indexPhonetic]
@@ -396,7 +401,7 @@ generatePhoneticIndicesTex z pps = [indexPhonetic]
       , z
       ]
     keyPart Part{ p_玉篇部首位 = (i, p) } = [i, p]
-    keyPhonetic (i, p) = [i, p]
+    keyPhonetic (PhoneticPartNumber (i, p)) = [i, p]
     numKeys = (keyPhonetic $ p_諧聲位 pps) <> concatMap keyPart (p_parts pps)
     numKeyStr = T.intercalate " " . map numberKey $ numKeys
     keyStr = numKeyStr <> "-" <> mconcat (unfoldIndexSet "0" "1" ((+ 1) . length $ p_parts pps) $ p_variants pps)

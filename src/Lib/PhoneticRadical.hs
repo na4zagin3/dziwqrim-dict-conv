@@ -19,13 +19,13 @@ import Data.Text qualified as T
 import Data.Text.Read as TR
 import GHC.Generics (Generic)
 import GHC.Stack (HasCallStack)
-import Lib.Row (p_r_partNumber, maybeToRight)
+import Lib.Row (p_r_phoneticNumber, maybeToRight, PhoneticPartNumber(..))
 import Text.Printf (printf)
 
 data PhoneticRadical = PhoneticRadical
   { pr_radical :: !Text
   , pr_pronunciation :: ![Text]
-  , pr_index :: !(Int, Int)
+  , pr_index :: !PhoneticPartNumber
   , pr_comment :: !Text
   }
   deriving (Eq, Ord, Show, Read)
@@ -39,7 +39,7 @@ parsePhoneticRadical :: (HasCallStack) => Int -> Map Text Text -> Either String 
 parsePhoneticRadical row m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
   f_pr_radical <- lookupField "聲首"
-  f_pr_index <- p_r_partNumber =<< lookupField "聲位"
+  f_pr_index <- p_r_phoneticNumber =<< lookupField "聲位"
   f_pr_comment <- lookupField "コメント"
   f_pr_pronunciation <- p_pr_pronunciation <$> lookupField "諧聲域"
   return $ PhoneticRadical
