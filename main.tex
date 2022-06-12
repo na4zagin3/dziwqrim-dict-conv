@@ -23,7 +23,7 @@
 \makeindex[name=phonetic,title={諧符索引},options={-L}]
 \makeindex[name=zyevio,title={中古音索引},options={-L}]
 
-\usepackage[marginpar=2cm]{geometry}
+\usepackage{geometry}
 
 %\setmainfont{Junicode}
 \setmainfont[Numbers={Lining,Monospaced}]{EB Garamond}
@@ -71,7 +71,7 @@
 
 \providecommand\phantomsection{}
 
-\geometry{includehead,top=1cm,headheight=18pt,headsep=2pt}
+\geometry{top=1.5cm,headheight=18pt,headsep=2pt}
 
 \titleformat{\section}[display]
 {%format
@@ -81,9 +81,10 @@
 }{%sep
   0pt
 }{%before-code
+  \pagebreak[3]
   \centering
 }
-\titlespacing*{\section}{0pt}{*4}{0pt}
+\titlespacing*{\section}{0pt}{1em plus 40em minus 0.2em}{0pt}
 
 \ExplSyntaxOn
 
@@ -241,6 +242,7 @@
 \newcommand{\PartHeader}[5]{%
   \section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
   \RecordSection{#1}{#2}%
+  \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
     \begin{center}
       #5%
@@ -253,6 +255,7 @@
     \end{center}
   }%
   \vspace{0.5em plus 0.2em minus 0.05em}
+  \nopagebreak[3]%
 }
 \NewDocumentEnvironment{Entry}{m m} {
   \noindent
