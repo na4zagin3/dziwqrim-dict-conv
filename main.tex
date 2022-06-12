@@ -225,6 +225,9 @@
       }
       \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
     }
+    \int_compare:nNnT {\_zqdict_entry_get_page:V \l_zqdict_current_entry_tl} > {\value {page} } {
+      \tl_map_break:n {}
+    }
   }
 }
 
