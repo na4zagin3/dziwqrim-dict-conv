@@ -224,6 +224,27 @@ soundPartsToTex mainText sps = "\\SoundParts{" <> content <> "}"
     concatParts = if mainText then T.intercalate " " else T.concat
     command = if mainText then "\\SoundPartN" else "\\SoundPartNI"
 
+-- | Generate a text content for an index prefix
+--
+-- >>> soundPartsToLabelPrefix $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
+-- "80+23'"
+--
+soundPartsToLabelPrefix :: Parts -> Text
+soundPartsToLabelPrefix sps = content
+  where
+    content = T.intercalate "+" $ map f texSoundPartsEither
+    f (Left x) = x
+    f (Right x) = x <> "'"
+    texSoundPartsEither = rightIndexes (p_variants sps) texSoundParts
+    texSoundParts = (phoneticPartNumberToIndex $ p_諧聲位 sps) : (map soundPartToIndex $ p_parts sps)
+    phoneticPartNumberToIndex (PhoneticPartNumber (n, 0)) = T.pack $ printf "%d" n
+    phoneticPartNumberToIndex (PhoneticPartNumber (n, p)) = T.pack $ printf "%d.%d" n p
+    soundPartToIndex Part{ p_玉篇部首位 = (n, 0), p_部外 = _} = T.pack $ printf "%d" n
+    soundPartToIndex Part{ p_玉篇部首位 = (n, p), p_部外 = _} = T.pack $ printf "%d.%d" n p
+
+entryToLabel :: Entry -> Text
+entryToLabel e = soundPartsToLabelPrefix (e_parts e) <> "-" <> (e_字 e)
+
 parenthesize
   :: (IsString c, Semigroup c) =>
      Bool -> [Either c c] -> c
@@ -445,7 +466,7 @@ entryToTex e = mconcat
     , T.intercalate "; " . map (\p -> T.pack $ printf "%d(%s)" (pos_row p) (pos_ver p)) . S.toList $ e_position e
     , "}"
     , "\n\n"
-    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}%\n"
+    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}{", entryToLabel e, "}%\n"
     , "  "
     , T.intercalate "%\n  " $ generateIndicesTex e
     , "%\n"
@@ -506,7 +527,7 @@ entriesToHeadingsTex :: (Ord a) => PathTree a [Entry] -> Text
 entriesToHeadingsTex pt = unfoldTreeToTex' True $ fmap renderEntries pt
   where
     renderEntries es = T.concat $ map renderEntry es
-    renderEntry e = "\\refEntry{" <> e_字 e <> "}"
+    renderEntry e = "\\refEntry{" <> e_字 e <> "}{" <> entryToLabel e <> "}"
 
 sectionToTex :: Section -> Text
 sectionToTex s = mconcat

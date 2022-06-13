@@ -257,7 +257,7 @@
   \vspace{0.5em plus 0.2em minus 0.05em}
   \nopagebreak[3]%
 }
-\NewDocumentEnvironment{Entry}{m m} {
+\NewDocumentEnvironment{Entry}{m m m} {
   \noindent
   \setlength{\EntryDescriptionLineHeight}{2\baselineskip}%
   \setlength{\EntryDescriptionLineLength}{\linewidth-2\EntryDescriptionLineHeight}%
@@ -279,7 +279,7 @@
   }%
   \phantomsection%
   \addcontentsline{toc}{subsection}{#1}%
-  \label{entry-#1}%
+  \label{entry-#3}%
   \RecordEntryBegin{#1}%
 }{%
   \RecordEntryEnd{#1}%
@@ -301,7 +301,7 @@
 \newcommand{\SoundPartNI}[1]{#1}
 
 \newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
-\newcommand{\refEntry}[1]{\hyperref[entry-#1]{#1}}
+\newcommand{\refEntry}[2]{\hyperref[entry-#2]{#1}}
 
 \newcommand{\Position}[1]{\texttt{\tiny #1}}
 
@@ -375,9 +375,9 @@
   \end{itemize}
 \end{itemize}
 
-\PartHeader{27}{冬聲}{toŋ}{}{\refEntry{冬}\refEntry{佟}{疼}{柊}{鼕}{螽}{終}}
+\PartHeader{27}{冬聲}{toŋ}{}{\refEntry{冬}{27-冬-test}\refEntry{佟}{27+23-佟-test}{疼}{柊}{鼕}{螽}{終}}
 
-\begin{Entry}{冬}{{k}}
+\begin{Entry}{冬}{{k}}{27-冬-test}
   + 0（夊部0畫）
   \\
   \Sikrok{2730}{3}
@@ -386,7 +386,7 @@
   \end{Sound}
 \end{Entry}
 
-\begin{Entry}{佟}{{k}}
+\begin{Entry}{佟}{{k}}{27+23-佟-test}
   \index[radical]{人部!5畫!佟}%
   \index[sikrok]{2723.3@\Sikrok{2723}{3}!佟}%
   \index[phonetic]{冬+23}%
@@ -399,9 +399,9 @@
   \end{Sound}
 \end{Entry}
 
-\PartHeader{28}{中聲}{tuŋ}{}{\refEntry{中}仲忠}
+\PartHeader{28}{中聲}{tuŋ}{}{\refEntry{中}{28-中-test}仲忠}
 
-\begin{Entry}{中}{{w}}%
+\begin{Entry}{中}{{w}}{28-中-test}%
   \index[radical]{丨部!3畫!中}%
   \index[sikrok]{5000.6@\Sikrok{5000}{6}}%
   \index[phonetic]{中+0}%
