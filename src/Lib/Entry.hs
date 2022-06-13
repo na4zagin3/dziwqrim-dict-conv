@@ -387,24 +387,6 @@ unfoldIndexSet vf vt l is = map f . take l $ [0..]
     f i | i `S.member` is = vt
         | otherwise = vf
 
--- | Generate an index for phonetic parts
---
--- >>> generatePhoneticIndicesTex "傻" $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
--- ["\\index[phonetic]{00000080 00000000 00000023 00000000-01@\22795\\SoundParts{(80+\\SoundPartNI{23})\8242}!\20667}"]
-generatePhoneticIndicesTex :: Text -> Parts -> [Text]
-generatePhoneticIndicesTex z pps = [indexPhonetic]
-  where
-    indexPhonetic = indexTex "phonetic"
-      [ keyStr <> "@" <> word
-      , z
-      ]
-    keyPart Part{ p_玉篇部首位 = (i, p) } = [i, p]
-    keyPhonetic (PhoneticPartNumber (i, p)) = [i, p]
-    numKeys = (keyPhonetic $ p_諧聲位 pps) <> concatMap keyPart (p_parts pps)
-    numKeyStr = T.intercalate " " . map numberKey $ numKeys
-    keyStr = numKeyStr <> "-" <> mconcat (unfoldIndexSet "0" "1" ((+ 1) . length $ p_parts pps) $ p_variants pps)
-    word = p_諧聲部 pps <> soundPartsToTex False pps
-
 generateZyevioIndicesTex :: Entry -> [Text]
 generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
   where
@@ -419,7 +401,6 @@ generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
 generateIndicesTex :: Entry -> [Text]
 generateIndicesTex e = concat
   [ generateRadicalIndicesTex e
-  , generatePhoneticIndicesTex (s_字 . s_親 . e_shapeVariants $ e) (e_parts e)
   , generateZyevioIndicesTex e
   ]
 
