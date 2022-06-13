@@ -381,29 +381,6 @@ generateRadicalIndicesTex e = [indexMaybeRadical $ e_部畫 e]
     indexMaybeRadical Nothing = indexTex "radical" [ "不明", e_字 e ]
     indexMaybeRadical (Just r) = indexRadical r
 
-generateSikrokIndicesTex :: Entry -> [Text]
-generateSikrokIndicesTex e = concat
-  [ [ indexSikroks svParent ]
-  , map (indexSikrokVariants svParent) $ s_選 sv
-  , map (indexSikrokVariants svParent) $ s_簡 sv
-  , map (indexSikrokVariants svParent) $ s_日 sv
-  , map (indexSikrokVariants svParent) $ s_异 sv
-  ]
-  where
-    indexSikroks ShapeVariant{s_字 = z, s_四角 = sks} = mconcat . map (indexSikrok z) $ NEL.toList sks
-    indexSikrok z sk@(skM, skS) = indexTex "sikrok"
-      [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
-      , z
-      ]
-    sv = e_shapeVariants $ e
-    svParent = s_親 sv
-    indexSikrokVariants ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sks} =
-      mconcat . map (indexSikrokVariant zp z) $ NEL.toList sks
-    indexSikrokVariant zp z sk@(skM, skS) = indexTex "sikrok"
-      [ skM <> "." <> skS <> "@" <> renderSikrokToTex sk
-      , z <> "（" <> zp <> "）"
-      ]
-
 unfoldIndexSet :: a -> a -> Int -> Set Int -> [a]
 unfoldIndexSet vf vt l is = map f . take l $ [0..]
   where
@@ -442,7 +419,6 @@ generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
 generateIndicesTex :: Entry -> [Text]
 generateIndicesTex e = concat
   [ generateRadicalIndicesTex e
-  , generateSikrokIndicesTex e
   , generatePhoneticIndicesTex (s_字 . s_親 . e_shapeVariants $ e) (e_parts e)
   , generateZyevioIndicesTex e
   ]

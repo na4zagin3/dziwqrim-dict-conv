@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE ImportQualifiedPost #-}
 
@@ -22,6 +23,7 @@ import GHC.Generics (Generic)
 
 import Lib.Entry (sectionsFromRows, sectionToTex)
 import Lib.Row (parseRow)
+import Lib.Index.SikrokIndex (sikrokSectionsToTex, sectionsToSikrokSections)
 import Lib.PhoneticRadical (parsePhoneticRadical)
 -- import Control.Monad.Trans.Writer.Strict (Writer)
 -- type Dictionary = List
@@ -42,7 +44,10 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
   parsedPhoneticRadicals <- contineShowingErrors . zip rows . map (uncurry parsePhoneticRadical) . zip rows . V.toList $ rawPhoneticRadicals
   let (errors2, sections) = sectionsFromRows parsedPhoneticRadicals . catMaybes $ parsedRows
   mapM_ putStrLn errors2
-  let outText = T.unlines . map sectionToTex $ sections
+  let outText = T.intercalate "\n"
+                [ T.unlines . map sectionToTex $ sections
+                , sikrokSectionsToTex $ sectionsToSikrokSections sections
+                ]
   T.writeFile outPath outText
 
 readCsvFile

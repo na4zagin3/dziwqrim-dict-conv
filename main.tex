@@ -11,6 +11,7 @@
 \usepackage{calc}
 \usepackage{fancyhdr}
 \usepackage{ifthen}
+\usepackage{multicol}
 \usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
@@ -19,7 +20,6 @@
 
 \indexsetup{level=\section,toclevel=section}
 \makeindex[name=radical,title={部首索引},options={-L}]
-\makeindex[name=sikrok,title={四角号碼索引},options={-L}]
 \makeindex[name=phonetic,title={諧符索引},options={-L}]
 \makeindex[name=zyevio,title={中古音索引},options={-L}]
 
@@ -305,6 +305,27 @@
 
 \newcommand{\Position}[1]{\texttt{\tiny #1}}
 
+\NewDocumentEnvironment{SikrokIndex}{}{
+  \part{四角号碼索引}
+  \begin{multicols}{3}
+}{
+  \end{multicols}
+}
+
+\NewDocumentCommand{\SikrokSection}{m}{
+  \begin{center}
+    \textbf{#1}
+  \end{center}
+}
+\NewDocumentCommand{\SikrokEntry}{m o m m}{
+  \IfNoValueTF{#2}{%
+    #1\hfill #3\hfill\pageref{entry-#4}%
+  }{%
+    #1\hfill #3（#2）\pageref{entry-#4}%
+  }%
+  \par
+}
+
 \newcommand{\Book}[1]{{《#1》}}
 
 \begin{document}
@@ -443,7 +464,6 @@
 \end{itemize}
 
 \printindex[radical]
-\printindex[sikrok]
 \printindex[phonetic]
 \printindex[zyevio]
 \end{document}

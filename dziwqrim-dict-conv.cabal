@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 836c977d4a4ae90967d083cf2019f9811624d93e068598250216abb6e365da8c
+-- hash: bf9d63f966ed6438ecec98fb0c415630e8470a0c08b417edb3e5a530f5de5fda
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Lib
       Lib.Entry
+      Lib.Index.SikrokIndex
       Lib.Kanji
       Lib.PathTree
       Lib.PhoneticRadical
