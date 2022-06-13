@@ -23,14 +23,16 @@ import Data.Text qualified as T
 import Data.Vector.NonEmpty (NonEmptyVector)
 import Data.Vector.NonEmpty qualified as NEV
 import GHC.Generics (Generic)
+import Lib.PathTree qualified as PT
 import Lib.Entry (renderSikrokToTex, Entry(..), Section(..), entryToLabel)
-import Lib.Row (ShapeVariant(..), ShapeVariants(..))
+import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..))
 import Text.Printf (printf)
 
 data SikrokEntry = SikrokEntry
   { sk_e_sikrok :: !(Text, Text)
   , sk_e_entry :: !Text
   , sk_e_label :: !Text
+  , sk_e_partPath :: ![Part]
   , sk_e_headword :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -87,8 +89,8 @@ sikrokSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [foot
       [ "\\end{SikrokIndex}"
       ]
 
-entryToSikrokEntries :: Entry -> [SikrokEntry]
-entryToSikrokEntries e = concat $ concat
+entryToSikrokEntries :: [Part] -> Entry -> [SikrokEntry]
+entryToSikrokEntries p e = concat $ concat
   [ [ indexSikroks svParent ]
   , map (indexSikrokVariants svParent) $ s_選 sv
   , map (indexSikrokVariants svParent) $ s_簡 sv
@@ -101,6 +103,7 @@ entryToSikrokEntries e = concat $ concat
       { sk_e_sikrok = sk
       , sk_e_entry = z
       , sk_e_label = label
+      , sk_e_partPath = p
       , sk_e_headword = Nothing
       }
     label = entryToLabel e
@@ -112,16 +115,29 @@ entryToSikrokEntries e = concat $ concat
       { sk_e_sikrok = sk
       , sk_e_entry = z
       , sk_e_label = label
+      , sk_e_partPath = p
       , sk_e_headword = Just zp
       }
 
 sectionsToSikrokSections :: [Section] -> [SikrokSection]
-sectionsToSikrokSections ss = [section]
+sectionsToSikrokSections ss = sections
   where
-    ses = concatMap entryToSikrokEntries es
-    es :: [Entry]
-    es = concatMap (concat . sec_entries) ss
-    section = SikrokSection
-      { sk_s_header = "test"
-      , sk_s_entries = ses
+    ses = L.sortOn (\e -> (sk_e_sikrok e, sk_e_partPath e)) $ concatMap (uncurry entryToSikrokEntries) es
+    es :: [([Part], Entry)]
+    es = concatMap (concatMap (\(p, vs) -> map (\v -> (p, v)) vs) . PT.toList . sec_entries) ss
+    sectionStartingWith h pre = SikrokSection
+      { sk_s_header = h
+      , sk_s_entries = filter (\e -> pre `T.isPrefixOf` (fst $ sk_e_sikrok e)) ses
       }
+    sections =
+      [ sectionStartingWith "0" "0"
+      , sectionStartingWith "1" "1"
+      , sectionStartingWith "2" "2"
+      , sectionStartingWith "3" "3"
+      , sectionStartingWith "4" "4"
+      , sectionStartingWith "5" "5"
+      , sectionStartingWith "6" "6"
+      , sectionStartingWith "7" "7"
+      , sectionStartingWith "8" "8"
+      , sectionStartingWith "9" "9"
+      ]
