@@ -54,14 +54,14 @@ sikrokEntryToTex SikrokEntry
     contents =
       [ "\\SikrokEntry"
       , "{"
+      , l
+      , "}"
+      , "{"
       , renderSikrokToTex sk
       , "}"
       , fromMaybe "" $ fmap (\x -> "[" <> x <> "]") hw
       , "{"
       , e
-      , "}"
-      , "{"
-      , l
       , "}"
       ]
 
