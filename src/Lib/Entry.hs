@@ -370,17 +370,6 @@ indexTex name inds = "\\index[" <> name <> "]{" <> T.intercalate "!" inds <> "}"
 numberKey :: Int -> Text
 numberKey i = T.pack $ printf "%08d" i
 
-generateRadicalIndicesTex :: Entry -> [Text]
-generateRadicalIndicesTex e = [indexMaybeRadical $ e_部畫 e]
-  where
-    indexRadical Shape部畫{ s_部 = r, s_畫 = s}= indexTex "radical"
-      [ r <> "部"
-      , numberKey s <> "@" <> (T.pack $ show s) <> "畫"
-      , e_字 e
-      ]
-    indexMaybeRadical Nothing = indexTex "radical" [ "不明", e_字 e ]
-    indexMaybeRadical (Just r) = indexRadical r
-
 unfoldIndexSet :: a -> a -> Int -> Set Int -> [a]
 unfoldIndexSet vf vt l is = map f . take l $ [0..]
   where
@@ -400,8 +389,7 @@ generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
 
 generateIndicesTex :: Entry -> [Text]
 generateIndicesTex e = concat
-  [ generateRadicalIndicesTex e
-  , generateZyevioIndicesTex e
+  [ generateZyevioIndicesTex e
   ]
 
 entryToQrContent :: Entry -> Text

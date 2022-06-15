@@ -326,6 +326,23 @@
   \par
 }
 
+\NewDocumentEnvironment{RadicalIndex}{}{
+  \part{部首索引}
+  \begin{multicols}{3}
+}{
+  \end{multicols}
+}
+\NewDocumentCommand{\RadicalSection}{m}{
+  \begin{center}
+    \textbf{#1}
+  \end{center}
+}
+\NewDocumentCommand{\RadicalEntry}{m m m m}{
+  \noindent%
+  #2\hfill #3\hfill #4\pageref{entry-#1}%
+  \par
+}
+
 \newcommand{\Book}[1]{{《#1》}}
 
 \begin{document}
