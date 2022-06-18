@@ -97,10 +97,16 @@ data Pronunciation辭源韵 = Pronunciation辭源韵
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data Pronunciation韵 =
+    Pronunciation韵Number !Int
+  | Pronunciation韵Other !Text
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Pronunciation = Pronunciation
-  { -- pr_韵部 :: !Text
-  -- ,
-    pr_反切集 :: !(Pronunciation反切集)
+  { pr_四聲 :: !(Maybe Int)
+  , pr_韵 :: !Pronunciation韵
+  , pr_小韵 :: !Pronunciation韵
+  , pr_反切集 :: !(Pronunciation反切集)
   , pr_漢辭海 :: !(Maybe Pronunciation漢辭海)
   -- , pr_辭源韵 :: !(Maybe Pronunciation辭源韵)
   , pr_略韵 :: !(Maybe Text)
@@ -288,6 +294,24 @@ p_r_parts ki kpsRaw ps vk vpsRaw = do
     , p_variants = vps
     , p_parts = f_parts
     }
+
+p_r_四聲 :: Text -> Either String (Maybe Int)
+p_r_四聲 "n" = Right Nothing
+p_r_四聲 iStr = do
+  (i, r) <- TR.decimal iStr :: Either String (Int, Text)
+  () <- if T.null r
+    then Right ()
+    else Left $ printf "trailing garbage: %s" r
+  return . Just $ i
+
+p_r_韵 :: Text -> Either String Pronunciation韵
+p_r_韵 t | t `elem` ["n", "x", "z"] = Right $ Pronunciation韵Other t
+p_r_韵 iStr = do
+  (i, r) <- TR.decimal iStr :: Either String (Int, Text)
+  () <- if T.null r
+    then Right ()
+    else Left $ printf "trailing garbage: %s" r
+  return $ Pronunciation韵Number i
 
 p_r_隋音 :: Text -> Either String Text
 p_r_隋音 "" = Left "Missing 隋音"
@@ -497,6 +521,9 @@ parseValidRow row version m = do
       <*> lookupField "分"
       <*> lookupField "聲外分"
 
+  f_r_四聲 <- left ("四聲: " <>) . join $ p_r_四聲 <$> lookupField "四聲"
+  f_r_韵 <- left ("韵: " <>) . join $ p_r_韵 <$> lookupField "韵"
+  f_r_小韵 <- left ("小韵: " <>) . join $ p_r_韵 <$> lookupField "小韵"
 
   f_r_漢辭海 <- join $ p_r_漢辭海 <$> lookupField "漢辭海聲" <*> lookupField "漢辭海韵" <*> lookupField "漢辭海調"
   -- f_r_辭源韵 <- join $ p_r_辭源韵 <$> lookupField "辭源韵"
@@ -505,7 +532,10 @@ parseValidRow row version m = do
 
   f_r_反切集 <- join $ p_r_反切集 <$> lookupField "切韵反切" <*> lookupField "切韵本" <*> lookupField "王韵反切" <*> lookupField "廣韵反切" <*> lookupField "集韵反切"
   let f_pronunciation = Pronunciation
-        { pr_漢辭海 = f_r_漢辭海
+        { pr_四聲 = f_r_四聲
+        , pr_韵 = f_r_韵
+        , pr_小韵 = f_r_小韵
+        , pr_漢辭海 = f_r_漢辭海
         , pr_反切集 = f_r_反切集
         , pr_略韵 = f_r_略韵
         , pr_字音補注 = f_r_字音補注

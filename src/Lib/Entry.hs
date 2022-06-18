@@ -105,7 +105,7 @@ sectionsFromRows prs rs = first concat . unzip . map renderSection $ MS.toList s
                   }
 
 entriesFromRows :: (Functor f, Foldable f) => f Row -> ([String], [Entry])
-entriesFromRows rs = (errors, L.sortBy (compare `on` e_position) groupedEntries)
+entriesFromRows rs = (errors, map sort音義InEntry groupedEntries)
   where
     undedupedEntries = Foldable.toList $ fmap entryFromRow rs
     entriesByHeadword = MS.map (NEV.foldl1' liftedMergeEntry . NEV.map Right) $ groupBy e_字 undedupedEntries
@@ -147,6 +147,15 @@ mergeEntry a b = do
     , e_parts = f_parts
     , e_音義 = f_音義
     }
+
+sort音義InEntry :: Entry -> Entry
+sort音義InEntry e = e { e_音義 = sort音義 $ e_音義 e }
+
+sort音義 :: [Entry音義] -> [Entry音義]
+sort音義 = L.sortOn (f . e_pronunciation)
+  where
+    f Pronunciation{pr_四聲=Nothing, pr_韵=i, pr_小韵=s } = (1, Nothing, i, s)
+    f Pronunciation{pr_四聲=t, pr_韵=i, pr_小韵=s } = (0, t, i, s)
 
 variantToTex :: Text -> [ShapeVariant] -> Text -> Maybe Text
 variantToTex _ [] _ = Nothing
