@@ -314,27 +314,29 @@
 \NewDocumentCommand{\SikrokEntry}{m m o m}{
   \noindent%
   \IfNoValueTF{#3}{%
-    #2\hfill #4\hfill\pageref{entry-#1}%
+    #2 #4 \hfill\pageref{entry-#1}%
   }{%
-    #2\hfill #4（#3）\pageref{entry-#1}%
+    #2 #4（#3）\hfill\pageref{entry-#1}%
   }%
   \par
 }
 
 \NewDocumentEnvironment{RadicalIndex}{}{
   \part{部首索引}
-  \begin{multicols}{3}
-}{
+  \begin{multicols}{4}
+  }{
   \end{multicols}
 }
 \NewDocumentCommand{\RadicalSection}{m}{
   \begin{center}
-    \textbf{#1}
+    \textbf{#1部}
   \end{center}
 }
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
   \noindent%
-  #2\hfill #3\hfill #4\pageref{entry-#1}%
+  \makebox[3em][l]{+#3畫} #4 \hfill\pageref{entry-#1}%
+  \par
+}
 
 \NewDocumentEnvironment{ReadingIndex}{}{
   \part{中古音索引}
