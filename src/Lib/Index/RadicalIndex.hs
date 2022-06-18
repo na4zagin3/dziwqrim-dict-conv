@@ -24,7 +24,7 @@ import Data.Vector.NonEmpty (NonEmptyVector)
 import Data.Vector.NonEmpty qualified as NEV
 import GHC.Generics (Generic)
 import Lib.PathTree qualified as PT
-import Lib.Entry (renderSikrokToTex, Entry(..), Section(..), entryToLabel)
+import Lib.Entry (renderSikrokToTex, Entry(..), EntrySortKey(..), Section(..), entryToLabel, entrySortKey)
 import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..), Shape部畫(..))
 import Text.Printf (printf)
 
@@ -32,7 +32,7 @@ data RadicalEntry = RadicalEntry
   { sk_r_radical :: !Shape部畫
   , sk_r_entry :: !Text
   , sk_r_label :: !Text
-  , sk_r_partPath :: ![Part]
+  , sk_r_sortKey :: !EntrySortKey
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -47,7 +47,6 @@ radicalEntryToTex RadicalEntry
   { sk_r_radical = r
   , sk_r_entry = e
   , sk_r_label = l
-  , sk_r_partPath = p
   } = mconcat
       [ "\\RadicalEntry"
       , "{"
@@ -97,7 +96,7 @@ entryToRadicalEntries p e = indexRadicals svParent (e_部畫 e)
         { sk_r_radical = r
         , sk_r_entry = z
         , sk_r_label = label
-        , sk_r_partPath = p
+        , sk_r_sortKey = entrySortKey e
         }
       ]
     label = entryToLabel e
@@ -113,5 +112,5 @@ sectionsToRadicalSections ss = sections
     sections =
       map (\(p, es) -> RadicalSection
             { sk_r_header = p
-            , sk_r_entries = L.sortOn (\e -> (sk_r_partPath e, s_畫 $ sk_r_radical e)) es
+            , sk_r_entries = L.sortOn (\e -> (s_畫 $ sk_r_radical e, sk_r_sortKey e)) es
             }) $ M.toList ses

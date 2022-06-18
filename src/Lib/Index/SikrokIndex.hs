@@ -24,7 +24,7 @@ import Data.Vector.NonEmpty (NonEmptyVector)
 import Data.Vector.NonEmpty qualified as NEV
 import GHC.Generics (Generic)
 import Lib.PathTree qualified as PT
-import Lib.Entry (renderSikrokToTex, Entry(..), Section(..), entryToLabel)
+import Lib.Entry (renderSikrokToTex, Entry(..), EntrySortKey(..), Section(..), entryToLabel, entrySortKey)
 import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..))
 import Text.Printf (printf)
 
@@ -32,7 +32,7 @@ data SikrokEntry = SikrokEntry
   { sk_e_sikrok :: !(Text, Text)
   , sk_e_entry :: !Text
   , sk_e_label :: !Text
-  , sk_e_partPath :: ![Part]
+  , sk_e_sortKey :: !EntrySortKey
   , sk_e_headword :: !(Maybe Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -103,7 +103,7 @@ entryToSikrokEntries p e = concat $ concat
       { sk_e_sikrok = sk
       , sk_e_entry = z
       , sk_e_label = label
-      , sk_e_partPath = p
+      , sk_e_sortKey = entrySortKey e
       , sk_e_headword = Nothing
       }
     label = entryToLabel e
@@ -115,14 +115,14 @@ entryToSikrokEntries p e = concat $ concat
       { sk_e_sikrok = sk
       , sk_e_entry = z
       , sk_e_label = label
-      , sk_e_partPath = p
+      , sk_e_sortKey = entrySortKey e
       , sk_e_headword = Just zp
       }
 
 sectionsToSikrokSections :: [Section] -> [SikrokSection]
 sectionsToSikrokSections ss = sections
   where
-    ses = L.sortOn (\e -> (sk_e_sikrok e, sk_e_partPath e)) $ concatMap (uncurry entryToSikrokEntries) es
+    ses = L.sortOn (\e -> (sk_e_sikrok e, sk_e_sortKey e)) $ concatMap (uncurry entryToSikrokEntries) es
     es :: [([Part], Entry)]
     es = concatMap (concatMap (\(p, vs) -> map (\v -> (p, v)) vs) . PT.toList . sec_entries) ss
     sectionStartingWith h pre = SikrokSection

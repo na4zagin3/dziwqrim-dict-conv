@@ -51,6 +51,14 @@ data Entry = Entry
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data EntrySortKey = EntrySortKey
+  { es_phoneticPartNumber :: !PhoneticPartNumber
+  , es_partPath :: ![Part]
+  -- , es_reading :: !Text
+  , es_position :: !(Set Position)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Section = Section
   { sec_諧符位 :: !PhoneticPartNumber
   , sec_諧符部 :: !Text
@@ -73,6 +81,13 @@ addEntryToTree e t = PT.insertWith (<>) path [e] t
   where
     path = p_parts $ e_parts e
 
+entrySortKey :: Entry -> EntrySortKey
+entrySortKey e = EntrySortKey
+  { es_phoneticPartNumber = p_諧聲位 $ e_parts e
+  , es_partPath = p_parts $ e_parts e
+  , es_position = e_position e
+  }
+
 sectionsFromRows :: (Foldable f) => [PhoneticRadical] -> f Row -> ([String], [Section])
 sectionsFromRows prs rs = first concat . unzip . map renderSection $ MS.toList sectionMap
   where
@@ -86,7 +101,7 @@ sectionsFromRows prs rs = first concat . unzip . map renderSection $ MS.toList s
                   { sec_諧符位 = fst k
                   , sec_諧符部 = snd k
                   , sec_phoneticRadical = M.lookup (fst k) phoneticRadicalMap
-                  , sec_entries = foldr addEntryToTree PT.empty f_entries
+                  , sec_entries = fmap (L.sortOn entrySortKey) $ foldr addEntryToTree PT.empty f_entries
                   }
 
 entriesFromRows :: (Functor f, Foldable f) => f Row -> ([String], [Entry])
