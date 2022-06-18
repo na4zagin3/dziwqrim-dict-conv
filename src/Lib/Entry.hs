@@ -379,34 +379,6 @@ pronunciationToTex Pronunciation
     stripPeriod x | T.takeEnd 1 x == "。" = T.dropEnd 1 x
                   | otherwise = x
 
-indexTex :: Text -> [Text] -> Text
-indexTex name inds = "\\index[" <> name <> "]{" <> T.intercalate "!" inds <> "}"
-
-numberKey :: Int -> Text
-numberKey i = T.pack $ printf "%08d" i
-
-unfoldIndexSet :: a -> a -> Int -> Set Int -> [a]
-unfoldIndexSet vf vt l is = map f . take l $ [0..]
-  where
-    f i | i `S.member` is = vt
-        | otherwise = vf
-
-generateZyevioIndicesTex :: Entry -> [Text]
-generateZyevioIndicesTex e = map indexZyevio $ e_音義 e
-  where
-    indexZyevio Entry音義{e_隋音 = p} = indexTex "zyevio"
-      [ p
-      , z
-      ]
-    z = s_字 svParent
-    svParent = s_親 sv
-    sv = e_shapeVariants $ e
-
-generateIndicesTex :: Entry -> [Text]
-generateIndicesTex e = concat
-  [ generateZyevioIndicesTex e
-  ]
-
 entryToQrContent :: Entry -> Text
 entryToQrContent e = mconcat . L.nub $ mconcat contents
   where
@@ -427,9 +399,6 @@ entryToTex e = mconcat
     , "}"
     , "\n\n"
     , "\\begin{Entry}{", e_字 e, "}{", qrText, "}{", entryToLabel e, "}%\n"
-    , "  "
-    , T.intercalate "%\n  " $ generateIndicesTex e
-    , "%\n"
     , "  "
     , soundPartsToTex True $ e_parts e
     , "。"

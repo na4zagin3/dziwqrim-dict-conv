@@ -15,11 +15,7 @@
 \usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
-\usepackage[xindy]{imakeidx}
 \usepackage{xparse}
-
-\indexsetup{level=\section,toclevel=section}
-\makeindex[name=zyevio,title={中古音索引},options={-L}]
 
 \usepackage{geometry}
 
@@ -339,6 +335,21 @@
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
   \noindent%
   #2\hfill #3\hfill #4\pageref{entry-#1}%
+
+\NewDocumentEnvironment{ReadingIndex}{}{
+  \part{中古音索引}
+  \begin{multicols}{3}
+}{
+  \end{multicols}
+}
+\NewDocumentCommand{\ReadingSection}{m}{
+  \begin{center}
+    \textbf{\MakeUppercase{#1}}
+  \end{center}
+}
+\NewDocumentCommand{\ReadingEntry}{m m m}{
+  \noindent%
+  \makebox[4em minus 2em][l]{#2} #3 \hfill\pageref{entry-#1}%
   \par
 }
 
@@ -435,7 +446,6 @@
 \end{Entry}
 
 \begin{Entry}{佟}{{k}}{27+23-佟-test}
-  \index[zyevio]{doŋ!佟}%
   + 23人（人部5畫）
   \\
   \Sikrok{2723}{3}
@@ -447,9 +457,6 @@
 \PartHeader{28}{中聲}{tuŋ}{}{\refEntry{中}{28-中-test}仲忠}
 
 \begin{Entry}{中}{{w}}{28-中-test}%
-  \index[zyevio]{tryuŋ!中}%
-  \index[zyevio]{tryûŋ!中}%
-  \index[zyevio]{dryûŋ!中}%
   + 0。丨部3畫。
   \\
   \Sikrok{5000}{6}。
@@ -484,5 +491,4 @@
   \end{itemize}
 \end{itemize}
 
-\printindex[zyevio]
 \end{document}

@@ -24,6 +24,7 @@ import GHC.Generics (Generic)
 import Lib.Entry (sectionsFromRows, sectionToTex)
 import Lib.Row (parseRow)
 import Lib.Index.RadicalIndex (radicalSectionsToTex, sectionsToRadicalSections)
+import Lib.Index.ReadingIndex (readingSectionsToTex, sectionsToReadingSections)
 import Lib.Index.SikrokIndex (sikrokSectionsToTex, sectionsToSikrokSections)
 import Lib.PhoneticRadical (parsePhoneticRadical)
 -- import Control.Monad.Trans.Writer.Strict (Writer)
@@ -49,6 +50,7 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
                 [ T.unlines . map sectionToTex $ sections
                 , sikrokSectionsToTex $ sectionsToSikrokSections sections
                 , radicalSectionsToTex $ sectionsToRadicalSections sections
+                , readingSectionsToTex $ sectionsToReadingSections sections
                 ]
   T.writeFile outPath outText
 
