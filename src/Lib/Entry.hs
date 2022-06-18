@@ -427,6 +427,7 @@ entryToTex e = mconcat
 escapeTex :: Text -> Text
 escapeTex s = T.concatMap f s
   where
+    f '~' = "\\textasciitilde{}"
     f '&' = "\\&"
     f '{' = "\\{"
     f '}' = "\\}"
