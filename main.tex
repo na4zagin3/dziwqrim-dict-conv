@@ -239,7 +239,8 @@
 \rhead{\small\ShowEntriesForTheCurrentPage}
 
 \newcommand{\PartHeader}[5]{%
-  \section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
+  %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
+  \section[#1 #2]{{\ltjsetparameter{jacharrange={-9}}#1}#2}%
   \RecordSection{#1}{#2}%
   \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
@@ -366,9 +367,6 @@
 やること
 \begin{itemize}
 \item{} 見出し
-  \begin{itemize}
-  \item{} 見出しPU等トル
-  \end{itemize}
 \item 字形
   \begin{itemize}
   \item{} 四角、最初の一つ以外は 括弧に入れてテン 出さない
