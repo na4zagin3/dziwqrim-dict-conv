@@ -33,6 +33,10 @@
 % Make en-dash non-CJK
 \ltjdefcharrange{8}{`–}
 
+% Make super-/subscripts Latin
+\ltjdefcharrange{1}{"2070-"209F}
+\ltjsetparameter{alxspmode={`₁,inhibit}}
+\ltjsetparameter{alxspmode={`₂,inhibit}}
 
 \newcommand{\textJapn}[1]{{%
     \newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]%
@@ -379,9 +383,6 @@
   \item ソート順：四声→韻→小韻（数→n→x→z）
   \end{itemize}
 \item{} 義
-  \begin{itemize}
-  \item 下付き2が出ないのを直す
-  \end{itemize}
 \item{} フォント
   \begin{itemize}
   \item{} 隋拼
