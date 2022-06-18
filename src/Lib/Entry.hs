@@ -170,7 +170,8 @@ renderSikrokToTex :: (Text, Text) -> Text
 renderSikrokToTex (sm, ss) = "\\Sikrok{" <> sm <> "}{" <> ss <> "}"
 
 renderSikroksToTex :: NonEmpty (Text, Text) -> Text
-renderSikroksToTex sks = T.intercalate "又" $ map renderSikrokToTex $ NEL.toList sks
+-- renderSikroksToTex sks = T.intercalate "、" $ map renderSikrokToTex $ NEL.toList sks
+renderSikroksToTex sks = renderSikrokToTex $ NEL.head sks
 
 shapeVariantsToTex :: ShapeVariants -> Text
 shapeVariantsToTex s = mconcat
