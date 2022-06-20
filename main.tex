@@ -38,24 +38,27 @@
 \ltjsetparameter{alxspmode={`₁,inhibit}}
 \ltjsetparameter{alxspmode={`₂,inhibit}}
 
+\newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]
+\newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]
+\newjfontfamily\fontMainKo{Noto Serif CJK KR}[]
+\newjfontfamily\fontSansKo{Noto Sans CJK KR}[]
+\newjfontfamily\fontMainHans{Noto Serif CJK SC}[]
+\newjfontfamily\fontSansHans{Noto Sans CJK SC}[]
+
 \newcommand{\textJapn}[1]{{%
-    \newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]%
-    \newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]%
+    \fontMainJapn%
     #1%
   }}
 \newcommand{\textKor}[1]{{%
-    \newjfontfamily\fontMainJapn{Noto Serif CJK KR}[]%
-    \newjfontfamily\fontSansJapn{Noto Sans CJK KR}[]%
+    \fontMainKo
     #1%
   }}
 \newcommand{\textHant}[1]{{%
-    \newjfontfamily\fontMainHans{Noto Serif CJK SC}[]%
-    \newjfontfamily\fontSansHans{Noto Sans CJK SC}[]%
+    \fontMainHans%
     #1%
   }}
 \newcommand{\textHans}[1]{{%
-    \newjfontfamily\fontMainHans{Noto Serif CJK SC}[]%
-    \newjfontfamily\fontSansHans{Noto Sans CJK SC}[]%
+    \fontMainHans%
     #1%
   }}
 
