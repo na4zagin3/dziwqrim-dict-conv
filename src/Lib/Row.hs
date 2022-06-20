@@ -69,6 +69,7 @@ data Parts = Parts
 data Pronunciation反切 = Pronunciation反切
   { pr_反切 :: !(Maybe (Text, Text))
   , pr_反切_comment :: !(Maybe Text)
+  , pr_反切_pre_info :: !(Maybe Text)
   , pr_反切_books :: !(NonEmpty Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -297,6 +298,7 @@ p_r_parts ki kpsRaw ps vk vpsRaw = do
 
 p_r_四聲 :: Text -> Either String (Maybe Int)
 p_r_四聲 "n" = Right Nothing
+p_r_四聲 "z" = Right Nothing
 p_r_四聲 iStr = do
   (i, r) <- TR.decimal iStr :: Either String (Int, Text)
   () <- if T.null r
@@ -305,7 +307,7 @@ p_r_四聲 iStr = do
   return . Just $ i
 
 p_r_韵 :: Text -> Either String Pronunciation韵
-p_r_韵 t | t `elem` ["n", "x", "z"] = Right $ Pronunciation韵Other t
+p_r_韵 t | t `elem` ["n", "x", "y", "z"] = Right $ Pronunciation韵Other t
 p_r_韵 iStr = do
   (i, r) <- TR.decimal iStr :: Either String (Int, Text)
   () <- if T.null r
@@ -360,6 +362,7 @@ p_r_反切 field books pc = do
     [] -> Right $ Pronunciation反切
         { pr_反切 = Nothing
         , pr_反切_comment = Nothing
+        , pr_反切_pre_info = Nothing
         , pr_反切_books = books
         }
     [r] -> Right r
@@ -392,15 +395,17 @@ p_r_反切 field books pc = do
 p_r_反切s :: Text -> NonEmpty Text -> Text -> Either String [Pronunciation反切]
 p_r_反切s field books pc = do
   fq <- left (printf "反切: %s (%s): %s" field pc) $ parseOnly p_fanqieField pc
-  let conv Nothing (Nothing, _, _) = Left $ printf "Cannot determine 反切本 for %s" field
-      conv (Just books) (b, fq, c) = Right $ Pronunciation反切
+  let conv Nothing (Nothing, _, _, _) = Left $ printf "Cannot determine 反切本 for %s" field
+      conv (Just books) (b, pre, fq, c) = Right $ Pronunciation反切
         { pr_反切 = fq
         , pr_反切_comment = c
+        , pr_反切_pre_info = pre
         , pr_反切_books = fromMaybe books . fmap NEL.singleton $ b
         }
-      conv Nothing ((Just b), fq, c) = Right $ Pronunciation反切
+      conv Nothing ((Just b), pre, fq, c) = Right $ Pronunciation反切
         { pr_反切 = fq
         , pr_反切_comment = c
+        , pr_反切_pre_info = pre
         , pr_反切_books = NEL.singleton b
         }
   case fq of

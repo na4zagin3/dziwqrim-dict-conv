@@ -80,11 +80,23 @@ p_balancedText = T.concat <$> many' f
       , ("“", "”")
       ]
 
-keyword_反切 :: [Text]
-keyword_反切 = ["未收", "脱字", "無本"]
+-- | Parse a fanqie with an optional comment
+--
+-- >>> parseOnly p_fanqieCharacterNote "誤作“苦角反”"
+-- Right "\35492\20316\8220\33510\35282\21453\8221"
+-- >>> parseOnly p_fanqieCharacterNote "字作“墅”"
+-- Right "\23383\20316\8220\22661\8221"
+p_fanqieCharacterNote = do
+  k <- choice . map string $ ["誤作", "字作"]
+  cp <- option "" $ do
+    string "“"
+    c <- p_balancedText
+    string "”"
+    return $ "“" <> c <> "”"
+  return $ k <> cp
 
 p_fanqieNote = do
-  k <- choice . map string $ keyword_反切
+  k <- choice . map string $ ["未收", "脱字", "無本"]
   cp <- option "" $ do
     string "（"
     c <- p_balancedText
@@ -109,14 +121,25 @@ p_fanqieWithComment = do
   c <- option Nothing (Just <$> p_fanqieComment)
   return $ (fq, c)
 
+p_fanqieRhymeGroup = do
+  rg <- p_kanji
+  c <- string "韵"
+  return rg
+
 p_fanqieItem = do
   b <- option Nothing (Just <$> p_book)
-  (f, c) <- choice
-    [ p_fanqieComment >>= \c -> return (Nothing, Just c)
-    , p_fanqieNote >>= \c -> return (Nothing, Just c)
-    , p_fanqieWithComment >>= \(fq, c) -> return (Just fq, c)
+  let parseFanqie rg = do
+        (f, c) <- choice
+          [ p_fanqieComment >>= \c -> return (Nothing, Just c)
+          , p_fanqieCharacterNote  >>= \c -> return (Nothing, Just c)
+          , p_fanqieNote >>= \c -> return (Nothing, Just c)
+          , p_fanqieWithComment >>= \(fq, c) -> return (Just fq, c)
+          ]
+        return (b, rg, f, c)
+  choice
+    [ p_fanqieRhymeGroup >>= (parseFanqie . Just)
+    , parseFanqie Nothing
     ]
-  return (b, f, c)
 
 -- | Parse a fanqie field
 --
@@ -146,7 +169,7 @@ p_fanqieItem = do
 -- Right [(Just "\29579\19977",Nothing,Just "\33073\23383\65288\33073\21453\35486\65289"),(Just "\29579\19968",Nothing,Just "\28961\26412")]
 
 p_fanqieField
-  :: Parser [(Maybe Text, Maybe (Text, Text), Maybe Text)]
+  :: Parser [(Maybe Text, Maybe Text, Maybe (Text, Text), Maybe Text)]
 p_fanqieField = choice
   [ string "なし" *> return []
   , p_fanqieItem `sepBy1` (char '，')

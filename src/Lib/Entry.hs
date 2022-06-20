@@ -321,19 +321,22 @@ pronunciation反切ContentToTex Pronunciation反切
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
   , pr_反切_comment = Just com
+  , pr_反切_pre_info = pre
   , pr_反切_books = _
-  } = Just com
+  } = Just $ fromMaybe "" pre <> com
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Nothing
+  , pr_反切_pre_info = pre
   , pr_反切_books = _
-  } = Just $ pc <> suf
+  } = Just $ fromMaybe "" pre <> pc <> suf
 
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Just com
+  , pr_反切_pre_info = pre
   , pr_反切_books = _
-  } = Just $ pc <> suf <> "（" <> com <> "）"
+  } = Just $ fromMaybe "" pre <> pc <> suf <> "（" <> com <> "）"
 
 pronunciation漢辭海ToTex :: Pronunciation漢辭海 -> Text
 pronunciation漢辭海ToTex Pronunciation漢辭海
