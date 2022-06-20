@@ -70,6 +70,7 @@
 
 \newlength{\EntryDescriptionLineLength}
 \newlength{\EntryDescriptionLineHeight}
+\newlength{\EntryDescriptionLineIndent}
 
 \providecommand\phantomsection{}
 
@@ -260,18 +261,21 @@
   \vspace{0.5em plus 0.2em minus 0.05em}
   \nopagebreak[3]%
 }
+\newsavebox{\EntryHeadwordBox}
 \NewDocumentEnvironment{Entry}{m m m} {
   \noindent
+  \savebox{\EntryHeadwordBox}{\fontseries{b}\fontsize{2\baselineskip}{2\baselineskip}\selectfont#1}%
   \setlength{\EntryDescriptionLineHeight}{2\baselineskip}%
-  \setlength{\EntryDescriptionLineLength}{\linewidth-2\EntryDescriptionLineHeight}%
+  \setlength{\EntryDescriptionLineIndent}{\wd\EntryHeadwordBox}%
+  \setlength{\EntryDescriptionLineLength}{\linewidth-\EntryDescriptionLineHeight-\EntryDescriptionLineIndent}%
   \parshape 3
-  \EntryDescriptionLineHeight \EntryDescriptionLineLength
-  \EntryDescriptionLineHeight \EntryDescriptionLineLength
+  \EntryDescriptionLineIndent \EntryDescriptionLineLength
+  \EntryDescriptionLineIndent \EntryDescriptionLineLength
   0cm \linewidth%
   %
   \makebox[0pt][r]{%
     \fontseries{b}\fontsize{2\baselineskip}{2\baselineskip}\selectfont%
-    \raisebox{-1ex}[0pt][0pt]{#1}%
+    \raisebox{-1ex}[0pt][0pt]{\usebox{\EntryHeadwordBox}}%
     \hspace*{0.1em}%
   }%
   \makebox[0pt][l]{%
