@@ -92,6 +92,8 @@
 \ExplSyntaxOn
 
 \tl_new:N \g_zqdict_entries_tl
+\tl_new:N \g_zqdict_entries_archived_tl
+\int_new:N \g_zqdict_entries_archived_page_int
 \tl_new:N \g_zqdict_current_section_tl
 
 \cs_set:Nn \_zqdict_xr_begin: {
@@ -181,8 +183,79 @@
 \tl_new:N \l_zqdict_current_entry_tl
 \str_new:N \l_zqdict_previous_part_str
 
-\NewDocumentCommand{\ShowEntriesForTheCurrentPage}{}{
+\int_new:N \l_zqdict_alive_page_int
+\int_new:N \l_zqdict_current_page_int
+
+\cs_set:Nn \_zqdict_archive_items_until_page:n {
+  \int_set:Nn \l_zqdict_alive_page_int {#1}
+  \tl_log:n {Remove items till page \int_use:N \l_zqdict_alive_page_int}
+
+  \bool_if:nTF {
+    \int_compare_p:nNn {\g_zqdict_entries_archived_page_int} < { \l_zqdict_alive_page_int }
+  } {
+    \tl_map_inline:Nn \g_zqdict_entries_tl {
+      \int_set:Nx \l_zqdict_current_page_int {
+        \_zqdict_entry_get_page:n {##1}
+      }
+      \int_compare:nNnTF {\l_zqdict_current_page_int} < {\l_zqdict_alive_page_int} {
+        \tl_gput_left:Nn \g_zqdict_entries_archived_tl {{##1}}
+        \tl_gset:Nx \g_zqdict_entries_tl {
+          \tl_tail:N \g_zqdict_entries_tl
+        }
+      } {
+        \tl_map_break:n {}
+      }
+    }
+  } {
+    \tl_map_inline:Nn \g_zqdict_entries_archived_tl {
+      \int_set:Nx \l_zqdict_current_page_int {
+        \_zqdict_entry_get_page:n {##1}
+      }
+      \int_compare:nNnTF {\l_zqdict_current_page_int} < {\l_zqdict_alive_page_int} {
+        \tl_map_break:n {}
+      } {
+        \tl_gput_left:Nn \g_zqdict_entries_tl {{##1}}
+        \tl_gset:Nx \g_zqdict_entries_archived_tl {
+          \tl_tail:N \g_zqdict_entries_archived_tl
+        }
+      }
+    }
+  }
+
+  \int_gset:Nn \g_zqdict_entries_archived_page_int {#1}
+}
+\cs_generate_variant:Nn \_zqdict_archive_items_until_page:n { o , x , V , v }
+\cs_generate_variant:Nn \int_show:n { o , x }
+\cs_generate_variant:Nn \int_set:Nn { No , Nx }
+
+\NewDocumentCommand{\ShowEntriesForPage}{m}{
+  \_zqdict_archive_items_until_page:x {\int_eval:n {#1 - 1}}
+
+  % \tl_show:x {
+  %   Debug~print~at~p. \int_eval:n {#1}
+  %   ^^J
+  %   The~first~item: \tl_head:N \g_zqdict_entries_tl
+  %   ^^J
+  %   The~archived~items: \tl_use:N \g_zqdict_entries_archived_tl
+  %   ^^J
+  %   The~archived~page: \int_use:N \g_zqdict_entries_archived_page_int
+  % }
+
+  \int_set:Nn \l_zqdict_alive_page_int {#1}
   \str_clear:N \l_zqdict_previous_part_str
+  \tl_clear:N \l_zqdict_current_entry_tl
+
+  \tl_map_inline:Nn \g_zqdict_entries_archived_tl {
+    \tl_if_eq:xnTF {\_zqdict_entry_get_type:n {##1}} {end} {
+      \tl_map_break:n {}
+    } {
+      \tl_if_eq:xnT {\_zqdict_entry_get_type:n {##1}} {begin} {
+        \tl_set:Nn \l_zqdict_current_entry_tl {##1}
+        \tl_map_break:n {}
+      }
+    }
+  }
+
   \tl_map_inline:Nn \g_zqdict_entries_tl {
     \str_set:Nx \l_zqdict_item_entry_type_str {
       \_zqdict_entry_get_type:n {##1}
@@ -192,23 +265,41 @@
       \tl_set:Nn \l_zqdict_current_entry_tl {##1}
     }
 
+    \tl_if_empty:NT \l_zqdict_current_entry_tl {
+      \tl_show:x {
+        Beginning~events~lack~at~p. \int_eval:n {\l_zqdict_alive_page_int}
+        ^^J
+        The~first~item: \tl_head:N \g_zqdict_entries_tl
+        ^^J
+        The~archived~items: \tl_use:N \g_zqdict_entries_archived_tl
+        ^^J
+        The~archived~page: \int_use:N \g_zqdict_entries_archived_page_int
+        ^^J
+        Trying~to~recover
+      }
+      \tl_set:Nn \l_zqdict_current_entry_tl {##1}
+    }
+
     \tl_set:Nx \l_tmpa_tl {
       \_zqdict_entry_get_section:V \l_zqdict_current_entry_tl
     }
     \str_set:Nx \l_zqdict_current_part_str {
       \_zqdict_section_get_part:V \l_tmpa_tl
     }
+    \int_set:Nx \l_zqdict_current_page_int {
+      \_zqdict_entry_get_page:V \l_zqdict_current_entry_tl
+    }
     \bool_if:nT {
       (
         \str_if_eq_p:Vn \l_zqdict_item_entry_type_str { begin }
         &&
-        \int_compare_p:nNn {\_zqdict_entry_get_page:V \l_zqdict_current_entry_tl} = { \value {page} }
+        \int_compare_p:nNn {\l_zqdict_current_page_int} = { \l_zqdict_alive_page_int }
       ) || (
         \str_if_eq_p:Vn \l_zqdict_item_entry_type_str { end }
         &&
         \int_compare_p:n {
-          \_zqdict_entry_get_page:V \l_zqdict_current_entry_tl
-          < \int_eval:n { \value {page} }
+          \l_zqdict_current_page_int
+          < \l_zqdict_alive_page_int
           <= \_zqdict_entry_get_page:n {##1}
         }
       )
@@ -231,7 +322,7 @@
       }
       \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
     }
-    \int_compare:nNnT {\_zqdict_entry_get_page:V \l_zqdict_current_entry_tl} > {\value {page} } {
+    \int_compare:nNnT {\l_zqdict_current_page_int} > {\l_zqdict_alive_page_int} {
       \tl_map_break:n {}
     }
   }
@@ -240,7 +331,7 @@
 \ExplSyntaxOff
 
 \pagestyle{fancy}
-\rhead{\small\ShowEntriesForTheCurrentPage}
+\rhead{\small\ShowEntriesForPage{\value{page}}}
 
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
