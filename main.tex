@@ -312,9 +312,15 @@
 
 \newcommand{\Position}[1]{\texttt{\tiny #1}}
 
+\ExplSyntaxOn
+\str_new:N \l_zqdict_index_subsection_label_str
+\ExplSyntaxOff
+
 \NewDocumentEnvironment{SikrokIndex}{}{
   \part{四角號碼索引}
-  \begin{multicols}{3}
+  \setlength{\columnsep}{0.25em}
+  \setlength{\columnseprule}{0.4pt}
+  \begin{multicols}{5}
 }{
   \end{multicols}
 }
@@ -323,19 +329,27 @@
     \textbf{#1}
   \end{center}
 }
+
+\newcommand\quelle[1]{{%
+    \unskip\nobreak\hfil\penalty50
+    \hskip0pt\hbox{}\nobreak\hfil{#1}%
+    \parfillskip=0pt \finalhyphendemerits=0 \par}}
 \NewDocumentCommand{\SikrokEntry}{m m o m}{
   \noindent%
   \IfNoValueTF{#3}{%
     #2 #4 \hfill\pageref{entry-#1}%
   }{%
-    #2 #4（#3）\hfill\pageref{entry-#1}%
+    #2 #4\quelle{→#3~\pageref{entry-#1}}%
   }%
   \par
 }
 
+\ExplSyntaxOn
 \NewDocumentEnvironment{RadicalIndex}{}{
   \part{部首索引}
-  \begin{multicols}{4}
+  \setlength{\columnsep}{0.25em}
+  \setlength{\columnseprule}{0.4pt}
+  \begin{multicols}{8}
   }{
   \end{multicols}
 }
@@ -343,16 +357,24 @@
   \begin{center}
     \textbf{#1部}
   \end{center}
+  \str_set:Nn \l_zqdict_index_subsection_label_str {0}
 }
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
-  \noindent%
-  \makebox[3em][l]{+#3畫} #4 \hfill\pageref{entry-#1}%
+  \noindent
+  \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#3} {
+    \centering{\footnotesize +#3畫}\\
+  }
+  \str_set:Nn \l_zqdict_index_subsection_label_str {#3}
+  #4~\hfill\pageref{entry-#1}
   \par
 }
 
 \NewDocumentEnvironment{ReadingIndex}{}{
   \part{中古音索引}
-  \begin{multicols}{3}
+  \setlength{\columnsep}{0.25em}
+  \setlength{\columnseprule}{0.4pt}
+  \begin{multicols}{7}
+    \str_clear:N \l_zqdict_index_subsection_label_str
 }{
   \end{multicols}
 }
@@ -360,12 +382,18 @@
   \begin{center}
     \textbf{\MakeUppercase{#1}}
   \end{center}
+  \str_clear:N \l_zqdict_index_subsection_label_str
 }
 \NewDocumentCommand{\ReadingEntry}{m m m}{
-  \noindent%
-  \makebox[4em minus 2em][l]{#2} #3 \hfill\pageref{entry-#1}%
+  \noindent
+  \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#2} {
+    \centering #2\\
+  }
+  \str_set:Nn \l_zqdict_index_subsection_label_str {#2}
+  #3 \hfill\pageref{entry-#1}
   \par
 }
+\ExplSyntaxOff
 
 \newcommand{\Book}[1]{{《#1》}}
 
