@@ -354,7 +354,7 @@
   \nopagebreak[2]%
 }
 \newsavebox{\EntryHeadwordBox}
-\NewDocumentEnvironment{Entry}{m m m} {
+\NewDocumentEnvironment{Entry}{m m m m} {
   \noindent
   \savebox{\EntryHeadwordBox}{\fontseries{b}\fontsize{2\baselineskip}{2\baselineskip}\selectfont#1}%
   \setlength{\EntryDescriptionLineHeight}{2\baselineskip}%
@@ -380,6 +380,7 @@
   \addcontentsline{toc}{subsection}{#1}%
   \label{entry-#3}%
   \RecordEntryBegin{#1}%
+  \Position{#4}%
 }{%
   \RecordEntryEnd{#1}%
   \vspace{0.2em plus 0.5em minus 0.1em}%

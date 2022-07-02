@@ -407,11 +407,14 @@ entryToQrContent e = mconcat . L.nub $ mconcat contents
 entryToTex :: Entry -> Text
 entryToTex e = mconcat
     [ "\\noindent"
-    , "\\Position{"
+    , "\n\n"
+    , "\\begin{Entry}"
+    , "{", e_字 e, "}"
+    , "{", qrText, "}{", entryToLabel e, "}"
+    , "{"
     , T.intercalate "; " . map (\p -> T.pack $ printf "%d(%s)" (pos_row p) (pos_ver p)) . S.toList $ e_position e
     , "}"
-    , "\n\n"
-    , "\\begin{Entry}{", e_字 e, "}{", qrText, "}{", entryToLabel e, "}%\n"
+    , "%\n"
     , "  "
     , soundPartsToTex True $ e_parts e
     , "。"
