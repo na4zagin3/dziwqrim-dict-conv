@@ -12,6 +12,7 @@
 \usepackage{fancyhdr}
 \usepackage{ifthen}
 \usepackage{multicol}
+\usepackage{pdfcomment}
 \usepackage{pxpic}
 \usepackage{enumitem}
 \usepackage{titlesec}
@@ -401,7 +402,7 @@
 \newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
 \newcommand{\refEntry}[2]{\hyperref[entry-#2]{#1}}
 
-\newcommand{\Position}[1]{\texttt{\tiny #1}}
+\newcommand{\Position}[1]{\pdfmargincomment{#1}}
 
 \ExplSyntaxOn
 \str_new:N \l_zqdict_index_subsection_label_str
