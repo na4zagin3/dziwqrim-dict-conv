@@ -75,20 +75,7 @@
 
 \providecommand\phantomsection{}
 
-\geometry{top=1.5cm,headheight=18pt,headsep=2pt,inner=1.5cm,textwidth=35em,textheight=50em}
-
-\titleformat{\section}[display]
-{%format
-  \bfseries\large%
-}{%label
-  %(\thesection)%
-}{%sep
-  0pt
-}{%before-code
-  \pagebreak[2]
-  \centering
-}
-\titlespacing*{\section}{0pt}{1em plus 3em minus 0.2em}{0pt}
+\geometry{top=1.5cm,headheight=18pt,headsep=2pt,inner=1.5cm,textwidth=35em,textheight=52em}
 
 \ExplSyntaxOn
 
@@ -332,7 +319,22 @@
 \ExplSyntaxOff
 
 \pagestyle{fancy}
-\rhead{\small\ShowEntriesForPage{\value{page}}}
+\fancyhead[RO,LE]{\small\ShowEntriesForPage{\value{page}}}
+\fancyhead[LO,RE]{\thepage}
+\fancyfoot{}
+
+\titleformat{\section}[display]
+{%format
+  \bfseries\large%
+}{%label
+  % (\thesection)%
+}{%sep
+  0pt
+}{%before-code
+  \pagebreak[2]
+  \centering
+}
+\titlespacing*{\section}{0pt}{0.5em plus 1.5em minus 0.2em}{0pt}
 
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
@@ -350,7 +352,7 @@
       #5%
     \end{center}
   }%
-  \vspace{0.5em plus 0.2em minus 0.05em}
+  \vspace{0.5em plus 1.5em minus 0.2em}
   \nopagebreak[2]%
 }
 \newsavebox{\EntryHeadwordBox}
@@ -383,14 +385,17 @@
   \Position{#4}%
 }{%
   \RecordEntryEnd{#1}%
-  \vspace{0.2em plus 0.5em minus 0.1em}%
-  \pagebreak[1]%
+  \vspace{0.25em plus 0.75em minus 0.1em}%
+  \pagebreak[2]%
 }
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
 \newcommand{\SoundItem}[1]{\item[]{#1:} }
 
-\newenvironment{Sense}{\begin{itemize}[itemsep=0.125em,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
+\newenvironment{Sense}{%
+  \vspace{0.25em plus 0.25em minus 0.05em}%
+  \begin{itemize}[itemsep=0.125em,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em,topsep=0pt,parsep=0pt,partopsep=0pt]}{\end{itemize}%
+}
 \newcommand{\SenseItem}[1]{\item[]{\fSemanticLabel\large\MakeUppercase{\raisebox{-0.125ex}{#1}:}} }
 
 \newcommand{\zyepheng}[1]{\textsf{#1}}
