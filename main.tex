@@ -1,4 +1,4 @@
-\documentclass[a5paper,10pt]{article}
+\documentclass[a5paper,10pt,twoside]{article}
 
 \usepackage{hyperref}
 
@@ -74,7 +74,7 @@
 
 \providecommand\phantomsection{}
 
-\geometry{top=1.5cm,headheight=18pt,headsep=2pt}
+\geometry{top=1.5cm,headheight=18pt,headsep=2pt,inner=1.5cm,textwidth=35em,textheight=50em}
 
 \titleformat{\section}[display]
 {%format
@@ -84,10 +84,10 @@
 }{%sep
   0pt
 }{%before-code
-  \pagebreak[3]
+  \pagebreak[2]
   \centering
 }
-\titlespacing*{\section}{0pt}{1em plus 40em minus 0.2em}{0pt}
+\titlespacing*{\section}{0pt}{1em plus 3em minus 0.2em}{0pt}
 
 \ExplSyntaxOn
 
@@ -350,7 +350,7 @@
     \end{center}
   }%
   \vspace{0.5em plus 0.2em minus 0.05em}
-  \nopagebreak[3]%
+  \nopagebreak[2]%
 }
 \newsavebox{\EntryHeadwordBox}
 \NewDocumentEnvironment{Entry}{m m m} {
@@ -382,7 +382,7 @@
 }{%
   \RecordEntryEnd{#1}%
   \vspace{0.2em plus 0.5em minus 0.1em}%
-  \pagebreak[3]%
+  \pagebreak[1]%
 }
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
@@ -605,7 +605,7 @@
   \end{Sense}
 \end{Entry}
 
-\clearpage{}
+\cleardoublepage{}
 \part{Generated}
 \input{test-data.tex}
 
