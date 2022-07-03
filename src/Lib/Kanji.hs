@@ -88,8 +88,10 @@ p_balancedText = T.concat <$> many' f
 -- Right "\35492\20316\8220\33510\35282\21453\8221"
 -- >>> parseOnly p_fanqieCharacterNote "字作“墅”"
 -- Right "\23383\20316\8220\22661\8221"
--- >>> parseOnly p_fanqieCharacterNote2 "誤以“麝”又反作“食夜反”"
+-- >>> parseOnly p_fanqieCharacterNote "誤以“麝”又反作“食夜反”"
 -- Right "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221"
+-- >>> parseOnly p_fanqieCharacterNote "誤以又反作“食夜反”"
+-- Right "\35492\20197\21448\21453\20316\8220\39135\22812\21453\8221"
 p_fanqieCharacterNote = choice
   [ p_fanqieCharacterNote1
   , p_fanqieCharacterNote2
@@ -105,6 +107,7 @@ p_fanqieCharacterNote1 = do
   k <- choice . map string $
     [ "誤作"
     , "字作"
+    , "誤以又反作"
     ]
   cp <- do
     string "“"
@@ -242,9 +245,10 @@ p_fanqiesForBook = do
 -- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289") :| []),(Just "\29579\19968",(Nothing,Nothing,Just "\28961\26412") :| [])]
 -- >>> parseOnly p_fanqieField "子句反、即具反"
 -- Right [(Nothing,(Nothing,Just ("\23376\21477","\21453"),Nothing) :| [(Nothing,Just ("\21363\20855","\21453"),Nothing)])]
-
--- >>> parseOnly p_fanqieField "子句反、即具反"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289"),(Just "\29579\19968",Nothing,Nothing,Just "\28961\26412") :| [])]
+-- >>> parseOnly p_fanqieField "《王三》誤以“麝”又反作“食夜反”"
+-- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
+-- >>> parseOnly p_fanqieField "《王三》誤以又反作“食夜反”"
+-- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\35492\20197\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
 
 p_fanqieField
   :: Parser [(Maybe Text, NonEmpty (Maybe Text, Maybe (Text, Text), Maybe Text))]
