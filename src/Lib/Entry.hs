@@ -9,7 +9,7 @@ import Data.Either (partitionEithers)
 import Data.Foldable qualified as Foldable
 import Data.Function (on)
 import Data.List qualified as L
-import Data.List.NonEmpty (NonEmpty)
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.List.NonEmpty qualified as NEL
 import Data.Map qualified as M
 import Data.Map.Strict qualified as MS
@@ -298,48 +298,48 @@ booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
 --
 -- Examples
 --
--- >>> pronunciation反切ToTex True (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999", pr_反切_pre_info=Nothing})
--- Just "\\Book{\21453\20999}\12394\12375"
+-- >>> pronunciation反切ToTex True (Pronunciation反切本 {pr_反切本_books = NEL.singleton "\21453\20999", pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_pre_info=Nothing} :| [] })
+-- "\\Book{\21453\20999}\12394\12375"
 --
--- >>> pronunciation反切ToTex False (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_books = NEL.singleton "\21453\20999", pr_反切_pre_info=Nothing})
--- Just "\12394\12375"
+-- >>> pronunciation反切ToTex False (Pronunciation反切本 {pr_反切本_books = NEL.singleton "\21453\20999", pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12394\12375", pr_反切_pre_info=Nothing} :| [] })
+-- "\12394\12375"
 --
--- >>> pronunciation反切ToTex False (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "無反語", pr_反切_books = NEL.singleton "\21453\20999", pr_反切_pre_info=Just "歌韵"})
--- Just "\27468\38901\28961\21453\35486"
+-- >>> pronunciation反切ToTex False (Pronunciation反切本 {pr_反切本_books = NEL.singleton "\21453\20999", pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "無反語",  pr_反切_pre_info=Just "歌韵"} :| [] })
+-- "\27468\38901\28961\21453\35486"
+--
+-- >>> pronunciation反切ToTex False (Pronunciation反切本 {pr_反切本_books = NEL.singleton "王韵", pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("子句","反"), pr_反切_comment = Nothing, pr_反切_pre_info=Nothing} :| [Pronunciation反切 {pr_反切 = Just ("即具","反"), pr_反切_comment = Nothing, pr_反切_pre_info=Nothing}] })
+-- "\23376\21477\21453\12289\21363\20855\21453"
 
-pronunciation反切ToTex :: Bool -> Pronunciation反切 -> Maybe Text
+pronunciation反切ToTex :: Bool -> Pronunciation反切本 -> Text
 pronunciation反切ToTex showBook fq =
-    addBooks $ pronunciation反切ContentToTex fq
+    addBooks . T.intercalate "、" . NEL.toList . fmap pronunciation反切ContentToTex $ pr_反切本_fanqies fq
   where
     addBooks = if showBook
-      then fmap (booksToTex (pr_反切_books fq) <>)
+      then (booksToTex (pr_反切本_books fq) <>)
       else id
 
-pronunciation反切ContentToTex :: Pronunciation反切 -> Maybe Text
+pronunciation反切ContentToTex :: Pronunciation反切 -> Text
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
+  , pr_反切_pre_info = Nothing
   , pr_反切_comment = Nothing
-  , pr_反切_books = _
-  } = Nothing
+  } = error "Empty 反切 entry"
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Nothing
   , pr_反切_comment = Just com
   , pr_反切_pre_info = pre
-  , pr_反切_books = _
-  } = Just $ fromMaybe "" pre <> com
+  } = fromMaybe "" pre <> com
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Nothing
   , pr_反切_pre_info = pre
-  , pr_反切_books = _
-  } = Just $ fromMaybe "" pre <> pc <> suf
+  } = fromMaybe "" pre <> pc <> suf
 
 pronunciation反切ContentToTex Pronunciation反切
   { pr_反切 = Just (pc, suf)
   , pr_反切_comment = Just com
   , pr_反切_pre_info = pre
-  , pr_反切_books = _
-  } = Just $ fromMaybe "" pre <> pc <> suf <> "（" <> com <> "）"
+  } = fromMaybe "" pre <> pc <> suf <> "（" <> com <> "）"
 
 pronunciation漢辭海ToTex :: Pronunciation漢辭海 -> Text
 pronunciation漢辭海ToTex Pronunciation漢辭海
@@ -371,11 +371,11 @@ pronunciation反切集ToTex Pronunciation反切集
       , f "" pDz
       ]
   where
-    f :: Text -> [Pronunciation反切] -> [Text]
+    f :: Text -> [Pronunciation反切本] -> [Text]
     f _ [] = []
-    f b [p] | pr_反切_books p == NEL.singleton b = maybeToList $ pronunciation反切ToTex False p
-            | otherwise = maybeToList $ pronunciation反切ToTex True p
-    f _ ps = catMaybes $ map (pronunciation反切ToTex True) ps
+    f b [p] | pr_反切本_books p == NEL.singleton b = pure $ pronunciation反切ToTex False p
+            | otherwise = pure $ pronunciation反切ToTex True p
+    f _ ps = map (pronunciation反切ToTex True) ps
 
 pronunciationToTex :: Pronunciation -> Text
 pronunciationToTex Pronunciation

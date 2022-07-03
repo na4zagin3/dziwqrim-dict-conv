@@ -66,19 +66,24 @@ data Parts = Parts
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
+data Pronunciation反切本 = Pronunciation反切本
+  { pr_反切本_fanqies :: !(NonEmpty Pronunciation反切)
+  , pr_反切本_books :: !(NonEmpty Text)
+  }
+  deriving (Read, Show, Eq, Ord, Generic)
+
 data Pronunciation反切 = Pronunciation反切
   { pr_反切 :: !(Maybe (Text, Text))
   , pr_反切_comment :: !(Maybe Text)
   , pr_反切_pre_info :: !(Maybe Text)
-  , pr_反切_books :: !(NonEmpty Text)
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
 data Pronunciation反切集 = Pronunciation反切集
-  { pr_切韵反切 :: ![Pronunciation反切]
-  , pr_王韵反切 :: ![Pronunciation反切]
-  , pr_廣韵反切 :: ![Pronunciation反切]
-  , pr_集韵反切 :: ![Pronunciation反切]
+  { pr_切韵反切 :: ![Pronunciation反切本]
+  , pr_王韵反切 :: ![Pronunciation反切本]
+  , pr_廣韵反切 :: ![Pronunciation反切本]
+  , pr_集韵反切 :: ![Pronunciation反切本]
   }
   deriving (Read, Show, Eq, Ord, Generic)
 
@@ -333,40 +338,40 @@ p_r_反切本 pCBooksRaw = do
 keyword_反切 :: [Text]
 keyword_反切 = ["未收", "脱字", "無本"]
 
--- | Parse a 反切
---
--- Examples
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "なし"
--- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Nothing, pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
---
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "（）"
--- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
---
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "（コメント）"
--- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
---
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "而鋭反（コメント）"
--- Right (Pronunciation反切 {pr_反切 = Just ("\32780\37613","\21453"), pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
---
--- >>> p_r_反切 "反" (NEL.singleton "切韻") "〓〓反（《王三》未收）"
--- Right (Pronunciation反切 {pr_反切 = Just ("\12307\12307","\21453"), pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
---
--- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王一》户恢反，《王三》未收"
--- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王一》户孟反，《王三》胡孟反"
--- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王三》脱字（脱反語），《王一》無本"
-
-p_r_反切 :: Text -> NonEmpty Text -> Text -> Either String (Pronunciation反切)
-p_r_反切 field books pc = do
-  rs <- p_r_反切s field books pc
-  case rs of
-    [] -> Right $ Pronunciation反切
-        { pr_反切 = Nothing
-        , pr_反切_comment = Nothing
-        , pr_反切_pre_info = Nothing
-        , pr_反切_books = books
-        }
-    [r] -> Right r
-    _ -> Left "too many 反切s"
+-- -- | Parse a 反切
+-- --
+-- -- Examples
+-- -- >>> p_r_反切 "反" (NEL.singleton "切韻") "なし"
+-- -- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Nothing, pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
+-- --
+-- -- >>> p_r_反切 "反" (NEL.singleton "切韻") "（）"
+-- -- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
+-- --
+-- -- >>> p_r_反切 "反" (NEL.singleton "切韻") "（コメント）"
+-- -- Right (Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
+-- --
+-- -- >>> p_r_反切 "反" (NEL.singleton "切韻") "而鋭反（コメント）"
+-- -- Right (Pronunciation反切 {pr_反切 = Just ("\32780\37613","\21453"), pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
+-- --
+-- -- >>> p_r_反切 "反" (NEL.singleton "切韻") "〓〓反（《王三》未收）"
+-- -- Right (Pronunciation反切 {pr_反切 = Just ("\12307\12307","\21453"), pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []})
+-- --
+-- -- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王一》户恢反，《王三》未收"
+-- -- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王一》户孟反，《王三》胡孟反"
+-- -- # >>> p_r_反切 "反" (NEL.singleton "王韻") "《王三》脱字（脱反語），《王一》無本"
+-- 
+-- p_r_反切 :: Text -> NonEmpty Text -> Text -> Either String (Pronunciation反切)
+-- p_r_反切 field books pc = do
+--   rs <- p_r_反切s field books pc
+--   case rs of
+--     [] -> Right $ Pronunciation反切
+--         { pr_反切 = Nothing
+--         , pr_反切_comment = Nothing
+--         , pr_反切_pre_info = Nothing
+--         , pr_反切_books = books
+--         }
+--     [r] -> Right r
+--     _ -> Left "too many 反切s"
 
 -- | Parse a 反切s
 --
@@ -375,43 +380,42 @@ p_r_反切 field books pc = do
 -- Right []
 --
 -- >>> p_r_反切s "反" (NEL.singleton "切韻") "（）"
--- Right [Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []}]
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\20999\38907" :| []}]
 --
 -- >>> p_r_反切s "反" (NEL.singleton "切韻") "（コメント）"
--- Right [Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []}]
---
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\20999\38907" :| []}]
 -- >>> p_r_反切s "反" (NEL.singleton "切韻") "而鋭反（コメント）"
--- Right [Pronunciation反切 {pr_反切 = Just ("\32780\37613","\21453"), pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []}]
---
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("\32780\37613","\21453"), pr_反切_comment = Just "\12467\12513\12531\12488", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\20999\38907" :| []}]
 -- >>> p_r_反切s "反" (NEL.singleton "切韻") "〓〓反（《王三》未收）"
--- Right [Pronunciation反切 {pr_反切 = Just ("\12307\12307","\21453"), pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_pre_info = Nothing, pr_反切_books = "\20999\38907" :| []}]
---
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("\12307\12307","\21453"), pr_反切_comment = Just "\12298\29579\19977\12299\26410\25910", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\20999\38907" :| []}]
 -- >>> p_r_反切s "反" (NEL.singleton "王韻") "《王一》户恢反，《王三》未收"
--- Right [Pronunciation反切 {pr_反切 = Just ("\25143\24674","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19968" :| []},Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\26410\25910", pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19977" :| []}]
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("\25143\24674","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19968" :| []},Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\26410\25910", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19977" :| []}]
 -- >>> p_r_反切s "反" (NEL.singleton "王韻") "《王一》户孟反，《王三》胡孟反"
--- Right [Pronunciation反切 {pr_反切 = Just ("\25143\23391","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19968" :| []},Pronunciation反切 {pr_反切 = Just ("\32993\23391","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19977" :| []}]
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("\25143\23391","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19968" :| []},Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Just ("\32993\23391","\21453"), pr_反切_comment = Nothing, pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19977" :| []}]
 -- >>> p_r_反切s "反" (NEL.singleton "王韻") "《王三》脱字（脱反語），《王一》無本"
--- Right [Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\33073\23383\65288\33073\21453\35486\65289", pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19977" :| []},Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\28961\26412", pr_反切_pre_info = Nothing, pr_反切_books = "\29579\19968" :| []}]
-p_r_反切s :: Text -> NonEmpty Text -> Text -> Either String [Pronunciation反切]
-p_r_反切s field books pc = do
-  fq <- left (printf "反切: %s (%s): %s" field pc) $ parseOnly p_fanqieField pc
-  let conv Nothing (Nothing, _, _, _) = Left $ printf "Cannot determine 反切本 for %s" field
-      conv (Just books) (b, pre, fq, c) = Right $ Pronunciation反切
-        { pr_反切 = fq
-        , pr_反切_comment = c
-        , pr_反切_pre_info = pre
-        , pr_反切_books = fromMaybe books . fmap NEL.singleton $ b
-        }
-      conv Nothing ((Just b), pre, fq, c) = Right $ Pronunciation反切
-        { pr_反切 = fq
-        , pr_反切_comment = c
-        , pr_反切_pre_info = pre
-        , pr_反切_books = NEL.singleton b
-        }
-  case fq of
+-- Right [Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\33073\23383\65288\33073\21453\35486\65289", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19977" :| []},Pronunciation反切本 {pr_反切本_fanqies = Pronunciation反切 {pr_反切 = Nothing, pr_反切_comment = Just "\28961\26412", pr_反切_pre_info = Nothing} :| [], pr_反切本_books = "\29579\19968" :| []}]
+p_r_反切s :: Text -> NonEmpty Text -> Text -> Either String [Pronunciation反切本]
+p_r_反切s field defaultBooks pc = do
+  fqs <- left (printf "反切: %s (%s): %s" field pc) $ parseOnly p_fanqieField pc
+  let
+    convItem (pre, fq, c) = Pronunciation反切
+      { pr_反切 = fq
+      , pr_反切_comment = c
+      , pr_反切_pre_info = pre
+      }
+    conv Nothing (Nothing, _) = Left $ printf "Cannot determine 反切本 for %s" field
+    conv Nothing ((Just b), fq) = Right $ Pronunciation反切本
+      { pr_反切本_fanqies = fmap convItem fq
+      , pr_反切本_books = NEL.singleton b
+      }
+    conv (Just bs) (b, fq) = Right $ Pronunciation反切本
+      { pr_反切本_fanqies = fmap convItem fq
+      , pr_反切本_books = fromMaybe bs . fmap NEL.singleton $ b
+      }
+  case fqs of
     [] -> Right []
     fq:fqs -> do
-      pr1 <- conv (Just books) fq
+      pr1 <- conv (Just defaultBooks) fq
       prs <- mapM (conv Nothing) fqs
       return $ [pr1] <> prs
 
