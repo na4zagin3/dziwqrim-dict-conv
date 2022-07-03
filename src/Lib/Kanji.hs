@@ -80,23 +80,68 @@ p_balancedText = T.concat <$> many' f
       , ("“", "”")
       ]
 
--- | Parse a fanqie with an optional comment
+-- | Parse a fanqie comment with references
 --
 -- >>> parseOnly p_fanqieCharacterNote "誤作“苦角反”"
 -- Right "\35492\20316\8220\33510\35282\21453\8221"
 -- >>> parseOnly p_fanqieCharacterNote "字作“墅”"
 -- Right "\23383\20316\8220\22661\8221"
-p_fanqieCharacterNote = do
-  k <- choice . map string $ ["誤作", "字作"]
-  cp <- option "" $ do
+-- >>> parseOnly p_fanqieCharacterNote2 "誤以“麝”又反作“食夜反”"
+-- Right "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221"
+p_fanqieCharacterNote = choice
+  [ p_fanqieCharacterNote1
+  , p_fanqieCharacterNote2
+  ]
+
+-- | Parse a fanqie comment with a reference
+--
+-- >>> parseOnly p_fanqieCharacterNote1 "誤作“苦角反”"
+-- Right "\35492\20316\8220\33510\35282\21453\8221"
+-- >>> parseOnly p_fanqieCharacterNote1 "字作“墅”"
+-- Right "\23383\20316\8220\22661\8221"
+p_fanqieCharacterNote1 = do
+  k <- choice . map string $
+    [ "誤作"
+    , "字作"
+    ]
+  cp <- do
     string "“"
     c <- p_balancedText
     string "”"
     return $ "“" <> c <> "”"
   return $ k <> cp
 
+-- | Parse a fanqie comment with two references
+--
+-- >>> parseOnly p_fanqieCharacterNote2 "誤以“麝”又反作“食夜反”"
+-- Right "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221"
+p_fanqieCharacterNote2 = do
+  k1 <- choice . map string $
+    [ "誤以"
+    ]
+  cp1 <- do
+    string "“"
+    c <- p_balancedText
+    string "”"
+    return $ "“" <> c <> "”"
+  k2 <- choice . map string $
+    [ "又反作"
+    ]
+  cp2 <- do
+    string "“"
+    c <- p_balancedText
+    string "”"
+    return $ "“" <> c <> "”"
+  return $ mconcat [k1, cp1, k2, cp2]
+
 p_fanqieNote = do
-  k <- choice . map string $ ["未收", "脱字", "無本"]
+  k <- choice . map string $
+    [ "未收"
+    , "無反語"
+    , "脱反語"
+    , "脱字"
+    , "無本"
+    ]
   cp <- option "" $ do
     string "（"
     c <- p_balancedText
@@ -126,6 +171,16 @@ p_fanqieRhymeGroup = do
   c <- string "韵"
   return rg
 
+-- | Parse a fanqie item
+--
+-- >>> parseOnly p_fanqieItem "歌韵無反語"
+-- Right (Nothing,Just "\27468",Nothing,Just "\28961\21453\35486")
+-- >>> parseOnly p_fanqieItem "而鋭反（コメント）"
+-- Right (Nothing,Nothing,Just ("\32780\37613","\21453"),Just "\12467\12513\12531\12488")
+-- >>> parseOnly p_fanqieItem "《王三》脱反語"
+-- Right (Just "\29579\19977",Nothing,Nothing,Just "\33073\21453\35486")
+-- >>> parseOnly p_fanqieItem "《王一》脱字（丁吕反）"
+-- Right (Just "\29579\19968",Nothing,Nothing,Just "\33073\23383\65288\19969\21525\21453\65289")
 p_fanqieItem = do
   b <- option Nothing (Just <$> p_book)
   let parseFanqie rg = do
@@ -148,25 +203,25 @@ p_fanqieItem = do
 -- >>> parseOnly p_fanqieField "なし"
 -- Right []
 -- >>> parseOnly p_fanqieField "（）"
--- Right [(Nothing,Nothing,Just "")]
+-- Right [(Nothing,Nothing,Nothing,Just "")]
 -- >>> parseOnly p_fanqieField "（コメント）"
--- Right [(Nothing,Nothing,Just "\12467\12513\12531\12488")]
+-- Right [(Nothing,Nothing,Nothing,Just "\12467\12513\12531\12488")]
 -- >>> parseOnly p_fanqieField "而鋭反（コメント）"
--- Right [(Nothing,Just ("\32780\37613","\21453"),Just "\12467\12513\12531\12488")]
+-- Right [(Nothing,Nothing,Just ("\32780\37613","\21453"),Just "\12467\12513\12531\12488")]
 -- >>> parseOnly p_fanqieField "〓〓反（《王三》未收）"
--- Right [(Nothing,Just ("\12307\12307","\21453"),Just "\12298\29579\19977\12299\26410\25910")]
+-- Right [(Nothing,Nothing,Just ("\12307\12307","\21453"),Just "\12298\29579\19977\12299\26410\25910")]
 -- >>> parseOnly p_fanqieField "《王三》未收"
--- Right [(Just "\29579\19977",Nothing,Just "\26410\25910")]
+-- Right [(Just "\29579\19977",Nothing,Nothing,Just "\26410\25910")]
 -- >>> parseOnly p_fanqieField "《王三》胡孟反"
--- Right [(Just "\29579\19977",Just ("\32993\23391","\21453"),Nothing)]
+-- Right [(Just "\29579\19977",Nothing,Just ("\32993\23391","\21453"),Nothing)]
 -- >>> parseOnly p_fanqieField "《王三》脱字（脱反語）"
--- Right [(Just "\29579\19977",Nothing,Just "\33073\23383\65288\33073\21453\35486\65289")]
+-- Right [(Just "\29579\19977",Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289")]
 -- >>> parseOnly p_fanqieField "《王一》户恢反，《王三》未收"
--- Right [(Just "\29579\19968",Just ("\25143\24674","\21453"),Nothing),(Just "\29579\19977",Nothing,Just "\26410\25910")]
+-- Right [(Just "\29579\19968",Nothing,Just ("\25143\24674","\21453"),Nothing),(Just "\29579\19977",Nothing,Nothing,Just "\26410\25910")]
 -- >>> parseOnly p_fanqieField "《王一》户孟反，《王三》胡孟反"
--- Right [(Just "\29579\19968",Just ("\25143\23391","\21453"),Nothing),(Just "\29579\19977",Just ("\32993\23391","\21453"),Nothing)]
+-- Right [(Just "\29579\19968",Nothing,Just ("\25143\23391","\21453"),Nothing),(Just "\29579\19977",Nothing,Just ("\32993\23391","\21453"),Nothing)]
 -- >>> parseOnly p_fanqieField "《王三》脱字（脱反語），《王一》無本"
--- Right [(Just "\29579\19977",Nothing,Just "\33073\23383\65288\33073\21453\35486\65289"),(Just "\29579\19968",Nothing,Just "\28961\26412")]
+-- Right [(Just "\29579\19977",Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289"),(Just "\29579\19968",Nothing,Nothing,Just "\28961\26412")]
 
 p_fanqieField
   :: Parser [(Maybe Text, Maybe Text, Maybe (Text, Text), Maybe Text)]
