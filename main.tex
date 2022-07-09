@@ -323,6 +323,16 @@
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
+\titleformat{\part}[display]
+{%format
+  \bfseries\large%
+}{%label
+  %第\thesection{}部
+}{%sep
+  0pt
+}{%before-code
+  \cleardoublepage
+}
 \titleformat{\section}[display]
 {%format
   \bfseries\large%
