@@ -27,6 +27,7 @@ import Lib.PathTree qualified as PT
 import Lib.Entry (renderSikrokToTex, Entry(..), Entry音義(..), EntrySortKey(..), Section(..), entryToLabel, entrySortKey)
 import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..), Shape部畫(..))
 import Text.Printf (printf)
+import Data.Text.ICU qualified as ICU
 
 data ReadingEntry = ReadingEntry
   { sk_r_reading :: !Text
@@ -102,11 +103,22 @@ entryToReadingEntries p e = map (indexReadings svParent) $ e_音義 e
 sectionsToReadingSections :: [Section] -> [ReadingSection]
 sectionsToReadingSections ss = sections
   where
-    ses = M.fromListWith (++) . map (\e -> (T.take 1 $ sk_r_reading e, [e])) $ concatMap (uncurry entryToReadingEntries) es
+    ses = M.fromListWith (++) . map (\e -> (takeInitial $ sk_r_reading e, [e])) $ concatMap (uncurry entryToReadingEntries) es
+    takeInitial t | T.take 2 t `elem` ["dz", "kh", "ph", "qh", "sh", "th", "zh"] = T.take 2 t
+                  | otherwise = T.take 1 t
     es :: [([Part], Entry)]
     es = concatMap (concatMap (\(p, vs) -> map (\v -> (p, v)) vs) . PT.toList . sec_entries) ss
     sections =
       map (\(p, es) -> ReadingSection
             { sk_r_header = p
-            , sk_r_entries = L.sortOn (\e -> (sk_r_reading e, sk_r_sortKey e)) es
-            }) $ M.toList ses
+            , sk_r_entries = L.sortOn (\e -> (ICU.sortKey collator $ sk_r_reading e, sk_r_sortKey e)) es
+            }) . L.sortOn (\(k, _) -> ICU.sortKey collator k) $ M.toList ses
+
+collator :: ICU.Collator
+collator = case ICU.collatorFrom rules Nothing Nothing of
+             Right c -> c
+             Left e -> error $ "Failed to interpret ICU collation rules: " <> show e
+  where
+    rules =
+      "&a < b < c < d < dz < e < ə < g < i < j < k < kh < l < m < n < ŋ < o < p < ph < q < qh < r < s < sh < t < th < u < x < y < z < zh\
+      \"

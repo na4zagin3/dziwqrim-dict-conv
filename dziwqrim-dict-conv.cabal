@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 90e85b02c61f7534c22612e13a541469c80b7cfa7a11ddd199a9a7975cef3b95
+-- hash: 582dc1b2dd55f35382dfc5b510c35dc713bb2094c43eb87ae8a8bc40b4bc8840
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -51,6 +51,7 @@ library
     , nonempty-vector
     , qrcode-core
     , text
+    , text-icu
     , transformers
     , vector
   default-language: Haskell2010
@@ -73,6 +74,7 @@ executable dziwqrim-dict-conv-exe
     , nonempty-vector
     , qrcode-core
     , text
+    , text-icu
     , transformers
     , vector
   default-language: Haskell2010
@@ -97,6 +99,7 @@ test-suite dziwqrim-dict-conv-test
     , nonempty-vector
     , qrcode-core
     , text
+    , text-icu
     , transformers
     , vector
   default-language: Haskell2010

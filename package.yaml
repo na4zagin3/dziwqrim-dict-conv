@@ -29,6 +29,7 @@ dependencies:
 # String
 - bytestring
 - text
+- text-icu
 # CSV
 - cassava > 0.5 && < 0.6
 # TeX
