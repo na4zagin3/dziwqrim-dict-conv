@@ -463,10 +463,7 @@ unfoldTreeToTex isRoot t = fromMaybe "" (PT.root t) <> brackettedChildrenStr
       else "（" <> childrenStr <> "）"
 
 unfoldTreeToTex' :: (Ord a) => Bool -> PathTree a Text -> Text
-unfoldTreeToTex' isRoot t =
-    if null children || isRoot
-      then content
-      else "（" <> content <> "）"
+unfoldTreeToTex' isRoot t = content
   where
     children = M.toList $ PT.children t
     childrenStr = mconcat (map (unfoldTreeToTex' False . snd) $ children)
@@ -476,7 +473,7 @@ entriesToHeadingsTex :: (Ord a) => PathTree a [Entry] -> Text
 entriesToHeadingsTex pt = unfoldTreeToTex' True $ fmap renderEntries pt
   where
     renderEntries es = T.concat $ map renderEntry es
-    renderEntry e = "\\refEntry{" <> e_字 e <> "}{" <> entryToLabel e <> "}"
+    renderEntry e = "\\refEntry{" <> e_字 e <> "}{" <> entryToLabel e <> "} "
 
 sectionToTex :: Section -> Text
 sectionToTex s = mconcat
