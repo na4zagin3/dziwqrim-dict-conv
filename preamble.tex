@@ -685,10 +685,11 @@
 
 \NewDocumentEnvironment{ReadingIndex}{m}{
   \part{隋拼索引}
-  \tl_map_inline:nn {#1}{
-    \noindent
-    ##1 {\scriptsize (p.\pageref{index-reading-section-##1})}~
-  }
+  \bgroup
+  \fReadingIndexLabel
+  字母\\
+  A ~ B ~ C ~ D ~ DZ ~ E ~ Ə ~ G ~ I ~ J ~ K ~ KH ~ L ~ M ~ N ~ Ŋ ~ O ~ P ~ PH ~ Q ~ QH ~ R ~ S ~ SH ~ T ~ TH ~ U ~ X ~ Y ~ Z ~ ZH
+  \egroup
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{7}\small
