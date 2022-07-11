@@ -76,11 +76,24 @@ radicalSectionToTex RadicalSection
       ]
     contents = map radicalEntryToTex es
 
+radicalSectionToIndexTex :: RadicalSection -> Text
+radicalSectionToIndexTex RadicalSection
+              { sk_r_header = h
+              , sk_r_entries = es
+              } = mconcat
+                  [ "{"
+                  , h
+                  , "}"
+                  ]
+
 radicalSectionsToTex :: [RadicalSection] -> Text
 radicalSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [footer]]
   where
     header = mconcat
       [ "\\begin{RadicalIndex}"
+      , "{"
+      , mconcat $ map radicalSectionToIndexTex sss
+      , "}"
       ]
     contents = map radicalSectionToTex sss
     footer = mconcat

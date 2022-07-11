@@ -79,6 +79,9 @@ readingSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [foo
   where
     header = mconcat
       [ "\\begin{ReadingIndex}"
+      , "{"
+      , mconcat . map (\h -> "{" <> h <> "}"). L.sortOn (ICU.sortKey collator) $ map sk_r_header sss
+      , "}"
       ]
     contents = map readingSectionToTex sss
     footer = mconcat
