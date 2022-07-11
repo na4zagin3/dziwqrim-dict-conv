@@ -22,6 +22,7 @@
 %\setmainfont[Numbers={Lining,Monospaced}]{EB Garamond}
 \setsansfont{Noto Sans}
 \setfontface\fSemanticLabel{Gentium Plus}[CharacterVariant={43:1}]
+\setfontface\fReadingIndexLabel{EB Garamond}
 
 \setmainjfont{Noto Serif CJK SC}
 \setsansjfont{Noto Sans CJK SC}
@@ -699,7 +700,7 @@
 }
 \NewDocumentCommand{\ReadingSection}{m}{
   \begin{center}
-    \textbf{\fSemanticLabel\MakeUppercase{#1}}\label{index-reading-section-#1}
+    \fReadingIndexLabel\textbf{\MakeUppercase{#1}}\label{index-reading-section-#1}
   \end{center}
   \str_clear:N \l_zqdict_index_subsection_label_str
 }
