@@ -92,10 +92,11 @@ sikrokSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [foot
 entryToSikrokEntries :: [Part] -> Entry -> [SikrokEntry]
 entryToSikrokEntries p e = concat $ concat
   [ [ indexSikroks svParent ]
-  , map (indexSikrokVariants svParent) $ s_選 sv
-  , map (indexSikrokVariants svParent) $ s_簡 sv
-  , map (indexSikrokVariants svParent) $ s_日 sv
-  , map (indexSikrokVariants svParent) $ s_异 sv
+  , map (indexSikrokVariants "\\textHans" svParent) $ s_選 sv
+  , map (indexSikrokVariants "\\textHans" svParent) $ s_簡 sv
+  , map (indexSikrokVariants "\\textJapn" svParent) $ s_日 sv
+  , map (indexSikrokVariants "\\textKor"  svParent) $ s_韓 sv
+  , map (indexSikrokVariants "\\textHans" svParent) $ s_异 sv
   ]
   where
     indexSikroks ShapeVariant{s_字 = z, s_四角 = sks} = map (indexSikrok z) $ NEL.toList sks
@@ -109,11 +110,11 @@ entryToSikrokEntries p e = concat $ concat
     label = entryToLabel e
     svParent = s_親 sv
     sv = e_shapeVariants $ e
-    indexSikrokVariants ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sks} =
-      map (indexSikrokVariant zp z) $ NEL.toList sks
-    indexSikrokVariant zp z sk = SikrokEntry
+    indexSikrokVariants com ShapeVariant{s_字 = zp, s_四角 = _} ShapeVariant{s_字 = z, s_四角 = sks} =
+      map (indexSikrokVariant com zp z) $ NEL.toList sks
+    indexSikrokVariant com zp z sk = SikrokEntry
       { sk_e_sikrok = sk
-      , sk_e_entry = z
+      , sk_e_entry = mconcat [com, "{", z, "}"]
       , sk_e_label = label
       , sk_e_sortKey = entrySortKey e
       , sk_e_headword = Just zp
