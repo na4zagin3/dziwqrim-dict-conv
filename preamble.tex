@@ -25,8 +25,29 @@
 \setfontfamily\fSemanticLabel{Gentium Plus}[CharacterVariant={43:1}]
 \setfontfamily\fReadingIndexLabel{EB Garamond}
 
-\setmainjfont{Noto Serif CJK SC}[JFM=CCT]
-\setsansjfont{Noto Sans CJK SC}[JFM=CCT]
+% Noto
+%
+% \setmainjfont{Noto Serif CJK SC}[JFM=CCT]
+% \setsansjfont{Noto Sans CJK SC}[JFM=CCT]
+% 
+% \newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]
+% \newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]
+% \newjfontfamily\fontMainKo{Noto Serif CJK KR}[]
+% \newjfontfamily\fontSansKo{Noto Sans CJK KR}[]
+% \newjfontfamily\fontMainHans{Noto Serif CJK SC}[JFM=CCT]
+% \newjfontfamily\fontSansHans{Noto Sans CJK SC}[JFM=CCT]
+
+% Source Han
+% 
+\setmainjfont{Source Han Serif CN}[JFM=CCT]
+\setsansjfont{Source Han Sans CN}[JFM=CCT]
+
+\newjfontfamily\fontMainJapn{Source Han Serif JP}[]
+\newjfontfamily\fontSansJapn{Source Han Sans JP}[]
+\newjfontfamily\fontMainKo{Source Han Serif KR}[]
+\newjfontfamily\fontSansKo{Source Han Sans KR}[]
+\newjfontfamily\fontMainHans{Source Han Serif CN}[JFM=CCT]
+\newjfontfamily\fontSansHans{Source Han Sans CN}[JFM=CCT]
 
 % Make Greek and Cyrillic non-CJK
 \ltjsetparameter{jacharrange={-2}}
@@ -38,13 +59,6 @@
 \ltjdefcharrange{1}{"2070-"209F}
 \ltjsetparameter{alxspmode={`₁,inhibit}}
 \ltjsetparameter{alxspmode={`₂,inhibit}}
-
-\newjfontfamily\fontMainJapn{Noto Serif CJK JP}[]
-\newjfontfamily\fontSansJapn{Noto Sans CJK JP}[]
-\newjfontfamily\fontMainKo{Noto Serif CJK KR}[]
-\newjfontfamily\fontSansKo{Noto Sans CJK KR}[]
-\newjfontfamily\fontMainHans{Noto Serif CJK SC}[JFM=CCT]
-\newjfontfamily\fontSansHans{Noto Sans CJK SC}[JFM=CCT]
 
 \newcommand{\textJapn}[1]{{%
     \fontMainJapn%
