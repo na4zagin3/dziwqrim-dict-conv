@@ -35,12 +35,15 @@ p_pr_pronunciation "" = []
 p_pr_pronunciation "—" = []
 p_pr_pronunciation s = T.split (`T.elem` "\n") s
 
+decodeComment :: Text -> Text
+decodeComment = T.replace "->" "→"
+
 parsePhoneticRadical :: (HasCallStack) => Int -> Map Text Text -> Either String PhoneticRadical
 parsePhoneticRadical row m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
   f_pr_radical <- lookupField "聲首"
   f_pr_index <- p_r_phoneticNumber =<< lookupField "聲位"
-  f_pr_comment <- lookupField "コメント"
+  f_pr_comment <- decodeComment <$> lookupField "コメント"
   f_pr_pronunciation <- p_pr_pronunciation <$> lookupField "諧聲域"
   return $ PhoneticRadical
     { pr_radical = f_pr_radical
