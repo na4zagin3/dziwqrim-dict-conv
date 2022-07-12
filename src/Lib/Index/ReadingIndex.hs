@@ -127,6 +127,6 @@ collator = case ICU.collatorFrom rules Nothing Nothing of
              Left e -> error $ "Failed to interpret ICU collation rules: " <> show e
   where
     rules =
-      "&a < b < c < d < dz < e < ə < g < i < j < k < kh < l < m < n < ŋ < o < p < ph < q < qh < r < s < sh < t < th < u < x < y < z < zh\
+      "&a < b < c < ch < d < dz < e < ə < g < i < j < k < kh < l < m < n < ŋ < o < p < ph < q < qh < r < s < sh < t < th < u < x < y < z < zh\
       \& [last tertiary ignorable] <<< ʼ\
       \"

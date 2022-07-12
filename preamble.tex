@@ -9,6 +9,7 @@
 \usepackage{calc}
 \usepackage{fancyhdr}
 \usepackage{ifthen}
+\usepackage{mfirstuc}
 \usepackage{multicol}
 \usepackage{pdfcomment}
 \usepackage{pxpic}
@@ -689,7 +690,7 @@
   \bgroup
   \fReadingIndexLabel
   字母\\
-  A ~ B ~ C ~ D ~ DZ ~ E ~ Ə ~ G ~ I ~ J ~ K ~ KH ~ L ~ M ~ N ~ Ŋ ~ O ~ P ~ PH ~ Q ~ QH ~ R ~ S ~ SH ~ T ~ TH ~ U ~ X ~ Y ~ Z ~ ZH
+  A ~ B ~ C ~ Ch ~ D ~ Dz ~ E ~ Ə ~ G ~ I ~ J ~ K ~ Kh ~ L ~ M ~ N ~ Ŋ ~ O ~ P ~ Ph ~ Q ~ Qh ~ R ~ S ~ Sh ~ T ~ Th ~ U ~ X ~ Y ~ Z ~ Zh
   \egroup
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
@@ -700,7 +701,7 @@
 }
 \NewDocumentCommand{\ReadingSection}{m}{
   \begin{center}
-    \fReadingIndexLabel\textbf{\MakeUppercase{#1}}\label{index-reading-section-#1}
+    {\fReadingIndexLabel\textbf{\capitalisewords{#1}}}\label{index-reading-section-#1}
   \end{center}
   \str_clear:N \l_zqdict_index_subsection_label_str
 }
