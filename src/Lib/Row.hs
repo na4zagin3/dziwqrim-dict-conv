@@ -19,8 +19,8 @@ import Data.Text qualified as T
 import Data.Text.Read as TR
 import GHC.Generics (Generic)
 import GHC.Stack (HasCallStack)
-import Lib.Kanji (explodeKanji)
-import Lib.Kanji (p_fanqieField)
+import Lib.IDS (convIds)
+import Lib.Kanji (explodeKanji, p_fanqieField)
 import Lib.Rhymes (list_平水)
 import Text.Printf (printf)
 
@@ -488,7 +488,9 @@ maybeToRight y Nothing  = Left y
 
 parseValidRow :: (HasCallStack) => Int -> Text -> Map Text Text -> Either String Row
 parseValidRow row version m = do
-  let lookupField f = maybeToRight (printf "missing field: %s" f) $ M.lookup (fromString f) m
+  let lookupField f = do
+        str <- maybeToRight (printf "missing field: %s" f) $ M.lookup (fromString f) m
+        left (printf "%s: invalid IDS: %s" f . show) $ convIds str
 
   f_字 <- p_r_字 =<< lookupField "字"
   f_親_pl <- left ("親: " <>) . join $ p_r_shapeVariant <$> lookupField "字" <*> lookupField "四角"
