@@ -114,9 +114,13 @@ sectionsToReadingSections ss = sections
     sections =
       map (\(p, es) -> ReadingSection
             { sk_r_header = p
-            , sk_r_entries = L.sortOn (\e -> (ICU.sortKey collator $ sk_r_reading e, sk_r_sortKey e)) es
+            , sk_r_entries = L.sortOn (\e -> (ICU.sortKey collator . normalizeForCollation $ sk_r_reading e, sk_r_sortKey e)) es
             }) . L.sortOn (\(k, _) -> ICU.sortKey collator k) $ M.toList ses
 
+normalizeForCollation :: Text -> Text
+normalizeForCollation = T.replace "'" "ʼ"
+
+-- | ICU collator
 collator :: ICU.Collator
 collator = case ICU.collatorFrom rules Nothing Nothing of
              Right c -> c
@@ -124,4 +128,5 @@ collator = case ICU.collatorFrom rules Nothing Nothing of
   where
     rules =
       "&a < b < c < d < dz < e < ə < g < i < j < k < kh < l < m < n < ŋ < o < p < ph < q < qh < r < s < sh < t < th < u < x < y < z < zh\
+      \& [last tertiary ignorable] <<< ʼ\
       \"
