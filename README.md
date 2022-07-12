@@ -3,6 +3,10 @@
 
 - [Haskell Stack](https://docs.haskellstack.org/en/stable/README/)
 - LuaLaTeX
+- EB Garamond
+- Junicode
+- Gentium Plus
+- Source Han or Noto CJK
 
 Haskellにより書かれているため、実行には[Haskell Stack](https://docs.haskellstack.org/en/stable/README/)が要る。
 
