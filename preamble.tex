@@ -503,243 +503,26 @@
 
 \ExplSyntaxOn
 
-\cs_set:Nn \_zqdict_radical_index_preface_header:n {
-  \par
-  \noindent\textbf{#1}\quad
-}
-\cs_set:Nn \_zqdict_radical_index_preface_radical:n {
-  \mbox{#1}~
-}
-\cs_set:Nn \_zqdict_kanji_cdot: {
+\NewDocumentCommand{\KanjiCdot}{}{
   \raisebox{0.25ex}{\cdot}
+}
+\NewDocumentEnvironment{RadicalIndexRadicalIndex}{}{
+\begin{itemize}
+}{
+\end{itemize}
+}
+\NewDocumentCommand{\RadicalIndexRadicalIndexLabel}{m}{
+  \item[\textbf{#1畫}]
+}
+\NewDocumentCommand{\RadicalIndexRadicalIndexElem}{m m}{
+  \mbox{#1 ~ #2} ~
 }
 \NewDocumentEnvironment{RadicalIndex}{m}{
   \part{《漢辭海》部首索引}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
-  \begin{multicols}{5}\small
-  \_zqdict_radical_index_preface_header:n{1畫}
-  \_zqdict_radical_index_preface_radical:n{一}
-  \_zqdict_radical_index_preface_radical:n{丨}
-  \_zqdict_radical_index_preface_radical:n{丶}
-  \_zqdict_radical_index_preface_radical:n{丿}
-  \_zqdict_radical_index_preface_radical:n{乙}
-  \_zqdict_radical_index_preface_radical:n{亅}
-  \_zqdict_radical_index_preface_header:n{2畫}
-  \_zqdict_radical_index_preface_radical:n{二}
-  \_zqdict_radical_index_preface_radical:n{亠}
-  \_zqdict_radical_index_preface_radical:n{人}
-  \_zqdict_radical_index_preface_radical:n{儿}
-  \_zqdict_radical_index_preface_radical:n{入}
-  \_zqdict_radical_index_preface_radical:n{八}
-  \_zqdict_radical_index_preface_radical:n{冂}
-  \_zqdict_radical_index_preface_radical:n{冫}
-  \_zqdict_radical_index_preface_radical:n{几}
-  \_zqdict_radical_index_preface_radical:n{凵}
-  \_zqdict_radical_index_preface_radical:n{刀}
-  \_zqdict_radical_index_preface_radical:n{力}
-  \_zqdict_radical_index_preface_radical:n{勹}
-  \_zqdict_radical_index_preface_radical:n{匕}
-  \_zqdict_radical_index_preface_radical:n{匚\_zqdict_kanji_cdot: 匸}
-  \_zqdict_radical_index_preface_radical:n{十}
-  \_zqdict_radical_index_preface_radical:n{卩}
-  \_zqdict_radical_index_preface_radical:n{厂}
-  \_zqdict_radical_index_preface_radical:n{厶}
-  \_zqdict_radical_index_preface_radical:n{又}
-  \_zqdict_radical_index_preface_header:n{3畫}
-  \_zqdict_radical_index_preface_radical:n{口}
-  \_zqdict_radical_index_preface_radical:n{囗}
-  \_zqdict_radical_index_preface_radical:n{土}
-  \_zqdict_radical_index_preface_radical:n{士}
-  \_zqdict_radical_index_preface_radical:n{夂\_zqdict_kanji_cdot: 夊}
-  \_zqdict_radical_index_preface_radical:n{夕}
-  \_zqdict_radical_index_preface_radical:n{大}
-  \_zqdict_radical_index_preface_radical:n{女}
-  \_zqdict_radical_index_preface_radical:n{子}
-  \_zqdict_radical_index_preface_radical:n{宀}
-  \_zqdict_radical_index_preface_radical:n{寸}
-  \_zqdict_radical_index_preface_radical:n{小}
-  \_zqdict_radical_index_preface_radical:n{尢}
-  \_zqdict_radical_index_preface_radical:n{尸}
-  \_zqdict_radical_index_preface_radical:n{屮}
-  \_zqdict_radical_index_preface_radical:n{山}
-  \_zqdict_radical_index_preface_radical:n{巛}
-  \_zqdict_radical_index_preface_radical:n{工}
-  \_zqdict_radical_index_preface_radical:n{己}
-  \_zqdict_radical_index_preface_radical:n{巾}
-  \_zqdict_radical_index_preface_radical:n{干}
-  \_zqdict_radical_index_preface_radical:n{幺}
-  \_zqdict_radical_index_preface_radical:n{广}
-  \_zqdict_radical_index_preface_radical:n{廴}
-  \_zqdict_radical_index_preface_radical:n{廾}
-  \_zqdict_radical_index_preface_radical:n{弋}
-  \_zqdict_radical_index_preface_radical:n{弓}
-  \_zqdict_radical_index_preface_radical:n{彐}
-  \_zqdict_radical_index_preface_radical:n{彡}
-  \_zqdict_radical_index_preface_radical:n{彳}
-  \_zqdict_radical_index_preface_header:n{4畫}
-  \_zqdict_radical_index_preface_radical:n{心}
-  \_zqdict_radical_index_preface_radical:n{戈}
-  \_zqdict_radical_index_preface_radical:n{户}
-  \_zqdict_radical_index_preface_radical:n{手}
-  \_zqdict_radical_index_preface_radical:n{攴\_zqdict_kanji_cdot: 攴}
-  \_zqdict_radical_index_preface_radical:n{文}
-  \_zqdict_radical_index_preface_radical:n{斗}
-  \_zqdict_radical_index_preface_radical:n{斤}
-  \_zqdict_radical_index_preface_radical:n{方}
-  \_zqdict_radical_index_preface_radical:n{无}
-  \_zqdict_radical_index_preface_radical:n{日}
-  \_zqdict_radical_index_preface_radical:n{曰}
-  \_zqdict_radical_index_preface_radical:n{月}
-  \_zqdict_radical_index_preface_radical:n{木}
-  \_zqdict_radical_index_preface_radical:n{欠}
-  \_zqdict_radical_index_preface_radical:n{止}
-  \_zqdict_radical_index_preface_radical:n{歹}
-  \_zqdict_radical_index_preface_radical:n{殳}
-  \_zqdict_radical_index_preface_radical:n{毋}
-  \_zqdict_radical_index_preface_radical:n{毛}
-  \_zqdict_radical_index_preface_radical:n{氏}
-  \_zqdict_radical_index_preface_radical:n{气}
-  \_zqdict_radical_index_preface_radical:n{水}
-  \_zqdict_radical_index_preface_radical:n{火}
-  \_zqdict_radical_index_preface_radical:n{爪}
-  \_zqdict_radical_index_preface_radical:n{父}
-  \_zqdict_radical_index_preface_radical:n{爻}
-  \_zqdict_radical_index_preface_radical:n{爿}
-  \_zqdict_radical_index_preface_radical:n{片}
-  \_zqdict_radical_index_preface_radical:n{牛}
-  \_zqdict_radical_index_preface_radical:n{犬}
-  \_zqdict_radical_index_preface_header:n{5畫}
-  \_zqdict_radical_index_preface_radical:n{玄}
-  \_zqdict_radical_index_preface_radical:n{瓜}
-  \_zqdict_radical_index_preface_radical:n{玉}
-  \_zqdict_radical_index_preface_radical:n{瓦}
-  \_zqdict_radical_index_preface_radical:n{甘}
-  \_zqdict_radical_index_preface_radical:n{生}
-  \_zqdict_radical_index_preface_radical:n{用}
-  \_zqdict_radical_index_preface_radical:n{田}
-  \_zqdict_radical_index_preface_radical:n{疋}
-  \_zqdict_radical_index_preface_radical:n{疒}
-  \_zqdict_radical_index_preface_radical:n{癶}
-  \_zqdict_radical_index_preface_radical:n{白}
-  \_zqdict_radical_index_preface_radical:n{皮}
-  \_zqdict_radical_index_preface_radical:n{皿}
-  \_zqdict_radical_index_preface_radical:n{目}
-  \_zqdict_radical_index_preface_radical:n{矛}
-  \_zqdict_radical_index_preface_radical:n{矢}
-  \_zqdict_radical_index_preface_radical:n{石}
-  \_zqdict_radical_index_preface_radical:n{示}
-  \_zqdict_radical_index_preface_radical:n{禸}
-  \_zqdict_radical_index_preface_radical:n{禾}
-  \_zqdict_radical_index_preface_radical:n{穴}
-  \_zqdict_radical_index_preface_radical:n{立}
-  \_zqdict_radical_index_preface_header:n{6畫}
-  \_zqdict_radical_index_preface_radical:n{竹}
-  \_zqdict_radical_index_preface_radical:n{米}
-  \_zqdict_radical_index_preface_radical:n{糸}
-  \_zqdict_radical_index_preface_radical:n{缶}
-  \_zqdict_radical_index_preface_radical:n{网}
-  \_zqdict_radical_index_preface_radical:n{羊}
-  \_zqdict_radical_index_preface_radical:n{羽}
-  \_zqdict_radical_index_preface_radical:n{老}
-  \_zqdict_radical_index_preface_radical:n{而}
-  \_zqdict_radical_index_preface_radical:n{耒}
-  \_zqdict_radical_index_preface_radical:n{耳}
-  \_zqdict_radical_index_preface_radical:n{聿}
-  \_zqdict_radical_index_preface_radical:n{肉}
-  \_zqdict_radical_index_preface_radical:n{臣}
-  \_zqdict_radical_index_preface_radical:n{至}
-  \_zqdict_radical_index_preface_radical:n{臼}
-  \_zqdict_radical_index_preface_radical:n{舌}
-  \_zqdict_radical_index_preface_radical:n{舛}
-  \_zqdict_radical_index_preface_radical:n{舟}
-  \_zqdict_radical_index_preface_radical:n{艮}
-  \_zqdict_radical_index_preface_radical:n{色}
-  \_zqdict_radical_index_preface_radical:n{艸}
-  \_zqdict_radical_index_preface_radical:n{虍}
-  \_zqdict_radical_index_preface_radical:n{虫}
-  \_zqdict_radical_index_preface_radical:n{血}
-  \_zqdict_radical_index_preface_radical:n{行}
-  \_zqdict_radical_index_preface_radical:n{衣}
-  \_zqdict_radical_index_preface_radical:n{襾}
-  \_zqdict_radical_index_preface_header:n{7畫}
-  \_zqdict_radical_index_preface_radical:n{見}
-  \_zqdict_radical_index_preface_radical:n{角}
-  \_zqdict_radical_index_preface_radical:n{言}
-  \_zqdict_radical_index_preface_radical:n{谷}
-  \_zqdict_radical_index_preface_radical:n{豆}
-  \_zqdict_radical_index_preface_radical:n{豕}
-  \_zqdict_radical_index_preface_radical:n{豸}
-  \_zqdict_radical_index_preface_radical:n{貝}
-  \_zqdict_radical_index_preface_radical:n{赤}
-  \_zqdict_radical_index_preface_radical:n{走}
-  \_zqdict_radical_index_preface_radical:n{足}
-  \_zqdict_radical_index_preface_radical:n{身}
-  \_zqdict_radical_index_preface_radical:n{車}
-  \_zqdict_radical_index_preface_radical:n{辛}
-  \_zqdict_radical_index_preface_radical:n{辵}
-  \_zqdict_radical_index_preface_radical:n{邑}
-  \_zqdict_radical_index_preface_radical:n{酉}
-  \_zqdict_radical_index_preface_radical:n{釆}
-  \_zqdict_radical_index_preface_radical:n{里}
-  \_zqdict_radical_index_preface_header:n{8畫}
-  \_zqdict_radical_index_preface_radical:n{金}
-  \_zqdict_radical_index_preface_radical:n{長}
-  \_zqdict_radical_index_preface_radical:n{門}
-  \_zqdict_radical_index_preface_radical:n{阜}
-  \_zqdict_radical_index_preface_radical:n{隶}
-  \_zqdict_radical_index_preface_radical:n{隹}
-  \_zqdict_radical_index_preface_radical:n{雨}
-  \_zqdict_radical_index_preface_radical:n{青}
-  \_zqdict_radical_index_preface_radical:n{非}
-  \_zqdict_radical_index_preface_header:n{9畫}
-  \_zqdict_radical_index_preface_radical:n{面}
-  \_zqdict_radical_index_preface_radical:n{革}
-  \_zqdict_radical_index_preface_radical:n{韋}
-  \_zqdict_radical_index_preface_radical:n{韭}
-  \_zqdict_radical_index_preface_radical:n{音}
-  \_zqdict_radical_index_preface_radical:n{頁}
-  \_zqdict_radical_index_preface_radical:n{風}
-  \_zqdict_radical_index_preface_radical:n{飛}
-  \_zqdict_radical_index_preface_radical:n{食}
-  \_zqdict_radical_index_preface_radical:n{首}
-  \_zqdict_radical_index_preface_radical:n{香}
-  \_zqdict_radical_index_preface_header:n{10畫}
-  \_zqdict_radical_index_preface_radical:n{馬}
-  \_zqdict_radical_index_preface_radical:n{骨}
-  \_zqdict_radical_index_preface_radical:n{高}
-  \_zqdict_radical_index_preface_radical:n{髟}
-  \_zqdict_radical_index_preface_radical:n{鬥}
-  \_zqdict_radical_index_preface_radical:n{鬯}
-  \_zqdict_radical_index_preface_radical:n{鬲}
-  \_zqdict_radical_index_preface_radical:n{鬼}
-  \_zqdict_radical_index_preface_header:n{11畫}
-  \_zqdict_radical_index_preface_radical:n{魚}
-  \_zqdict_radical_index_preface_radical:n{鳥}
-  \_zqdict_radical_index_preface_radical:n{鹵}
-  \_zqdict_radical_index_preface_radical:n{鹿}
-  \_zqdict_radical_index_preface_radical:n{麥}
-  \_zqdict_radical_index_preface_radical:n{麻}
-  \_zqdict_radical_index_preface_header:n{12畫}
-  \_zqdict_radical_index_preface_radical:n{黃}
-  \_zqdict_radical_index_preface_radical:n{黍}
-  \_zqdict_radical_index_preface_radical:n{黑}
-  \_zqdict_radical_index_preface_radical:n{黹}
-  \_zqdict_radical_index_preface_header:n{13畫}
-  \_zqdict_radical_index_preface_radical:n{黽}
-  \_zqdict_radical_index_preface_radical:n{鼎}
-  \_zqdict_radical_index_preface_radical:n{鼓}
-  \_zqdict_radical_index_preface_radical:n{鼠}
-  \_zqdict_radical_index_preface_header:n{14畫}
-  \_zqdict_radical_index_preface_radical:n{鼻}
-  \_zqdict_radical_index_preface_radical:n{齊}
-  \_zqdict_radical_index_preface_header:n{15畫}
-  \_zqdict_radical_index_preface_radical:n{齒}
-  \_zqdict_radical_index_preface_header:n{16畫}
-  \_zqdict_radical_index_preface_radical:n{龍}
-  \_zqdict_radical_index_preface_radical:n{龜}
-  \_zqdict_radical_index_preface_header:n{17畫}
-  \_zqdict_radical_index_preface_radical:n{龠}
+  \begin{multicols}{2}\small
+  #1
   \end{multicols}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
@@ -747,9 +530,9 @@
   }{
   \end{multicols}
 }
-\NewDocumentCommand{\RadicalSection}{m}{
+\NewDocumentCommand{\RadicalSection}{m m}{
   \begin{center}
-    \textbf{#1部}\label{index-radical-section-#1}
+    \textbf{#1\\#2部}\label{index-radical-section-#1-#2}
   \end{center}
   \str_set:Nn \l_zqdict_index_subsection_label_str {0}
 }
