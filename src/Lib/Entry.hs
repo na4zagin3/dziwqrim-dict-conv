@@ -379,12 +379,12 @@ pronunciationToTex Pronunciation
   -- , pr_辭源韵 = i
   , pr_略韵 = li
   , pr_字音補注 = n
-  } = T.intercalate "。"  $ filter (not . T.null) cs
+  } = T.intercalate "。" cs
   where
     fqs :: [Text]
     fqs = pronunciation反切集ToTex pc
     cs :: [Text]
-    cs = fqs <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li) <> (maybeToList n)
+    cs = fqs <> (maybeToList $ fmap pronunciation漢辭海ToTex h) <> (maybeToList li) <> [fromMaybe "" n]
 
 entryToQrContent :: Entry -> Text
 entryToQrContent e = mconcat . L.nub $ mconcat contents
