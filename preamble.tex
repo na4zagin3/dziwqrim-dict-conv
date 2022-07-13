@@ -39,14 +39,49 @@
 
 % Source Han
 % 
-\setmainjfont{Source Han Serif CN}[JFM=CCT]
+\setmainjfont{Source Han Serif CN}[
+  AltFont={
+    {Range={
+      "205E8, "201A2, "2090E, "20B9F,
+      "21484, "210E4, "21883, "21A25,
+      "224ED, "2274A, "22D67, "23154,
+      "24169, "25CD1, "25E24, "26855,
+      "2696F, "26C29, "278B3, "27E87,
+      "27FB7, "280B7, "284DC, "289E8,
+      "2B7CF, "2C1C7
+    },
+    Font=HanaMinB}
+  },
+  JFM=CCT
+]
 \setsansjfont{Source Han Sans CN}[JFM=CCT]
 
 \newjfontfamily\fontMainJapn{Source Han Serif JP}[]
 \newjfontfamily\fontSansJapn{Source Han Sans JP}[]
-\newjfontfamily\fontMainKo{Source Han Serif KR}[]
+\newjfontfamily\fontMainKo{Source Han Serif KR}[
+  AltFont={
+    {Range={
+      "5F4D, "7926, "7AEB, "87E5, "89F5, "913A, "92C1
+    },
+    Font=SourceHanSerifJP}
+  }
+]
 \newjfontfamily\fontSansKo{Source Han Sans KR}[]
-\newjfontfamily\fontMainHans{Source Han Serif CN}[JFM=CCT]
+\newjfontfamily\fontMainHans{Source Han Serif CN}[
+  AltFont={
+    {Range={
+      "205E8, "201A2, "20B9F, "2090E,
+      "21484, "210E4, "21883, "21A25,
+      "224ED, "2274A, "22D67, "23154,
+      "24169, "25CD1, "25E24, "26855,
+      "2696F, "26C29, "278B3, "27E87,
+      "27FB7, "280B7, "284DC, "289E8,
+      "2B7CF, "2C1C7
+    },
+    Font=HanaMinB}
+  },
+  JFM=CCT
+]
 \newjfontfamily\fontSansHans{Source Han Sans CN}[JFM=CCT]
 
 % Make Greek and Cyrillic non-CJK
