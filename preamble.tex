@@ -507,15 +507,18 @@
   \raisebox{0.25ex}{\cdot}
 }
 \NewDocumentEnvironment{RadicalIndexRadicalIndex}{}{
+\bgroup
+\footnotesize
 \begin{itemize}
 }{
 \end{itemize}
+\egroup
 }
 \NewDocumentCommand{\RadicalIndexRadicalIndexLabel}{m}{
   \item[\textbf{#1畫}]
 }
 \NewDocumentCommand{\RadicalIndexRadicalIndexElem}{m m}{
-  \mbox{#1 ~ #2} ~
+  \mbox{#1 ~ #2} \quad
 }
 \NewDocumentEnvironment{RadicalIndex}{m}{
   \part{《漢辭海》部首索引}
@@ -532,7 +535,7 @@
 }
 \NewDocumentCommand{\RadicalSection}{m m}{
   \begin{center}
-    \textbf{#1\\#2部}\label{index-radical-section-#1-#2}
+    \textbf{{\footnotesize #1}\\#2部}\label{index-radical-section-#1-#2}
   \end{center}
   \str_set:Nn \l_zqdict_index_subsection_label_str {0}
 }
