@@ -27,13 +27,19 @@ p_simpleKanji = satisfy notIds
     isIds = (`elem` (ids2 ++ ids3))
 
 p_kanji :: Parser Text
-p_kanji = choice [p_simpleKanji >>= return . T.singleton, p_seq2]
+p_kanji = choice [p_simpleKanji >>= return . T.singleton, p_seq2, p_seq3]
   where
     p_seq2 = do
       op <- p_ids2
       k1 <- p_kanji
       k2 <- p_kanji
       return $ mconcat [T.singleton op, k1, k2]
+    p_seq3 = do
+      op <- p_ids3
+      k1 <- p_kanji
+      k2 <- p_kanji
+      k3 <- p_kanji
+      return $ mconcat [T.singleton op, k1, k2, k3]
 
 explodeKanji :: Text -> Either String [Text]
 explodeKanji = parseOnly p
