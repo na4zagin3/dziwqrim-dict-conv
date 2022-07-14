@@ -481,11 +481,11 @@
 }{
   \end{multicols}
 }
-\NewDocumentCommand{\SikrokSection}{m}{
+\NewDocumentEnvironment{SikrokSection}{m}{
   \begin{center}
-    \textbf{#1}
+    \textbf{#1}%
   \end{center}
-}
+}{}
 
 \newcommand\quelle[1]{{%
     \unskip\nobreak\hfil\penalty50
@@ -533,12 +533,12 @@
   }{
   \end{multicols}
 }
-\NewDocumentCommand{\RadicalSection}{m m}{
+\NewDocumentEnvironment{RadicalSection}{m m}{
   \begin{center}
     \textbf{{\footnotesize #1}\\#2部}\label{index-radical-section-#1-#2}
   \end{center}
   \str_set:Nn \l_zqdict_index_subsection_label_str {0}
-}
+}{}
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
   \noindent
   \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#3} {
@@ -563,12 +563,12 @@
 }{
   \end{multicols}
 }
-\NewDocumentCommand{\ReadingSection}{m}{
+\NewDocumentEnvironment{ReadingSection}{m}{
   \begin{center}
     {\fReadingIndexLabel\textbf{\capitalisewords{#1}}}\label{index-reading-section-#1}
   \end{center}
   \str_clear:N \l_zqdict_index_subsection_label_str
-}
+}{}
 \NewDocumentCommand{\ReadingEntry}{m m m}{
   \noindent
   \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#2} {

@@ -65,14 +65,17 @@ readingSectionToTex :: ReadingSection -> Text
 readingSectionToTex ReadingSection
               { sk_r_header = h
               , sk_r_entries = es
-              } = T.intercalate "\n" $ header : contents
+              } = T.intercalate "\n" $ concat [[header], contents, [footer]]
   where
     header = mconcat
-      [ "\\ReadingSection{"
+      [ "\\begin{ReadingSection}{"
       , h
       , "}"
       ]
     contents = map readingEntryToTex es
+    footer = mconcat
+      [ "\\end{ReadingSection}"
+      ]
 
 readingSectionsToTex :: [ReadingSection] -> Text
 readingSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [footer]]

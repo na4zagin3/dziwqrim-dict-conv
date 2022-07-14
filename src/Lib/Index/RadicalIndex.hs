@@ -67,23 +67,26 @@ radicalSectionToTex :: RadicalSection -> Text
 radicalSectionToTex RadicalSection
               { sk_r_header = h
               , sk_r_entries = es
-              } = T.intercalate "\n" $ header (MS.lookup h radicalMap): contents
+              } = T.intercalate "\n" $ mconcat [[header (MS.lookup h radicalMap)], contents, [footer]]
   where
     header Nothing = mconcat
-      [ "\\RadicalSection{"
+      [ "\\begin{RadicalSection}{"
       , "---"
       , "}{"
       , h
       , "}"
       ]
     header (Just (i, r)) = mconcat
-      [ "\\RadicalSection{"
+      [ "\\begin{RadicalSection}{"
       , i
       , "}{"
       , r
       , "}"
       ]
     contents = map radicalEntryToTex es
+    footer = mconcat
+      [ "\\end{RadicalSection}"
+      ]
 
 radicalSectionsToTex :: [RadicalSection] -> Text
 radicalSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [footer]]

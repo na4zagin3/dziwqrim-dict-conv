@@ -69,14 +69,17 @@ sikrokSectionToTex :: SikrokSection -> Text
 sikrokSectionToTex SikrokSection
               { sk_s_header = h
               , sk_s_entries = es
-              } = T.intercalate "\n" $ header : contents
+              } = T.intercalate "\n" $ concat [[header], contents, [footer]]
   where
     header = mconcat
-      [ "\\SikrokSection{"
+      [ "\\begin{SikrokSection}{"
       , h
       , "}"
       ]
     contents = map sikrokEntryToTex es
+    footer = mconcat
+      [ "\\end{SikrokSection}"
+      ]
 
 sikrokSectionsToTex :: [SikrokSection] -> Text
 sikrokSectionsToTex sss = T.intercalate "\n" $ concat [[header], contents, [footer]]
