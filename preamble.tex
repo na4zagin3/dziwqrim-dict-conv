@@ -207,7 +207,7 @@
   }
 }
 \AtEndDocument {
-  \iow_now:cx { @auxout } {
+  \iow_shipout_x:cn { @auxout } {
     \token_to_str:N \ExplSyntaxOn
     \token_to_str:N \_zqdict_xr_end:
     \token_to_str:N \ExplSyntaxOff
