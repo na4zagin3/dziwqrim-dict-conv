@@ -41,6 +41,9 @@ convTable =
 convMap :: Map Text Text
 convMap = M.fromList . map (\(f, t, _) -> (f, t)) . filter (\(_, _, d) -> d) $ convTable
 
+convMapFull :: Map Text Text
+convMapFull = M.fromList . map (\(f, t, _) -> (f, t)) $ convTable
+
 convIdsWith :: Map Text Text -> Text -> Either String Text
 convIdsWith convMap t = do
   ks <- explodeKanji t
@@ -48,3 +51,6 @@ convIdsWith convMap t = do
 
 convIds :: Text -> Either String Text
 convIds = convIdsWith convMap
+
+convIdsFull :: Text -> Either String Text
+convIdsFull = convIdsWith convMapFull

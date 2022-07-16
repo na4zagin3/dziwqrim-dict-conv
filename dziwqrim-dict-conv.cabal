@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.34.6.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c4d5360891508869d0255f1e2c1619044e2f76f2ca2153cec35d24ebb8ef95de
+-- hash: 2413088233343673051bd8d32efedd30d9c38f75a983130d17de4783b2f53de2
 
 name:           dziwqrim-dict-conv
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       Lib.Index.RadicalIndex
       Lib.Index.ReadingIndex
       Lib.Index.SikrokIndex
+      Lib.Index.UnicodeIndex
       Lib.Kanji
       Lib.PathTree
       Lib.PhoneticRadical

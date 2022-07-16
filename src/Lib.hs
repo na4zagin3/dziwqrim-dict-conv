@@ -26,6 +26,7 @@ import Lib.Row (parseRow)
 import Lib.Index.RadicalIndex (radicalSectionsToTex, sectionsToRadicalSections)
 import Lib.Index.ReadingIndex (readingSectionsToTex, sectionsToReadingSections)
 import Lib.Index.SikrokIndex (sikrokSectionsToTex, sectionsToSikrokSections)
+import Lib.Index.UnicodeIndex (unicodeSectionsToTex, sectionsToUnicodeSections)
 import Lib.PhoneticRadical (parsePhoneticRadical)
 -- import Control.Monad.Trans.Writer.Strict (Writer)
 -- type Dictionary = List
@@ -51,6 +52,7 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
                 , sikrokSectionsToTex $ sectionsToSikrokSections sections
                 , radicalSectionsToTex $ sectionsToRadicalSections sections
                 , readingSectionsToTex $ sectionsToReadingSections sections
+                , unicodeSectionsToTex $ sectionsToUnicodeSections sections
                 ]
   T.writeFile outPath outText
 

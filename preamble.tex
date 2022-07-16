@@ -506,6 +506,29 @@
   \par
 }
 
+\NewDocumentEnvironment{UnicodeIndex}{}{
+  \part{Unicode索引}
+  \setlength{\columnsep}{0.25em}
+  \setlength{\columnseprule}{0.4pt}
+  \begin{multicols}{5}\small
+}{
+  \end{multicols}
+}
+\NewDocumentEnvironment{UnicodeSection}{m}{
+  \begin{center}
+    \textbf{#1}%
+  \end{center}
+}{}
+\NewDocumentCommand{\UnicodeEntry}{m m o m}{
+  \noindent%
+  \IfNoValueTF{#3}{%
+    #2 #4 \hfill\pageref{entry-#1}%
+  }{%
+    #2 #4\quelle{→#3~\pageref{entry-#1}}%
+  }%
+  \par
+}
+
 \ExplSyntaxOn
 
 \NewDocumentCommand{\KanjiCdot}{}{
