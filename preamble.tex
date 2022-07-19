@@ -391,7 +391,7 @@
 }{%before-code
   \cleardoublepage
 }
-\titleformat{\section}[display]
+\titleformat{\subsection}[display]
 {%format
   \bfseries\large%
 }{%label
@@ -402,11 +402,14 @@
   \pagebreak[2]
   \centering
 }
-\titlespacing*{\section}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
+\titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
+\NewDocumentEnvironment{MainGroup}{m}{
+  \section{#1}%
+}{}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
-  \section[#1 #2]{{\ltjsetparameter{jacharrange={-9}}#1}#2}%
+  \subsection[#1 #2]{{\ltjsetparameter{jacharrange={-9}}#1}#2}%
   \RecordSection{#1}{#2}%
   \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
@@ -447,7 +450,7 @@
     }%
   }%
   \phantomsection%
-  \addcontentsline{toc}{subsection}{#1}%
+  \addcontentsline{toc}{subsubsection}{#1}%
   \label{entry-#3}%
   \RecordEntryBegin{#1}%
   \Position{#4}%

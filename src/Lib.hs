@@ -19,9 +19,8 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Data.Text.IO qualified as T
 import Text.Printf (printf)
-import GHC.Generics (Generic)
 
-import Lib.Entry (sectionsFromRows, sectionToTex)
+import Lib.Entry (sectionsFromRows, groupToTex, groupSections)
 import Lib.Row (parseRow)
 import Lib.Index.RadicalIndex (radicalSectionsToTex, sectionsToRadicalSections)
 import Lib.Index.ReadingIndex (readingSectionsToTex, sectionsToReadingSections)
@@ -48,7 +47,7 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
   let (errors2, sections) = sectionsFromRows parsedPhoneticRadicals . catMaybes $ parsedRows
   mapM_ putStrLn errors2
   let outText = T.intercalate "\n"
-                [ T.unlines . map sectionToTex $ sections
+                [ T.unlines . map groupToTex . groupSections $ sections
                 , sikrokSectionsToTex $ sectionsToSikrokSections sections
                 , radicalSectionsToTex $ sectionsToRadicalSections sections
                 , readingSectionsToTex $ sectionsToReadingSections sections
