@@ -31,7 +31,15 @@ import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..))
 import Text.Printf (printf)
 
 data UnicodeBlock =
-  CJKUnified | Other
+  CJKUnified
+  | CJKUnifiedExtA
+  | CJKUnifiedExtB
+  | CJKUnifiedExtC
+  | CJKUnifiedExtD
+  | CJKUnifiedExtE
+  | CJKUnifiedExtF
+  | CJKUnifiedExtG
+  | Other
   deriving (Read, Show, Eq, Ord, Generic)
 
 data UnicodeEntry = UnicodeEntry
@@ -133,14 +141,29 @@ entryToUnicodeEntries p e = concat $ concat
 charToUnicodeNotations :: Char -> Text
 charToUnicodeNotations = charConv . Char.ord
   where
-    charConv c | c <= 0xffff = T.pack $ printf "U+%04X" c
-               | otherwise = T.pack $ printf "U+%06X" c
+    charConv c | c <= 0xffff = T.pack $ printf "%04X" c
+               | otherwise = T.pack $ printf "%06X" c
 
 blockToHeader :: UnicodeBlock -> Text
-blockToHeader CJKUnified = "CJK Unified"
-blockToHeader Other = "CJK Unified"
+blockToHeader CJKUnified = "CJK統合漢字"
+blockToHeader CJKUnifiedExtA = "CJK統合漢字拡張A"
+blockToHeader CJKUnifiedExtB = "CJK統合漢字拡張B"
+blockToHeader CJKUnifiedExtC = "CJK統合漢字拡張C"
+blockToHeader CJKUnifiedExtD = "CJK統合漢字拡張D"
+blockToHeader CJKUnifiedExtE = "CJK統合漢字拡張E"
+blockToHeader CJKUnifiedExtF = "CJK統合漢字拡張F"
+blockToHeader CJKUnifiedExtG = "CJK統合漢字拡張G"
+blockToHeader Other = "その他"
 
 stringToBlock :: String -> UnicodeBlock
+stringToBlock (c:_) | Char.ord c >= 0x4e00 && Char.ord c <= 0x9ffc = CJKUnified
+                    | Char.ord c >= 0x3400 && Char.ord c <= 0x4dbf = CJKUnifiedExtA
+                    | Char.ord c >= 0x20000 && Char.ord c <= 0x2a6dd = CJKUnifiedExtB
+                    | Char.ord c >= 0x2a700 && Char.ord c <= 0x2b734 = CJKUnifiedExtC
+                    | Char.ord c >= 0x2b740 && Char.ord c <= 0x2b81d = CJKUnifiedExtD
+                    | Char.ord c >= 0x2b820 && Char.ord c <= 0x2cea1 = CJKUnifiedExtE
+                    | Char.ord c >= 0x2ceb0 && Char.ord c <= 0x2ebe0 = CJKUnifiedExtF
+                    | Char.ord c >= 0x30000 && Char.ord c <= 0x3a34a = CJKUnifiedExtG
 stringToBlock _ = Other
 
 sectionsToUnicodeSections :: [Section] -> [UnicodeSection]
