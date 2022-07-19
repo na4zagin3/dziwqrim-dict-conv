@@ -18,6 +18,6 @@ LuaLaTeXはTeXLiveを使うのがよい。
 スプレッドシートをプロジェクトディレクトリに `隋語常用漢字音表.csv` `諧聲.csv` の名で保存して、次のコマンドを実行する。
 
 ```
-$ stack build && stack exec -- dziwqrim-dict-conv-exe 隋語常用漢字音表.csv 諧聲.csv test-data.tex
+$ stack build && stack exec -- dziwqrim-dict-conv-exe 隋語常用漢字音表.csv 諧聲.csv data
 $ matexmk -lualatex main.tex
 ```

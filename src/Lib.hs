@@ -46,14 +46,17 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
   parsedPhoneticRadicals <- contineShowingErrors . zip rows . map (uncurry parsePhoneticRadical) . zip rows . V.toList $ rawPhoneticRadicals
   let (errors2, sections) = sectionsFromRows parsedPhoneticRadicals . catMaybes $ parsedRows
   mapM_ putStrLn errors2
-  let outText = T.intercalate "\n"
-                [ T.unlines . map groupToTex . groupSections $ sections
-                , sikrokSectionsToTex $ sectionsToSikrokSections sections
-                , radicalSectionsToTex $ sectionsToRadicalSections sections
-                , readingSectionsToTex $ sectionsToReadingSections sections
-                , unicodeSectionsToTex $ sectionsToUnicodeSections sections
-                ]
-  T.writeFile outPath outText
+  let
+    mainText = T.unlines . map groupToTex . groupSections $ sections
+    sikrokIndexText = sikrokSectionsToTex $ sectionsToSikrokSections sections
+    radicalIndexText = radicalSectionsToTex $ sectionsToRadicalSections sections
+    readingIndexText = readingSectionsToTex $ sectionsToReadingSections sections
+    unicodeIndexText = unicodeSectionsToTex $ sectionsToUnicodeSections sections
+  T.writeFile (outPath <> "-main.tex") $ mainText
+  T.writeFile (outPath <> "-index-sikrok.tex") $ sikrokIndexText
+  T.writeFile (outPath <> "-index-radical.tex") $ radicalIndexText
+  T.writeFile (outPath <> "-index-reading.tex") $ readingIndexText
+  T.writeFile (outPath <> "-index-unicode.tex") $ unicodeIndexText
 
 readCsvFile
   :: FilePath -> IO (Either String (Vector (Map Text Text)))
