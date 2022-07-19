@@ -39,6 +39,7 @@ data ReadingEntry = ReadingEntry
 
 data ReadingSection = ReadingSection
   { sk_r_header :: !Text
+  , sk_r_note :: !(Maybe Text)
   , sk_r_entries :: ![ReadingEntry]
   }
   deriving (Read, Show, Eq, Ord, Generic)
@@ -64,6 +65,7 @@ readingEntryToTex ReadingEntry
 readingSectionToTex :: ReadingSection -> Text
 readingSectionToTex ReadingSection
               { sk_r_header = h
+              , sk_r_note = n
               , sk_r_entries = es
               } = T.intercalate "\n" $ concat [[header], contents, [footer]]
   where
@@ -71,6 +73,7 @@ readingSectionToTex ReadingSection
       [ "\\begin{ReadingSection}{"
       , h
       , "}"
+      , fromMaybe "" $ fmap (\nstr -> "[" <> nstr <> "]") n
       ]
     contents = map readingEntryToTex es
     footer = mconcat
@@ -115,13 +118,45 @@ sectionsToReadingSections ss = sections
     es :: [([Part], Entry)]
     es = concatMap (concatMap (\(p, vs) -> map (\v -> (p, v)) vs) . PT.toList . sec_entries) ss
     sections =
-      map (\(p, es) -> ReadingSection
-            { sk_r_header = p
-            , sk_r_entries = L.sortOn (\e -> (ICU.sortKey collator . normalizeForCollation $ sk_r_reading e, sk_r_sortKey e)) es
-            }) . L.sortOn (\(k, _) -> ICU.sortKey collator k) $ M.toList ses
+      map (\(p, es) -> lookupSection p es) . L.sortOn (\(k, _) -> ICU.sortKey collator k) $ M.toList ses
+    lookupSection p es = ReadingSection
+      { sk_r_header = h
+      , sk_r_note = Just n
+      , sk_r_entries = L.sortOn (\e -> (ICU.sortKey collator . normalizeForCollation $ sk_r_reading e, sk_r_sortKey e)) es
+      }
+      where
+        (h, n) = fromMaybe (error $ printf "Undefined header: %s" p) $ MS.lookup p headerMap
 
 normalizeForCollation :: Text -> Text
 normalizeForCollation = T.replace "'" "ʼ"
+
+headerMap :: MS.Map Text (Text, Text)
+headerMap = MS.fromList
+  [ ("b", ("B", "並奉"))
+  , ("c", ("C", "精莊"))
+  , ("ch", ("Ch", "清初"))
+  , ("d", ("D", "定澄禪"))
+  , ("dz", ("Dz", "從崇"))
+  , ("g", ("G", "群"))
+  , ("j", ("J", "以"))
+  , ("k", ("K", "見"))
+  , ("kh", ("Kh", "溪"))
+  , ("l", ("L", "來"))
+  , ("m", ("M", "明微"))
+  , ("n", ("N", "泥娘日"))
+  , ("ŋ", ("Ŋ", "疑"))
+  , ("p", ("P", "幫非"))
+  , ("ph", ("Ph", "滂敷"))
+  , ("q", ("Q", "影"))
+  , ("qh", ("Qh", "曉"))
+  , ("s", ("S", "心生"))
+  , ("sh", ("Sh", "書"))
+  , ("t", ("T", "端知章"))
+  , ("th", ("Th", "透徹昌"))
+  , ("x", ("X", "匣云"))
+  , ("z", ("Z", "邪崇"))
+  , ("zh", ("Zh", "船"))
+  ]
 
 -- | ICU collator
 collator :: ICU.Collator
