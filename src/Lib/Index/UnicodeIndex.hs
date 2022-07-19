@@ -133,8 +133,8 @@ entryToUnicodeEntries p e = concat $ concat
 charToUnicodeNotations :: Char -> Text
 charToUnicodeNotations = charConv . Char.ord
   where
-    charConv c | c <= 0xffff = T.pack $ printf "U+%04x" c
-               | otherwise = T.pack $ printf "U+%06x" c
+    charConv c | c <= 0xffff = T.pack $ printf "U+%04X" c
+               | otherwise = T.pack $ printf "U+%06X" c
 
 blockToHeader :: UnicodeBlock -> Text
 blockToHeader CJKUnified = "CJK Unified"
