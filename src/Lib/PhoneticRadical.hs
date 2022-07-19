@@ -43,7 +43,7 @@ parsePhoneticRadical row m = do
   let lookupField f = maybeToRight f $ M.lookup (fromString f) m
   f_pr_radical <- lookupField "聲首"
   f_pr_index <- p_r_phoneticNumber =<< lookupField "聲位"
-  f_pr_comment <- decodeComment <$> lookupField "コメント"
+  f_pr_comment <- decodeComment <$> lookupField "コメント1"
   f_pr_pronunciation <- p_pr_pronunciation <$> lookupField "諧聲域"
   return $ PhoneticRadical
     { pr_radical = f_pr_radical
