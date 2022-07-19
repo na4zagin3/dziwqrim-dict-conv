@@ -223,17 +223,27 @@ p_r_部畫 p s = do
     , s_畫 = sn
     }
 
-p_r_phoneticNumber :: Text -> Either String PhoneticPartNumber
-p_r_phoneticNumber pIRaw = do
+p_r_number :: Text -> Either String Int
+p_r_number pIRaw = do
   (n, r) <- TR.decimal pIRaw :: Either String (Int, Text)
   case T.take 1 r of
-    "" -> Right $ PhoneticPartNumber (n, 0)
+    "" -> Right n
+    _ -> Left $ printf "trailing garbage: %s" r
+
+p_r_numberPair :: Text -> Either String (Int, Int)
+p_r_numberPair pIRaw = do
+  (n, r) <- TR.decimal pIRaw :: Either String (Int, Text)
+  case T.take 1 r of
+    "" -> Right (n, 0)
     "." -> do
       (n2, r2) <- TR.decimal (T.drop 1 r) :: Either String (Int, Text)
       if T.null r2
-        then Right $ PhoneticPartNumber (n, n2)
+        then Right (n, n2)
         else Left $ printf "trailing garbage: %s" r
     _ -> Left $ printf "trailing garbage: %s" r
+
+p_r_phoneticNumber :: Text -> Either String PhoneticPartNumber
+p_r_phoneticNumber = fmap PhoneticPartNumber . p_r_numberPair
 
 p_r_partNumber :: Text -> Either String (Int, Int)
 p_r_partNumber pIRaw = do
