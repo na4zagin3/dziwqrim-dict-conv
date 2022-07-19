@@ -134,12 +134,14 @@
 \ExplSyntaxOn
 
 \tl_new:N \g_zqdict_entries_tl
+\bool_new:N \g_zqdict_entries_incomplete_bool
 \tl_new:N \g_zqdict_entries_archived_tl
 \int_new:N \g_zqdict_entries_archived_page_int
 \tl_new:N \g_zqdict_current_section_tl
 
 \cs_set:Nn \_zqdict_xr_begin: {
   \tl_build_gbegin:N \g_zqdict_entries_tl
+  \bool_gset_true:N \g_zqdict_entries_incomplete_bool
 }
 \cs_set:Nn \_zqdict_xr_section:nnnn {
   \tl_gset:Nn \g_zqdict_current_section_tl {{#1}{#2}{#3}{#4}}
@@ -151,8 +153,12 @@
   \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{end}{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
 }
 \cs_set:Nn \_zqdict_xr_end: {
-  \tl_build_gend:N \g_zqdict_entries_tl
+  \bool_if:NT \g_zqdict_entries_incomplete_bool {
+    \tl_build_gend:N \g_zqdict_entries_tl
+    \bool_gset_false:N \g_zqdict_entries_incomplete_bool
+  }
 }
+
 \cs_set:Nn \_zqdict_entry_get_type:n {
   \tl_item:nn {#1} {1}
 }
@@ -211,12 +217,8 @@
     \token_to_str:N \ExplSyntaxOff
   }
 }
-\AtEndDocument {
-  \iow_shipout_x:cn { @auxout } {
-    \token_to_str:N \ExplSyntaxOn
-    \token_to_str:N \_zqdict_xr_end:
-    \token_to_str:N \ExplSyntaxOff
-  }
+\AtBeginDocument {
+  \_zqdict_xr_end:
 }
 
 \str_new:N \l_zqdict_item_entry_type_str
