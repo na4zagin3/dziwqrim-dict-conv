@@ -22,6 +22,7 @@ import Text.Printf (printf)
 
 import Lib.Entry (sectionsFromRows, groupToTex, groupSections)
 import Lib.Row (parseRow)
+import Lib.Index.GroupIndex (groupsToIndexTex)
 import Lib.Index.RadicalIndex (radicalSectionsToTex, sectionsToRadicalSections)
 import Lib.Index.ReadingIndex (readingSectionsToTex, sectionsToReadingSections)
 import Lib.Index.SikrokIndex (sikrokSectionsToTex, sectionsToSikrokSections)
@@ -47,16 +48,19 @@ convertCsvToTex inRowPath inPhoneticRadicalPath outPath = do
   let (errors2, sections) = sectionsFromRows parsedPhoneticRadicals . catMaybes $ parsedRows
   mapM_ putStrLn errors2
   let
-    mainText = T.unlines . map groupToTex . groupSections $ sections
+    groups = groupSections $ sections
+    mainText = T.unlines $ map groupToTex groups
     sikrokIndexText = sikrokSectionsToTex $ sectionsToSikrokSections sections
     radicalIndexText = radicalSectionsToTex $ sectionsToRadicalSections sections
     readingIndexText = readingSectionsToTex $ sectionsToReadingSections sections
     unicodeIndexText = unicodeSectionsToTex $ sectionsToUnicodeSections sections
+    groupIndexText = groupsToIndexTex groups
   T.writeFile (outPath <> "-main.tex") $ mainText
   T.writeFile (outPath <> "-index-sikrok.tex") $ sikrokIndexText
   T.writeFile (outPath <> "-index-radical.tex") $ radicalIndexText
   T.writeFile (outPath <> "-index-reading.tex") $ readingIndexText
   T.writeFile (outPath <> "-index-unicode.tex") $ unicodeIndexText
+  T.writeFile (outPath <> "-index-groups.tex") $ groupIndexText
 
 readCsvFile
   :: FilePath -> IO (Either String (Vector (Map Text Text)))

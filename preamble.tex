@@ -9,6 +9,7 @@
 \usepackage{adjustbox}
 \usepackage{calc}
 \usepackage{fancyhdr}
+\usepackage{hanging}
 \usepackage{ifthen}
 \usepackage{mfirstuc}
 \usepackage{multicol}
@@ -407,7 +408,7 @@
 \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
 \NewDocumentEnvironment{MainGroup}{m m}{
-  \section{#1（#2）}%
+  \section{#1（#2）}\label{group-#1}%
 }{}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
@@ -539,6 +540,25 @@
 }
 
 \ExplSyntaxOn
+
+\NewDocumentEnvironment{GroupIndex}{}{
+  \part{諧聲部目録}
+  \setlength{\columnsep}{0.25em}
+  \setlength{\columnseprule}{0.4pt}
+  %\begin{multicols}{2}
+  \small
+  \begin{hangparas}{2em}{1}
+  }{
+  \end{hangparas}
+  %\end{multicols}
+}
+\NewDocumentCommand{\GroupIndexEntry}{m m}{
+  \textbf{#1} (p. \pageref{group-#1}--)
+  \tl_map_inline:Nn {#2} {
+    \hspace{0.5em plus 0.2em minus 0.1em} \mbox{\tl_item:nn {##1} {2}}
+  }
+  \par
+}
 
 \NewDocumentCommand{\KanjiCdot}{}{
   \raisebox{0.25ex}{\cdot}
