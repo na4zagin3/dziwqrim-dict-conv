@@ -176,4 +176,5 @@ sectionsToUnicodeSections ss = sections
       { sk_s_header = blockToHeader b
       , sk_s_entries = es
       }
-    sections = map pairToSection .  M.toList . M.unionsWith mappend $ map eToMap ses
+    blockMap = M.unionsWith mappend $ map eToMap ses
+    sections = map pairToSection .  M.toList $ Other `M.delete` blockMap
