@@ -5,6 +5,7 @@
 \usepackage{luatexja-ruby}
 
 \usepackage{expl3}
+\usepackage{chngcntr}
 \usepackage{adjustbox}
 \usepackage{calc}
 \usepackage{fancyhdr}
@@ -391,6 +392,7 @@
 }{%before-code
   \cleardoublepage
 }
+\counterwithin*{section}{part}
 \titleformat{\subsection}[display]
 {%format
   \bfseries\large%
