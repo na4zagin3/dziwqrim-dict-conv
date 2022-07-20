@@ -409,10 +409,10 @@
 
 \NewDocumentEnvironment{MainGroup}{m m}{
   \section{#1（#2）}\label{group-#1}%
-}{}
+}{\clearpage}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
-  \subsection[#1 #2]{{\ltjsetparameter{jacharrange={-9}}#1}#2}%
+  \subsection[#2]{#2}%
   \RecordSection{#1}{#2}%
   \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
