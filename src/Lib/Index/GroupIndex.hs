@@ -26,6 +26,7 @@ import Data.Vector.NonEmpty qualified as NEV
 import GHC.Generics (Generic)
 import Lib.PathTree qualified as PT
 import Lib.Entry (soundPartNumberToTex, Group(..), Section(..), entryToLabel, entrySortKey)
+import Lib.PhoneticRadical (rhymeNoteMap)
 import Lib.IDS (convIdsFull)
 import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..))
 import Text.Printf (printf)
@@ -35,7 +36,10 @@ groupToEntryTex :: Group -> Text
 groupToEntryTex g = mconcat
     [ "\\GroupIndexEntry"
     , "{"
-    , grp_mainRhyme_text g
+    , rhymeText
+    , "}"
+    , "{"
+    , fromMaybe "" rhymeNote
     , "}"
     , "{"
     , mconcat . map sectionToTex . Foldable.toList $ grp_sections g
@@ -53,6 +57,8 @@ groupToEntryTex g = mconcat
       , "}"
       , "}"
       ]
+    rhymeNote = rhymeText `M.lookup` rhymeNoteMap
+    rhymeText = grp_mainRhyme_text g
 
 groupsToIndexTex :: [Group] -> Text
 groupsToIndexTex gs = T.intercalate "\n" $ concat [[header], contents, [footer]]

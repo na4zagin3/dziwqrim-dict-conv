@@ -552,9 +552,9 @@
   \end{hangparas}
   %\end{multicols}
 }
-\NewDocumentCommand{\GroupIndexEntry}{m m}{
-  \textbf{#1} (p. \pageref{group-#1}--)
-  \tl_map_inline:Nn {#2} {
+\NewDocumentCommand{\GroupIndexEntry}{m m m}{
+  \textbf{#1（#2）} (p. \pageref{group-#1}--)
+  \tl_map_inline:Nn {#3} {
     \hspace{0.5em plus 0.2em minus 0.1em} \mbox{\tl_item:nn {##1} {2}}
   }
   \par
