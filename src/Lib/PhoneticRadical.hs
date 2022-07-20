@@ -70,3 +70,18 @@ parsePhoneticRadical row m = do
       , mr_subIndex = f_pr_mainRhyme_subIndex
       }
     }
+
+rhymeNoteMap :: Map Text Text
+rhymeNoteMap = M.fromList
+  [ ("職部", "之職蒸")
+  , ("覺部", "幽覺冬")
+  , ("藥部", "宵藥")
+  , ("屋部", "侯屋東")
+  , ("鐸部", "魚鐸陽")
+  , ("錫部", "支錫耕")
+  , ("質部", "脂質真")
+  , ("物部", "微物文")
+  , ("月部", "歌月元")
+  , ("緝部", "緝侵")
+  , ("葉部", "葉談")
+  ]

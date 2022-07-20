@@ -28,7 +28,7 @@ import Text.Printf (printf)
 import Lib.Row
 import Lib.PathTree (PathTree)
 import Lib.PathTree qualified as PT
-import Lib.PhoneticRadical (MainRhyme(..), PhoneticRadical(..))
+import Lib.PhoneticRadical (MainRhyme(..), PhoneticRadical(..), rhymeNoteMap)
 
 data Entry音義 = Entry音義
   { e_隋音 :: !Text
@@ -513,14 +513,20 @@ sectionToTex s = mconcat
 
 groupToTex :: Group -> Text
 groupToTex g = mconcat
-    [ "\\begin{MainGroup}{"
+    [ "\\begin{MainGroup}"
+    , "{"
     , grp_mainRhyme_text g
+    , "}"
+    , "{"
+    , fromMaybe "" rhymeNote
     , "}"
     , T.intercalate "\n" . map sectionToTex . Foldable.toList $ grp_sections g
     , "\\end{MainGroup}"
     , "\n\n"
     ]
   where
+    rhymeNote = rhymeText `M.lookup` rhymeNoteMap
+    rhymeText = grp_mainRhyme_text g
 
 -- QR
 qrImageToTex :: QR.QRImage -> Text

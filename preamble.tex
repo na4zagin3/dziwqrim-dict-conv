@@ -404,8 +404,8 @@
 }
 \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
-\NewDocumentEnvironment{MainGroup}{m}{
-  \section{#1}%
+\NewDocumentEnvironment{MainGroup}{m m}{
+  \section{#1（#2）}%
 }{}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
