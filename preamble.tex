@@ -24,15 +24,26 @@
 \usepackage{geometry}
 
 \setmainfont{Junicode}
-\newunicodechar{Д}{{\setmainfont{EB Garamond} Д}}
-\newunicodechar{х}{{\setmainfont{EB Garamond} х}}
-\newunicodechar{ъ}{{\setmainfont{EB Garamond} ъ}}
-\newunicodechar{ь}{{\setmainfont{EB Garamond} ь}}
+\newunicodechar{Д}{{\setmainfont{EB Garamond}Д}}
+\newunicodechar{х}{{\setmainfont{EB Garamond}х}}
+\newunicodechar{ъ}{{\setmainfont{EB Garamond}ъ}}
+\newunicodechar{ь}{{\setmainfont{EB Garamond}ь}}
+\newunicodechar{М}{{\setmainfont{EB Garamond}М}}
+\newunicodechar{О}{{\setmainfont{EB Garamond}О}}
+\newunicodechar{Т}{{\setmainfont{EB Garamond}Т}}
+\newunicodechar{г}{{\setmainfont{EB Garamond}г}}
+\newunicodechar{л}{{\setmainfont{EB Garamond}л}}
+\newunicodechar{н}{{\setmainfont{EB Garamond}н}}
+\newunicodechar{о}{{\setmainfont{EB Garamond}о}}
+\newunicodechar{р}{{\setmainfont{EB Garamond}р}}
+\newunicodechar{у}{{\setmainfont{EB Garamond}у}}
+
 %\setmainfont[Numbers={Lining,Monospaced}]{EB Garamond}
 %\setsansfont{Noto Sans}
 \setfontfamily\fSemanticLabel{Gentium Plus}[CharacterVariant={43:1}]
 \setfontfamily\fReadingIndexLabel{EB Garamond}
 \setfontfamily\fCyrilic{EB Garamond}
+\setfontfamily\fGreek{EB Garamond}
 
 % Noto
 %
@@ -176,8 +187,14 @@
   \tl_item:nn {#1} {4}
 }
 
+\cs_set:Nn \_zqdict_section_get_partlabel:n {
+  \tl_item:nn {#1} {1}
+}
 \cs_set:Nn \_zqdict_section_get_number:n {
   \tl_item:nn {#1} {2}
+}
+\cs_set:Nn \_zqdict_section_get_options:n {
+  \tl_item:nn {#1} {3}
 }
 \cs_set:Nn \_zqdict_section_get_label:n {
   \tl_item:nn {#1} {4}
@@ -187,6 +204,7 @@
 \cs_generate_variant:Nn \_zqdict_entry_get_headword:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_entry_get_page:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_entry_get_section:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_section_get_partlabel:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_section_get_number:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_section_get_label:n { o , x , V , v }
 \cs_generate_variant:Nn \tl_if_eq:nnTF { xnTF }
@@ -230,6 +248,7 @@
 \str_new:N \l_zqdict_current_part_str
 \tl_new:N \l_zqdict_current_entry_tl
 \str_new:N \l_zqdict_previous_section_str
+\tl_new:N \l_zqdict_buffer_part_tl
 
 \int_new:N \l_zqdict_alive_page_int
 \int_new:N \l_zqdict_current_page_int
@@ -353,9 +372,23 @@
       )
     } {
       \str_if_eq:VVTF \l_zqdict_current_section_str \l_zqdict_previous_section_str {
-        \hspace{0.25em}
+        % non-first element in a section
+        \tl_put_right:Nn \l_zqdict_buffer_part_tl {
+          \hspace{0.25em}
+        }
       } {
-        \str_if_eq:VnF \l_zqdict_previous_section_str {} {
+        % output elements for the previous part
+        \tl_use:N \l_zqdict_buffer_part_tl
+        \tl_clear:N \l_zqdict_buffer_part_tl
+
+        \str_if_eq:VnTF \l_zqdict_previous_section_str {} {
+          % first section
+          \tl_if_empty:xF {\_zqdict_section_get_partlabel:V \l_tmpa_tl} {
+            \_zqdict_section_get_partlabel:V \l_tmpa_tl
+            \quad
+          }
+        } {
+          % non-first section
           \quad
         }
         \textbf{
@@ -368,9 +401,15 @@
         \hspace{0.5em}
         \str_set:NV \l_zqdict_previous_section_str \l_zqdict_current_section_str
       }
-      \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
+      \tl_put_right:Nx \l_zqdict_buffer_part_tl {
+        \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
+      }
     }
     \int_compare:nNnT {\l_zqdict_current_page_int} > {\l_zqdict_alive_page_int} {
+      % output elements for the current incomplete part
+      \tl_use:N \l_zqdict_buffer_part_tl
+      \tl_clear:N \l_zqdict_buffer_part_tl
+
       \tl_map_break:n {}
     }
   }
