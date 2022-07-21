@@ -252,16 +252,16 @@ soundPartToTex mainText Part{ p_玉篇部首位 = k, p_部外 = e} =
 -- | Generate a text content for phonetic parts
 --
 -- >>> putStrLn . T.unpack $ soundPartsToTex True $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
--- \SoundParts{(80 + \SoundPart{23}{人})′}
+-- \SoundParts{(夋 + \SoundPart{23}{人})′}
 -- >>> putStrLn . T.unpack $ soundPartsToTex False $ Parts {p_諧聲部 = "夋", p_諧聲位 = PhoneticPartNumber (80, 0), p_parts = [Part {p_玉篇部首位 = (23, 0), p_部外 = "人"}], p_variants = S.fromList [1]}
--- \SoundParts{(80+\SoundPartNI{23})′}
+-- \SoundParts{(夋+\SoundPartNI{23})′}
 --
 soundPartsToTex :: Bool -> Parts -> Text
 soundPartsToTex mainText sps = "\\SoundParts{" <> content <> "}"
   where
     content = parenthesize mainText texSoundPartsEither
     texSoundPartsEither = rightIndexes (p_variants sps) texSoundParts
-    texSoundParts = (soundPartNumberToTex $ p_諧聲位 sps) : (map (soundPartToTex mainText) $ p_parts sps)
+    texSoundParts = (p_諧聲部 sps) : (map (soundPartToTex mainText) $ p_parts sps)
     concatParts = if mainText then T.intercalate " " else T.concat
     command = if mainText then "\\SoundPartN" else "\\SoundPartNI"
 
