@@ -494,7 +494,7 @@
 
 \NewDocumentEnvironment{MainGroup}{m m}{
   \section{#1（#2）}\label{group-#1}%
-  \markboth{正文 #1（#2）}{}
+  \markboth{\thesection #1（#2）}{}
 }{\clearpage}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
@@ -649,7 +649,7 @@
   %\end{multicols}
 }
 \NewDocumentCommand{\GroupIndexEntry}{m m m}{
-  \textbf{#1（#2）} (p. \pageref{group-#1}--)
+  \textbf{\ref{group-#1} #1（#2）} (p. \pageref{group-#1}--)
   \tl_map_inline:Nn {#3} {
     \hspace{0.5em plus 0.2em minus 0.1em} \mbox{\tl_item:nn {##1} {2}}
   }
