@@ -49,11 +49,21 @@ explodeKanji = parseOnly p
       endOfInput
       return ks
 
+-- | Parse a fanqie
+--
+-- >>> parseTest p_book "兩《王韵》"
+-- Done "" "\20841\12298\29579\38901\12299"
+-- >>> parseTest p_book "《王韵》"
+-- Done "" "\12298\29579\38901\12299"
 p_book :: Parser Text
 p_book = do
+  choice [string "兩《王韵》", p_bookUsual]
+
+p_bookUsual :: Parser Text
+p_bookUsual = do
   string "《"
   cs <- manyTill' anyChar (string "》")
-  return $ T.pack cs
+  return $ "《" <> T.pack cs <> "》"
 
 -- | Parse a fanqie
 --
@@ -213,9 +223,9 @@ p_fanqieItem = do
 -- >>> parseOnly p_fanqiesForBook "而鋭反（コメント）"
 -- Right (Nothing,(Nothing,Just ("\32780\37613","\21453"),Just "\12467\12513\12531\12488") :| [])
 -- >>> parseOnly p_fanqiesForBook "《王三》脱反語"
--- Right (Just "\29579\19977",(Nothing,Nothing,Just "\33073\21453\35486") :| [])
+-- Right (Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\33073\21453\35486") :| [])
 -- >>> parseOnly p_fanqiesForBook "《王一》脱字（丁吕反）"
--- Right (Just "\29579\19968",(Nothing,Nothing,Just "\33073\23383\65288\19969\21525\21453\65289") :| [])
+-- Right (Just "\12298\29579\19968\12299",(Nothing,Nothing,Just "\33073\23383\65288\19969\21525\21453\65289") :| [])
 -- >>> parseOnly p_fanqiesForBook "子句反、即具反"
 -- Right (Nothing,(Nothing,Just ("\23376\21477","\21453"),Nothing) :| [(Nothing,Just ("\21363\20855","\21453"),Nothing)])
 p_fanqiesForBook = do
@@ -238,23 +248,23 @@ p_fanqiesForBook = do
 -- >>> parseOnly p_fanqieField "〓〓反（《王三》未收）"
 -- Right [(Nothing,(Nothing,Just ("\12307\12307","\21453"),Just "\12298\29579\19977\12299\26410\25910") :| [])]
 -- >>> parseOnly p_fanqieField "《王三》未收"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\26410\25910") :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\26410\25910") :| [])]
 -- >>> parseOnly p_fanqieField "《王三》胡孟反"
--- Right [(Just "\29579\19977",(Nothing,Just ("\32993\23391","\21453"),Nothing) :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Just ("\32993\23391","\21453"),Nothing) :| [])]
 -- >>> parseOnly p_fanqieField "《王三》脱字（脱反語）"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289") :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289") :| [])]
 -- >>> parseOnly p_fanqieField "《王一》户恢反，《王三》未收"
--- Right [(Just "\29579\19968",(Nothing,Just ("\25143\24674","\21453"),Nothing) :| []),(Just "\29579\19977",(Nothing,Nothing,Just "\26410\25910") :| [])]
+-- Right [(Just "\12298\29579\19968\12299",(Nothing,Just ("\25143\24674","\21453"),Nothing) :| []),(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\26410\25910") :| [])]
 -- >>> parseOnly p_fanqieField "《王一》户孟反，《王三》胡孟反"
--- Right [(Just "\29579\19968",(Nothing,Just ("\25143\23391","\21453"),Nothing) :| []),(Just "\29579\19977",(Nothing,Just ("\32993\23391","\21453"),Nothing) :| [])]
+-- Right [(Just "\12298\29579\19968\12299",(Nothing,Just ("\25143\23391","\21453"),Nothing) :| []),(Just "\12298\29579\19977\12299",(Nothing,Just ("\32993\23391","\21453"),Nothing) :| [])]
 -- >>> parseOnly p_fanqieField "《王三》脱字（脱反語），《王一》無本"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289") :| []),(Just "\29579\19968",(Nothing,Nothing,Just "\28961\26412") :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\33073\23383\65288\33073\21453\35486\65289") :| []),(Just "\12298\29579\19968\12299",(Nothing,Nothing,Just "\28961\26412") :| [])]
 -- >>> parseOnly p_fanqieField "子句反、即具反"
 -- Right [(Nothing,(Nothing,Just ("\23376\21477","\21453"),Nothing) :| [(Nothing,Just ("\21363\20855","\21453"),Nothing)])]
 -- >>> parseOnly p_fanqieField "《王三》誤以“麝”又反作“食夜反”"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\35492\20197\8220\40605\8221\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
 -- >>> parseOnly p_fanqieField "《王三》誤以又反作“食夜反”"
--- Right [(Just "\29579\19977",(Nothing,Nothing,Just "\35492\20197\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
+-- Right [(Just "\12298\29579\19977\12299",(Nothing,Nothing,Just "\35492\20197\21448\21453\20316\8220\39135\22812\21453\8221") :| [])]
 
 p_fanqieField
   :: Parser [(Maybe Text, NonEmpty (Maybe Text, Maybe (Text, Text), Maybe Text))]
