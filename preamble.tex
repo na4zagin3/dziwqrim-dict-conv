@@ -162,10 +162,10 @@
   \tl_gset:Nn \g_zqdict_current_section_tl {{#1}{#2}{#3}{#4}}
 }
 \cs_set:Nn \_zqdict_xr_entry_begin:nn {
-  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{begin}{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
+  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{begin}{\exp_not:n {#1}}{\exp_not:n {#2}}{\tl_use:N{\g_zqdict_current_section_tl}}}}
 }
 \cs_set:Nn \_zqdict_xr_entry_end:nn {
-  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{end}{#1}{#2}{\tl_use:N{\g_zqdict_current_section_tl}}}}
+  \tl_build_gput_right:Nx \g_zqdict_entries_tl {{{end}{\exp_not:n {#1}}{\exp_not:n {#2}}{\tl_use:N{\g_zqdict_current_section_tl}}}}
 }
 \cs_set:Nn \_zqdict_xr_end: {
   \bool_if:NT \g_zqdict_entries_incomplete_bool {
@@ -206,9 +206,10 @@
 \cs_generate_variant:Nn \_zqdict_entry_get_section:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_section_get_partlabel:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_section_get_number:n { o , x , V , v }
+\cs_generate_variant:Nn \_zqdict_section_get_options:n { o , x , V , v }
 \cs_generate_variant:Nn \_zqdict_section_get_label:n { o , x , V , v }
-\cs_generate_variant:Nn \tl_if_eq:nnTF { xnTF }
-\cs_generate_variant:Nn \tl_if_eq:nnT { xnT }
+\cs_generate_variant:Nn \tl_if_eq:nnTF { xnTF, fnTF }
+\cs_generate_variant:Nn \tl_if_eq:nnT { xnT, fnT }
 
 
 \AtBeginDocument {
@@ -258,7 +259,7 @@
   \tl_log:n {Remove items till page \int_use:N \l_zqdict_alive_page_int}
 
   \bool_if:nTF {
-    \int_compare_p:nNn {\g_zqdict_entries_archived_page_int} < { \l_zqdict_alive_page_int }
+    \int_compare_p:nNn {\g_zqdict_entries_archived_page_int + 10} < { \l_zqdict_alive_page_int }
   } {
     \tl_map_inline:Nn \g_zqdict_entries_tl {
       \int_set:Nx \l_zqdict_current_page_int {
@@ -295,6 +296,35 @@
 \cs_generate_variant:Nn \int_show:n { o , x }
 \cs_generate_variant:Nn \int_set:Nn { No , Nx }
 
+\bool_new:N \l_zqdict_header_render_elements_first_bool
+\cs_set:Nn \_zqdict_header_render_elements:nn {
+  \clist_if_in:nnTF {#1} {rangeElements} {
+    \tl_if_empty:nF {#2} {
+      \tl_if_single:nTF {#2} {
+        \tl_head:n {#2}
+      } {
+        \tl_head:n {#2}
+        --
+        \tl_item:nn {#2} {-1}
+      }
+    }
+  } {
+    \bool_set_true:N \l_zqdict_header_render_elements_first_bool
+    \tl_map_inline:Nn {#2} {
+      %\tl_show:n {##1}
+      \bool_if:NF \l_zqdict_header_render_elements_first_bool {
+        \bool_set_false:N \l_zqdict_header_render_elements_first_bool
+        \hspace{0.25em}
+      }
+
+      ##1
+
+    }
+    \bool_set_false:N \l_zqdict_header_render_elements_first_bool
+  }
+}
+\cs_generate_variant:Nn \_zqdict_header_render_elements:nn { nV, xV, fV }
+
 \NewDocumentCommand{\ShowEntriesForPage}{m}{
   \_zqdict_archive_items_until_page:x {\int_eval:n {#1 - 1}}
 
@@ -311,6 +341,7 @@
   \int_set:Nn \l_zqdict_alive_page_int {#1}
   \str_clear:N \l_zqdict_previous_part_str
   \tl_clear:N \l_zqdict_current_entry_tl
+  \tl_clear:N \l_zqdict_buffer_part_tl
 
   \tl_map_inline:Nn \g_zqdict_entries_archived_tl {
     \tl_if_eq:xnTF {\_zqdict_entry_get_type:n {##1}} {end} {
@@ -373,14 +404,10 @@
     } {
       \str_if_eq:VVTF \l_zqdict_current_section_str \l_zqdict_previous_section_str {
         % non-first element in a section
-        \tl_put_right:Nn \l_zqdict_buffer_part_tl {
-          \hspace{0.25em}
+        \tl_put_right:Nx \l_zqdict_buffer_part_tl {
+          {\_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl}
         }
       } {
-        % output elements for the previous part
-        \tl_use:N \l_zqdict_buffer_part_tl
-        \tl_clear:N \l_zqdict_buffer_part_tl
-
         \str_if_eq:VnTF \l_zqdict_previous_section_str {} {
           % first section
           \tl_if_empty:xF {\_zqdict_section_get_partlabel:V \l_tmpa_tl} {
@@ -388,6 +415,12 @@
             \quad
           }
         } {
+          % output elements for the previous part
+          \_zqdict_header_render_elements:xV {
+            \_zqdict_section_get_options:V \l_tmpa_tl
+          } \l_zqdict_buffer_part_tl
+          \tl_clear:N \l_zqdict_buffer_part_tl
+
           % non-first section
           \quad
         }
@@ -399,26 +432,39 @@
           \str_use:N \l_zqdict_current_section_str
         }
         \hspace{0.5em}
+
+        % the first element in a section
+        \tl_put_right:Nx \l_zqdict_buffer_part_tl {
+          {\_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl}
+        }
+
         \str_set:NV \l_zqdict_previous_section_str \l_zqdict_current_section_str
-      }
-      \tl_put_right:Nx \l_zqdict_buffer_part_tl {
-        \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl
       }
     }
     \int_compare:nNnT {\l_zqdict_current_page_int} > {\l_zqdict_alive_page_int} {
       % output elements for the current incomplete part
-      \tl_use:N \l_zqdict_buffer_part_tl
+      \_zqdict_header_render_elements:xV {
+        \_zqdict_section_get_options:V \l_tmpa_tl
+      } \l_zqdict_buffer_part_tl
       \tl_clear:N \l_zqdict_buffer_part_tl
 
       \tl_map_break:n {}
     }
+  }
+
+  \tl_if_empty:NF \l_zqdict_buffer_part_tl {
+    \_zqdict_header_render_elements:xV {
+      \_zqdict_section_get_options:V \l_tmpa_tl
+    } \l_zqdict_buffer_part_tl
+    \tl_clear:N \l_zqdict_buffer_part_tl
   }
 }
 
 \ExplSyntaxOff
 
 \pagestyle{fancy}
-\fancyhead[LO,RE]{\small\ShowEntriesForPage{\value{page}}}
+\fancyhead[LO]{\small\leftmark\quad\ShowEntriesForPage{\value{page}}}
+\fancyhead[RE]{\small\ShowEntriesForPage{\value{page}}\quad\leftmark}
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
@@ -448,11 +494,12 @@
 
 \NewDocumentEnvironment{MainGroup}{m m}{
   \section{#1（#2）}\label{group-#1}%
+  \markboth{正文 #1（#2）}{}
 }{\clearpage}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
   \subsection[#2]{#2}%
-  \RecordSection{#1}{#2}%
+  \RecordSection{}{#2}%
   \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
     \begin{center}
@@ -518,7 +565,8 @@
 \newcommand{\SoundPartN}[1]{#1}
 \newcommand{\SoundPartNI}[1]{#1}
 
-\newcommand{\Sikrok}[2]{#1\textsubscript{#2}}
+\NewDocumentCommand{\Sikrok}{m m}{#1\textsubscript{#2}}
+\NewDocumentCommand{\Unicode}{m}{\texttt{#1}}
 \newcommand{\refEntry}[2]{\hyperref[entry-#2]{#1}}
 
 \newcommand{\Position}[1]{\pdfmargincomment{#1}}
@@ -529,9 +577,11 @@
 
 \NewDocumentEnvironment{SikrokIndex}{}{
   \part{四角號碼索引}
+  \markboth{四角號碼索引}{}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{5}\small
+    \RecordSection{}[rangeElements]{}%
 }{
   \end{multicols}
 }
@@ -547,19 +597,23 @@
     \parfillskip=0pt \finalhyphendemerits=0 \par}}
 \NewDocumentCommand{\SikrokEntry}{m m o m}{
   \noindent%
+  \RecordEntryBegin{#2}%
   \IfNoValueTF{#3}{%
     #2 #4 \hfill\pageref{entry-#1}%
   }{%
     #2 #4\quelle{→#3~\pageref{entry-#1}}%
   }%
+  \RecordEntryEnd{#2}%
   \par
 }
 
 \NewDocumentEnvironment{UnicodeIndex}{}{
   \part{Unicode索引}
+  \markboth{Unicode索引}{}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{7}\small
+    \RecordSection{}[rangeElements]{}%
 }{
   \end{multicols}
 }
@@ -570,11 +624,13 @@
 }{}
 \NewDocumentCommand{\UnicodeEntry}{m m o m}{
   \noindent%
+    \RecordEntryBegin{\Unicode{#2}}%
   \IfNoValueTF{#3}{%
-    \texttt{#2} #4 \hfill\pageref{entry-#1}%
+    \Unicode{#2} #4 \hfill\pageref{entry-#1}%
   }{%
-    \texttt{#2} #4\quelle{→#3~\pageref{entry-#1}}%
+    \Unicode{#2} #4\quelle{→#3~\pageref{entry-#1}}%
   }%
+    \RecordEntryEnd{\Unicode{#2}}%
   \par
 }
 
@@ -582,6 +638,7 @@
 
 \NewDocumentEnvironment{GroupIndex}{}{
   \part{諧聲部目録}
+  \markboth{諧聲部目録}{}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   %\begin{multicols}{2}
@@ -618,6 +675,7 @@
 }
 \NewDocumentEnvironment{RadicalIndex}{m}{
   \part{《漢辭海》部首索引}
+  \markboth{《漢辭海》部首索引}{}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{2}\small
@@ -626,15 +684,19 @@
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{8}\small
+    \RecordSection{}[rangeElements]{}%
   }{
   \end{multicols}
 }
 \NewDocumentEnvironment{RadicalSection}{m m}{
   \begin{center}
-    \textbf{{\footnotesize #1}\\#2部}\label{index-radical-section-#1-#2}
+    \textbf{{\footnotesize #1}\\#2部}\label{index-radical-section-#1-#2}%
+    \RecordEntryBegin{#1 #2部}%
   \end{center}
   \str_set:Nn \l_zqdict_index_subsection_label_str {0}
-}{}
+}{
+    \RecordEntryEnd{#1 #2部}%
+}
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
   \noindent
   \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#3} {
@@ -647,15 +709,12 @@
 
 \NewDocumentEnvironment{ReadingIndex}{m}{
   \part{隋拼索引}
-  \bgroup
-  \fReadingIndexLabel
-  字母\\
-  A ~ B ~ C ~ Ch ~ D ~ Dz ~ E ~ Ə ~ G ~ I ~ J ~ K ~ Kh ~ L ~ M ~ N ~ Ŋ ~ O ~ P ~ Ph ~ Q ~ Qh ~ R ~ S ~ Sh ~ T ~ Th ~ U ~ X ~ Y ~ Z ~ Zh
-  \egroup
+  \markboth{隋拼索引}{}
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
   \begin{multicols}{7}\small
     \str_clear:N \l_zqdict_index_subsection_label_str
+    \RecordSection{}[rangeElements]{}%
 }{
   \end{multicols}
 }
@@ -670,11 +729,13 @@
 }{}
 \NewDocumentCommand{\ReadingEntry}{m m m}{
   \noindent
+  \RecordEntryBegin{#2}%
   \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#2} {
     \centering #2\\
   }
   \str_set:Nn \l_zqdict_index_subsection_label_str {#2}
   #3 \hfill\pageref{entry-#1}
+  \RecordEntryEnd{#2}%
   \par
 }
 \ExplSyntaxOff
