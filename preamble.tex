@@ -323,7 +323,7 @@
     \bool_set_false:N \l_zqdict_header_render_elements_first_bool
   }
 }
-\cs_generate_variant:Nn \_zqdict_header_render_elements:nn { nV, xV, fV }
+\cs_generate_variant:Nn \_zqdict_header_render_elements:nn { nV, xV, fV, xx }
 
 \NewDocumentCommand{\ShowEntriesForPage}{m}{
   \_zqdict_archive_items_until_page:x {\int_eval:n {#1 - 1}}
@@ -404,8 +404,15 @@
     } {
       \str_if_eq:VVTF \l_zqdict_current_section_str \l_zqdict_previous_section_str {
         % non-first element in a section
-        \tl_put_right:Nx \l_zqdict_buffer_part_tl {
-          {\_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl}
+        \tl_if_empty:NTF \l_zqdict_buffer_part_tl {
+          \tl_set:Nx \l_zqdict_buffer_part_tl {
+            { \_zqdict_section_get_options:V \l_tmpa_tl }
+            { \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl }
+          }
+        } {
+          \tl_put_right:Nx \l_zqdict_buffer_part_tl {
+            {\_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl}
+          }
         }
       } {
         \str_if_eq:VnTF \l_zqdict_previous_section_str {} {
@@ -416,9 +423,11 @@
           }
         } {
           % output elements for the previous part
-          \_zqdict_header_render_elements:xV {
-            \_zqdict_section_get_options:V \l_tmpa_tl
-          } \l_zqdict_buffer_part_tl
+          \_zqdict_header_render_elements:xx {
+            \tl_head:N \l_zqdict_buffer_part_tl
+          } {
+            \tl_tail:N \l_zqdict_buffer_part_tl
+          }
           \tl_clear:N \l_zqdict_buffer_part_tl
 
           % non-first section
@@ -434,8 +443,9 @@
         \hspace{0.5em}
 
         % the first element in a section
-        \tl_put_right:Nx \l_zqdict_buffer_part_tl {
-          {\_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl}
+        \tl_set:Nx \l_zqdict_buffer_part_tl {
+          { \_zqdict_section_get_options:V \l_tmpa_tl }
+          { \_zqdict_entry_get_headword:V \l_zqdict_current_entry_tl }
         }
 
         \str_set:NV \l_zqdict_previous_section_str \l_zqdict_current_section_str
@@ -443,9 +453,11 @@
     }
     \int_compare:nNnT {\l_zqdict_current_page_int} > {\l_zqdict_alive_page_int} {
       % output elements for the current incomplete part
-      \_zqdict_header_render_elements:xV {
-        \_zqdict_section_get_options:V \l_tmpa_tl
-      } \l_zqdict_buffer_part_tl
+      \_zqdict_header_render_elements:xx {
+        \tl_head:N \l_zqdict_buffer_part_tl
+      } {
+        \tl_tail:N \l_zqdict_buffer_part_tl
+      }
       \tl_clear:N \l_zqdict_buffer_part_tl
 
       \tl_map_break:n {}
@@ -453,9 +465,11 @@
   }
 
   \tl_if_empty:NF \l_zqdict_buffer_part_tl {
-    \_zqdict_header_render_elements:xV {
-      \_zqdict_section_get_options:V \l_tmpa_tl
-    } \l_zqdict_buffer_part_tl
+    \_zqdict_header_render_elements:xx {
+      \tl_head:N \l_zqdict_buffer_part_tl
+    } {
+      \tl_tail:N \l_zqdict_buffer_part_tl
+    }
     \tl_clear:N \l_zqdict_buffer_part_tl
   }
 }
