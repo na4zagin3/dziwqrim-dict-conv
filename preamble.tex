@@ -511,8 +511,8 @@
 }{%sep
   0pt
 }{%before-code
-  \pagebreak[2]
-  \centering
+  \pagebreak[2]%
+  \centering%
 }
 \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
@@ -529,15 +529,17 @@
   }
   \section{#1（#2）}\label{group-#1}%
   \markboth{\thesection #1（#2）}{}
-  \paragraph{部内諧聲部}
+  \begin{multicols}{6}[\noindent\textbf{部内諧聲部}]\small
   \tl_map_inline:nn {#3} {
+    \noindent
     \tl_item:nn {##1} {2}
     \nobreakspace
-    \group_begin:
-    \footnotesize
-    (p.\nobreakspace \pageref{main-part-\tl_item:nn {##1} {1}})
-    \group_end:
+    \quelle{
+      (p.\nobreakspace \pageref{main-part-\tl_item:nn {##1} {1}})
+    }
+    \par
   }
+  \end{multicols}
 }{%
   \clearpage%
   \titleformat{\section}[hang]%
