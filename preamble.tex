@@ -493,7 +493,17 @@
   \clearpage
 }
 \counterwithin*{section}{part}
-\titleformat{\subsection}[display]
+\titleformat{\section}[hang]
+{%format
+  \bfseries\large%
+}{%label
+  % (\thesection)%
+}{%sep
+  0pt
+}{%before-code
+  \pagebreak[2]
+}
+\titleformat{\subsection}[hang]
 {%format
   \bfseries\large%
 }{%label
@@ -507,6 +517,15 @@
 \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
 \NewDocumentEnvironment{MainGroup}{m m}{
+  \titleformat{\section}[hang]
+  {%format
+    \bfseries\large%
+  }{%label
+    \thesection%
+  }{%sep
+    0pt
+  }{%before-code
+  }
   \section{#1（#2）}\label{group-#1}%
   \markboth{\thesection #1（#2）}{}
 }{\clearpage}
