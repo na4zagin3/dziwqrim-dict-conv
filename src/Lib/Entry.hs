@@ -520,13 +520,27 @@ groupToTex g = mconcat
     , "{"
     , fromMaybe "" rhymeNote
     , "}"
-    , T.intercalate "\n" . map sectionToTex . Foldable.toList $ grp_sections g
+    , "{"
+    , T.intercalate "\n" . map sectionInfos $ Foldable.toList sections
+    , "}"
+    , T.intercalate "\n" . map sectionToTex $ Foldable.toList sections
     , "\\end{MainGroup}"
     , "\n\n"
     ]
   where
     rhymeNote = rhymeText `M.lookup` rhymeNoteMap
     rhymeText = grp_mainRhyme_text g
+    sections = grp_sections g
+    sectionInfos s = mconcat
+      [ "{"
+      , "{"
+      , soundPartNumberToTex $ sec_諧符位 s
+      , "}"
+      , "{"
+      , sec_諧符部 s
+      , "}"
+      , "}"
+      ]
 
 -- QR
 qrImageToTex :: QR.QRImage -> Text

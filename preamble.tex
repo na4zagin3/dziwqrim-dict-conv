@@ -477,8 +477,8 @@
 \ExplSyntaxOff
 
 \pagestyle{fancy}
-\fancyhead[LO]{\small\leftmark\quad\ShowEntriesForPage{\value{page}}}
-\fancyhead[RE]{\small\ShowEntriesForPage{\value{page}}\quad\leftmark}
+\fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
+\fancyhead[LO,RE]{\small\leftmark}
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
@@ -516,23 +516,46 @@
 }
 \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
 
-\NewDocumentEnvironment{MainGroup}{m m}{
+\ExplSyntaxOn
+\NewDocumentEnvironment{MainGroup}{m m m}{
   \titleformat{\section}[hang]
   {%format
     \bfseries\large%
   }{%label
     \thesection%
   }{%sep
-    0pt
+    5pt
   }{%before-code
   }
   \section{#1（#2）}\label{group-#1}%
   \markboth{\thesection #1（#2）}{}
-}{\clearpage}
+  \paragraph{部内諧聲部}
+  \tl_map_inline:nn {#3} {
+    \tl_item:nn {##1} {2}
+    \nobreakspace
+    \group_begin:
+    \footnotesize
+    (p.\nobreakspace \pageref{main-part-\tl_item:nn {##1} {1}})
+    \group_end:
+  }
+}{%
+  \clearpage%
+  \titleformat{\section}[hang]%
+  {%format
+    \bfseries\large%
+  }{%label
+    % (\thesection)%
+  }{%sep
+    0pt
+  }{%before-code
+    \pagebreak[2]
+  }%
+}
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
   \subsection[#2]{#2}%
   \RecordSection{}{#2}%
+  \label{main-part-#1}%
   \nopagebreak[3]%
   \ifthenelse{\equal{#4}{}}{%
     \begin{center}
@@ -542,10 +565,12 @@
     \begin{center}
       {\small #4}%
 
+      \par
+
       #5%
     \end{center}
   }%
-  \vspace{0.5em plus 0.5em minus 0.2em}
+  \vspace{0.5em plus 0.5em minus 0.2em}%
   \nopagebreak[2]%
 }
 \newsavebox{\EntryHeadwordBox}
@@ -581,6 +606,7 @@
   \vspace{0.25em plus 0.75em minus 0.1em}%
   \pagebreak[2]%
 }
+\ExplSyntaxOff
 
 \newenvironment{Sound}{\begin{itemize}[nosep,labelindent=0.5em,itemindent=-1em,leftmargin=1.5em]}{\end{itemize}}
 \newcommand{\SoundItem}[1]{\item[]{#1:} }
