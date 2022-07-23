@@ -523,6 +523,7 @@
 
 \ExplSyntaxOn
 \NewDocumentEnvironment{MainGroup}{m m m}{
+  \titlespacing{\section}{0pt}{*4}{*0}
   \titleformat{\section}[hang]
   {%format
     \bfseries\large%
@@ -545,6 +546,7 @@
     \par
   }
   \end{multicols}
+  \vspace{1em plus 1em minus 0.2em}
 }{%
   \clearpage%
   \RestoreTitleFormat%
