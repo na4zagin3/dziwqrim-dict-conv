@@ -480,39 +480,46 @@
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
-\titleformat{\part}[display]
-{%format
-  \sffamily\gtfamily\bfseries\large%
-}{%label
-  %第\thesection{}部
-}{%sep
-  0pt
-}{%before-code
-  \clearpage
-}
 \counterwithin*{section}{part}
-\titleformat{\section}[hang]
-{%format
+
+\NewDocumentCommand{\RestoreTitleFormat}{}{
+  \titleformat{\part}[display]
+  {%format
   \sffamily\gtfamily\bfseries\large%
-}{%label
-  % (\thesection)%
-}{%sep
+  }{%label
+  %第\thesection{}部
+  }{%sep
   0pt
-}{%before-code
+  }{%before-code
+  \clearpage
+  }
+  \titlespacing{\section}{0pt}{*4}{*1.5}
+  \titleformat{\section}[hang]
+  {%format
+  \sffamily\gtfamily\bfseries\large%
+  }{%label
+  % (\thesection)%
+  }{%sep
+  0pt
+  }{%before-code
   \pagebreak[2]%
-}
-\titleformat{\subsection}[hang]
-{%format
+  }
+  \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
+  \titleformat{\subsection}[hang]
+  {%format
   \bfseries\large%
-}{%label
+  }{%label
   % (\thesection)%
-}{%sep
+  }{%sep
   0pt
-}{%before-code
+  }{%before-code
   \pagebreak[2]%
   \centering%
+  }
 }
-\titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
+
+\RestoreTitleFormat
+
 
 \ExplSyntaxOn
 \NewDocumentEnvironment{MainGroup}{m m m}{
@@ -540,16 +547,7 @@
   \end{multicols}
 }{%
   \clearpage%
-  \titleformat{\section}[hang]%
-  {%format
-    \bfseries\large%
-  }{%label
-    % (\thesection)%
-  }{%sep
-    0pt
-  }{%before-code
-    \pagebreak[2]
-  }%
+  \RestoreTitleFormat%
 }
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
