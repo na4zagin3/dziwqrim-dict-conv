@@ -16,6 +16,7 @@
 \usepackage{pdfcomment}
 \usepackage{pxpic}
 \usepackage{enumitem}
+\usepackage{tcolorbox}
 \usepackage{titlesec}
 \usepackage{xparse}
 
@@ -145,6 +146,8 @@
 \providecommand\phantomsection{}
 
 \geometry{top=10mm,headheight=18pt,headsep=2pt,inner=20mm,outer=10mm,textheight=55em}
+
+\tcbset{colback=white,fonttitle=\bfseries}
 
 \ExplSyntaxOn
 
@@ -535,17 +538,21 @@
   }
   \section{#1（#2）}\label{group-#1}%
   \markboth{\thesection #1（#2）}{}
-  \begin{multicols}{6}\small
-  \tl_map_inline:nn {#3} {
-    \noindent
-    \tl_item:nn {##1} {2}
-    \nobreakspace
-    \quelle{
-      (p.\nobreakspace \pageref{main-part-\tl_item:nn {##1} {1}})
-    }
-    \par
-  }
-  \end{multicols}
+  \begin{tcolorbox}[title=韵部内諧聲部]
+    \small
+    \begin{multicols}{6}
+      \tl_map_inline:nn {#3} {
+        \noindent
+        \tl_item:nn {##1} {2}
+        %\dotfill\pageref{main-part-\tl_item:nn {##1} {1}}
+        \nobreakspace
+        \quelle{
+          (p.\nobreakspace \pageref{main-part-\tl_item:nn {##1} {1}})
+        }
+        \par
+      }
+    \end{multicols}
+  \end{tcolorbox}
   \vspace{1em plus 1em minus 0.2em}
 }{%
   \clearpage%
