@@ -527,6 +527,9 @@
 
 \ExplSyntaxOn
 \NewDocumentEnvironment{MainGroup}{m m m}{
+  \int_compare:nNnT {\thesection} > {0} {
+    \clearpage%
+  }
   \titlespacing{\section}{0pt}{*4}{*0}
   \titleformat{\section}[hang]
   {%format
@@ -556,7 +559,6 @@
   \end{tcolorbox}
   \vspace{1em plus 1em minus 0.2em}
 }{%
-  \clearpage%
   \RestoreTitleFormat%
 }
 \newcommand{\PartHeader}[5]{%
@@ -702,12 +704,9 @@
 \NewDocumentEnvironment{GroupIndex}{}{
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
-  %\begin{multicols}{2}
-  \small
-  \begin{hangparas}{2em}{1}
+  \bgroup\small
   }{
-  \end{hangparas}
-  %\end{multicols}
+  \egroup
 }
 \NewDocumentCommand{\GroupIndexEntry}{m m m}{
   \begin{tcolorbox}[title={\textbf{\ref{group-#1} #1（#2）} \textmd{(p. \pageref{group-#1}--)}}]
