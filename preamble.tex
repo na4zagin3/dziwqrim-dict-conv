@@ -311,14 +311,12 @@
   } {
     \bool_set_true:N \l_zqdict_header_render_elements_first_bool
     \tl_map_inline:Nn {#2} {
-      %\tl_show:n {##1}
       \bool_if:NF \l_zqdict_header_render_elements_first_bool {
-        \bool_set_false:N \l_zqdict_header_render_elements_first_bool
         \hspace{0.25em}
       }
+      \bool_set_false:N \l_zqdict_header_render_elements_first_bool
 
       ##1
-
     }
     \bool_set_false:N \l_zqdict_header_render_elements_first_bool
   }
