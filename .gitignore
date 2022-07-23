@@ -17,5 +17,6 @@
 auto/
 
 # Haskell
+_build/
 .stack-work/
 dist-newstyle/
