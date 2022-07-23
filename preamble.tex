@@ -478,13 +478,13 @@
 
 \pagestyle{fancy}
 \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
-\fancyhead[LO,RE]{\small\leftmark}
+\fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
 \titleformat{\part}[display]
 {%format
-  \bfseries\large%
+  \sffamily\gtfamily\bfseries\large%
 }{%label
   %第\thesection{}部
 }{%sep
@@ -495,7 +495,7 @@
 \counterwithin*{section}{part}
 \titleformat{\section}[hang]
 {%format
-  \bfseries\large%
+  \sffamily\gtfamily\bfseries\large%
 }{%label
   % (\thesection)%
 }{%sep
