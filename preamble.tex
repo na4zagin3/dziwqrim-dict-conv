@@ -709,11 +709,12 @@
   %\end{multicols}
 }
 \NewDocumentCommand{\GroupIndexEntry}{m m m}{
-  \textbf{\ref{group-#1} #1（#2）} (p. \pageref{group-#1}--)
+  \begin{tcolorbox}[title={\textbf{\ref{group-#1} #1（#2）} \textmd{(p. \pageref{group-#1}--)}}]
   \tl_map_inline:Nn {#3} {
-    \hspace{0.5em plus 0.2em minus 0.1em} \mbox{\tl_item:nn {##1} {2}}
+    \mbox{\tl_item:nn {##1} {2}}
+    \hspace{0.5em plus 0.2em minus 0.1em}
   }
-  \par
+  \end{tcolorbox}
 }
 
 \NewDocumentCommand{\KanjiCdot}{}{
