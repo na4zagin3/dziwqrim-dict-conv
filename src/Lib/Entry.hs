@@ -382,8 +382,8 @@ pronunciation反切集ToTex Pronunciation反切集
   , pr_集韵反切 = pDz
   } = map (T.intercalate "，") $ filter (not . null)
       [ f "" pC
-      , f "王韵" pUs
-      , f "廣韵" pK
+      , f "《王韵》" pUs
+      , f "《廣韵》" pK
       , f "" pDz
       ]
   where
