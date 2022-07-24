@@ -440,9 +440,9 @@ p_r_反切集 pC pCBooksRaw pU pK pDz = do
     _ -> do
       pCBooks <- p_r_反切本 pCBooksRaw
       p_r_反切s "切韵" pCBooks pC
-  f_pr_王韵反切 <- p_r_反切s "王韵" (NEL.singleton "王韵") pU
-  f_pr_廣韵反切 <- p_r_反切s "廣韵" (NEL.singleton "廣韵") pK
-  f_pr_集韵反切 <- p_r_反切s "集韵" (NEL.singleton "集韵") pDz
+  f_pr_王韵反切 <- p_r_反切s "王韵" (NEL.singleton "《王韵》") pU
+  f_pr_廣韵反切 <- p_r_反切s "廣韵" (NEL.singleton "《廣韵》") pK
+  f_pr_集韵反切 <- p_r_反切s "集韵" (NEL.singleton "《集韵》") pDz
   Right $ Pronunciation反切集
     { pr_切韵反切 = f_pr_切韵反切
     , pr_王韵反切 = f_pr_王韵反切
