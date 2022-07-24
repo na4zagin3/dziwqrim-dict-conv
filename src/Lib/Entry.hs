@@ -214,7 +214,7 @@ shapeVariantsToTex s = mconcat
                     [ variantToTex "" (s_韓 s) "\\textKor"
                     , variantToTex "" (s_异 s) ""
                     ]
-    variantSimpJapn [simp] [japn] | simp == japn = [("簡・日作", [simp], "\\textHans")]
+    variantSimpJapn [simp] [japn] | simp == japn = [("簡·日作", [simp], "\\textHans")]
     variantSimpJapn simp japn =
       [ ("簡作", simp, "\\textHans")
       , ("日作", japn, "\\textJapn")
