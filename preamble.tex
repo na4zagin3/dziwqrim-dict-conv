@@ -469,7 +469,6 @@
   }
 }
 
-\ExplSyntaxOff
 
 \pagestyle{fancy}
 \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
@@ -477,7 +476,27 @@
 \fancyhead[RO,LE]{\thepage}
 \fancyfoot{}
 
+\NewDocumentCommand{\InvisiblePart}{m}{
+  \clearpage
+  \refstepcounter{part}
+  \addcontentsline{toc}{part}{#1}
+}
+
 \counterwithin*{section}{part}
+
+\NewDocumentCommand{\TitleFormatSectionWithNumber}{}{
+  \titlespacing{\section}{0pt}{*4}{*1.5}
+  \titleformat{\section}[hang]
+  {%format
+  \sffamily\gtfamily\bfseries\large%
+  }{%label
+  \thesection
+  }{%sep
+  0.25em
+  }{%before-code
+  \pagebreak[2]%
+  }
+}
 
 \NewDocumentCommand{\RestoreTitleFormat}{}{
   \titleformat{\part}[display]
@@ -497,9 +516,39 @@
   }{%label
   % (\thesection)%
   }{%sep
+    0pt
+  }{%before-code
+  \pagebreak[2]%
+  }
+  \titlespacing*{\subsection}{0pt}{0.25em plus 0.05em minus 0.05em}{0.125em plus 0.025em minus 0.025em}
+  \titleformat{\subsection}[hang]
+  {%format
+  \bfseries\gtfamily\sffamily\normalsize%
+  }{%label
+  % (\thesection)%
+  }{%sep
   0pt
   }{%before-code
   \pagebreak[2]%
+  }
+}
+
+\RestoreTitleFormat
+
+
+\NewDocumentEnvironment{MainGroup}{m m m}{
+  \int_compare:nNnT {\thesection} > {0} {
+    \clearpage%
+  }
+  \titlespacing{\section}{0pt}{*4}{*0}
+  \titleformat{\section}[hang]
+  {%format
+    \bfseries\sffamily\gtfamily\huge%
+  }{%label
+    \thesection%
+  }{%sep
+    0.5em
+  }{%before-code
   }
   \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
   \titleformat{\subsection}[hang]
@@ -512,26 +561,6 @@
   }{%before-code
   \pagebreak[2]%
   \centering%
-  }
-}
-
-\RestoreTitleFormat
-
-
-\ExplSyntaxOn
-\NewDocumentEnvironment{MainGroup}{m m m}{
-  \int_compare:nNnT {\thesection} > {0} {
-    \clearpage%
-  }
-  \titlespacing{\section}{0pt}{*4}{*0}
-  \titleformat{\section}[hang]
-  {%format
-    \bfseries\sffamily\gtfamily\huge%
-  }{%label
-    \thesection%
-  }{%sep
-    5pt
-  }{%before-code
   }
   \section[#1（#2）]{#1{\large （#2）}}\label{group-#1}%
   \markboth{\thesection #1}{}
