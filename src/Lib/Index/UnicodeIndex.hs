@@ -144,14 +144,14 @@ charToUnicodeNotations = charConv . Char.ord
     charConv c = T.pack $ printf "%04X" c
 
 blockToHeader :: UnicodeBlock -> Text
-blockToHeader CJKUnified = "CJK統合漢字"
-blockToHeader CJKUnifiedExtA = "CJK統合漢字拡張A"
-blockToHeader CJKUnifiedExtB = "CJK統合漢字拡張B"
-blockToHeader CJKUnifiedExtC = "CJK統合漢字拡張C"
-blockToHeader CJKUnifiedExtD = "CJK統合漢字拡張D"
-blockToHeader CJKUnifiedExtE = "CJK統合漢字拡張E"
-blockToHeader CJKUnifiedExtF = "CJK統合漢字拡張F"
-blockToHeader CJKUnifiedExtG = "CJK統合漢字拡張G"
+blockToHeader CJKUnified = "CJK\\linebreak[2]統合漢字"
+blockToHeader CJKUnifiedExtA = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張A"
+blockToHeader CJKUnifiedExtB = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張B"
+blockToHeader CJKUnifiedExtC = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張C"
+blockToHeader CJKUnifiedExtD = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張D"
+blockToHeader CJKUnifiedExtE = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張E"
+blockToHeader CJKUnifiedExtF = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張F"
+blockToHeader CJKUnifiedExtG = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張G"
 blockToHeader Other = "その他"
 
 stringToBlock :: String -> UnicodeBlock
