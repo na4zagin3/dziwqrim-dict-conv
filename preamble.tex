@@ -667,7 +667,6 @@
 
 \ExplSyntaxOn
 \str_new:N \l_zqdict_index_subsection_label_str
-\ExplSyntaxOff
 
 \NewDocumentEnvironment{SikrokIndex}{}{
   \setlength{\columnsep}{0.25em}
@@ -691,9 +690,9 @@
   \noindent%
   \RecordEntryBegin{#2}%
   \IfNoValueTF{#3}{%
-    #2 #4 \hfill\pageref{entry-#1}%
+    #2~#4~\hfill\pageref{entry-#1}%
   }{%
-    #2 #4\quelle{→#3~\pageref{entry-#1}}%
+    #2~#4\quelle{→#3\nobreakspace\pageref{entry-#1}}%
   }%
   \RecordEntryEnd{#2}%
   \par
@@ -716,15 +715,14 @@
   \noindent%
     \RecordEntryBegin{\Unicode{#2}}%
   \IfNoValueTF{#3}{%
-    \Unicode{#2} #4 \hfill\pageref{entry-#1}%
+    \Unicode{#2}~#4~\hfill\pageref{entry-#1}%
   }{%
-    \Unicode{#2} #4\quelle{→#3~\pageref{entry-#1}}%
+    \Unicode{#2}~#4\quelle{→#3\nobreakspace\pageref{entry-#1}}%
   }%
     \RecordEntryEnd{\Unicode{#2}}%
   \par
 }
 
-\ExplSyntaxOn
 
 \NewDocumentEnvironment{GroupIndex}{}{
   \setlength{\columnsep}{0.25em}
