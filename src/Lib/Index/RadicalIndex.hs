@@ -67,7 +67,7 @@ radicalSectionToTex :: RadicalSection -> Text
 radicalSectionToTex RadicalSection
               { sk_r_header = h
               , sk_r_entries = es
-              } = T.intercalate "\n" $ mconcat [[header (MS.lookup h radicalMap)], contents, [footer]]
+              } = T.intercalate "\n" $ mconcat [[header (MS.lookup h radicalMap)], contents es, [footer]]
   where
     header Nothing = mconcat
       [ "\\begin{RadicalSection}{"
@@ -83,7 +83,8 @@ radicalSectionToTex RadicalSection
       , r
       , "}"
       ]
-    contents = map radicalEntryToTex es
+    contents [] = ["\\RadicalEntryMissing"]
+    contents es' = map radicalEntryToTex es'
     footer = mconcat
       [ "\\end{RadicalSection}"
       ]
@@ -128,6 +129,7 @@ entryToRadicalEntries p e = indexRadicals svParent (e_部畫 e)
 sectionsToRadicalSections :: [Section] -> [RadicalSection]
 sectionsToRadicalSections ss = sections
   where
+    dummySections = M.fromList $ map (\k -> (k, [])) radicals
     ses = M.fromListWith (++) . map (\e -> (s_部 $ sk_r_radical e, [e])) $ concatMap (uncurry entryToRadicalEntries) es
     es :: [([Part], Entry)]
     es = concatMap (concatMap (\(p, vs) -> map (\v -> (p, v)) vs) . PT.toList . sec_entries) ss
@@ -135,10 +137,13 @@ sectionsToRadicalSections ss = sections
       map (\(p, es) -> RadicalSection
             { sk_r_header = p
             , sk_r_entries = L.sortOn (\e -> (s_畫 $ sk_r_radical e, sk_r_sortKey e)) es
-            }) $ M.toList ses
+            }) . M.toList $ M.unionWith (++) ses dummySections
 
 radicalMap :: MS.Map Text (Text, Text)
 radicalMap = M.fromList $ concatMap (\(k, i, r) -> map (\c -> (T.singleton c, (i, k))) $ T.unpack k) $ concatMap (\(_, rs) -> rs) radicalTable
+
+radicals :: [Text]
+radicals = map (\(k, _, _) -> T.take 1 k) $ concatMap snd radicalTable
 
 radicalTable :: [(Int, [(Text, Text, Text)])]
 radicalTable =

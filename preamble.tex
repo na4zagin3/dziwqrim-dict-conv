@@ -792,6 +792,11 @@
 }{
     \RecordEntryEnd{#1 #2部}%
 }
+\NewDocumentCommand{\RadicalEntryMissing}{}{
+  \begin{center}
+    ---
+  \end{center}
+}
 \NewDocumentCommand{\RadicalEntry}{m m m m}{
   \noindent
   \str_if_eq:VnF \l_zqdict_index_subsection_label_str {#3} {
