@@ -668,6 +668,19 @@
 \ExplSyntaxOn
 \str_new:N \l_zqdict_index_subsection_label_str
 
+\NewDocumentCommand{\IndexHeader}{m m}{
+  \begin{tcolorbox}[
+    halign=center,
+    fontupper=\bfseries,
+    colback=black,coltext=white,
+    size=small
+  ]
+    #1
+
+    #2
+  \end{tcolorbox}
+}
+
 \NewDocumentEnvironment{SikrokIndex}{}{
   \setlength{\columnsep}{0.25em}
   \setlength{\columnseprule}{0.4pt}
@@ -677,9 +690,7 @@
   \end{multicols}
 }
 \NewDocumentEnvironment{SikrokSection}{m}{
-  \begin{center}
-    \textbf{#1}%
-  \end{center}
+  \IndexHeader{#1}{}
 }{}
 
 \newcommand\quelle[1]{{%
@@ -707,9 +718,7 @@
   \end{multicols}
 }
 \NewDocumentEnvironment{UnicodeSection}{m}{
-  \begin{center}
-    \textbf{#1}%
-  \end{center}
+  \IndexHeader{#1}{}
 }{}
 \NewDocumentCommand{\UnicodeEntry}{m m o m}{
   \noindent%
@@ -782,10 +791,10 @@
   \end{multicols}
 }
 \NewDocumentEnvironment{RadicalSection}{m m}{
-  \begin{center}
-    \textbf{{\footnotesize #1}\\#2部}\label{index-radical-section-#1-#2}%
+  \IndexHeader{{\footnotesize #1}\\#2部}{
+    \label{index-radical-section-#1-#2}%
     \RecordEntryBegin{#1 #2部}%
-  \end{center}
+  }
   \str_set:Nn \l_zqdict_index_subsection_label_str {0}
 }{
     \RecordEntryEnd{#1 #2部}%
@@ -815,12 +824,12 @@
   \end{multicols}
 }
 \NewDocumentEnvironment{ReadingSection}{m o}{
-  \begin{center}
-    {\fReadingIndexLabel\textbf{#1}}\label{index-reading-section-#1}
+  \IndexHeader{
+    \fReadingIndexLabel #1
     \tl_if_empty:nF {#2} {
-      {\footnotesize #2}
+      {\footnotesize\mdseries #2}
     }
-  \end{center}
+  }{\label{index-reading-section-#1}}
   \str_clear:N \l_zqdict_index_subsection_label_str
 }{}
 \NewDocumentCommand{\ReadingEntry}{m m m}{
