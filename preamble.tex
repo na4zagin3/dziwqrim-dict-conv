@@ -587,7 +587,7 @@
   \titlespacing*{\subsection}{0pt}{0.5em plus 0.5em minus 0.2em}{0pt}
   \titleformat{\subsection}[hang]
   {%format
-  \bfseries\large%
+  \bfseries\Large%
   }{%label
   % (\thesection)%
   }{%sep
@@ -696,6 +696,7 @@
 \newcommand{\refEntry}[2]{\hyperref[entry-#2]{#1}}
 
 \newcommand{\Position}[1]{\pdfmargincomment{#1}}
+\renewcommand{\Position}[1]{}
 
 \ExplSyntaxOn
 \str_new:N \l_zqdict_index_subsection_label_str
@@ -842,8 +843,8 @@
     \centering{\footnotesize +#3畫}\\
   }
   \str_set:Nn \l_zqdict_index_subsection_label_str {#3}
-  #4~\hfill\pageref{entry-#1}
-  \par
+  #4\space\hfill\quelle{\pageref{entry-#1}}
+  %\par
 }
 
 \NewDocumentEnvironment{ReadingIndex}{m}{
@@ -858,6 +859,7 @@
 \NewDocumentEnvironment{ReadingSection}{m o}{
   \IndexHeader{
     \fReadingIndexLabel #1
+    
     \tl_if_empty:nF {#2} {
       {\\\footnotesize\mdseries #2}
     }
