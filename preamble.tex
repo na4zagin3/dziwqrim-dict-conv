@@ -472,12 +472,6 @@
   }
 }
 
-\fancypagestyle{plain}{
-  \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
-  \fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
-  \fancyhead[RO,LE]{\thepage}
-  \fancyfoot{}
-}
 \pagestyle{plain}
 
 \NewDocumentCommand{\InvisiblePart}{m}{
@@ -503,7 +497,16 @@
   }
 }
 
-\NewDocumentCommand{\RestoreTitleFormat}{}{
+\NewDocumentCommand{\RestorePageLayout}{}{
+  \fancypagestyle{plain}{
+    \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
+    \fancyhead[C]{\small DRAFT}
+    \fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
+    \fancyhead[RO,LE]{\thepage}
+    \fancyfoot{}
+  }
+  \pagestyle{plain}
+
   \titlespacing{\part}{0pt}{-14pt}{0pt}
   \titleformat{\part}[hang]
   {%format
@@ -536,13 +539,41 @@
   }
 }
 
-\RestoreTitleFormat
+\RestorePageLayout
 
+% fancy-thumb
+\setlength{\unitlength}{16mm}
+\newcommand{\blob}{\rule[-.25\unitlength]{2\unitlength}{.5\unitlength}}
+\newcommand\rblob[1]{\thepage
+\begin{picture}(0,0)
+\put(0.25,-\value{section}){\blob}
+\put(0.35,-\value{section}){\large\fontseries{eb}\sffamily\gtfamily\rlap{\raisebox{-0.4em}[0pt][0pt]{\textcolor{white}{#1}}}}
+\end{picture}}
+\newcommand\lblob[1]{%
+\begin{picture}(0,0)
+\put(-2.25,-\value{section}){\blob}
+\put(-0.35,-\value{section}){\large\fontseries{eb}\sffamily\gtfamily\llap{\raisebox{-0.4em}[0pt][0pt]{\textcolor{white}{#1}}}}
+\end{picture}%
+\thepage}
+\newcounter{line}
+\newcommand{\secname}[1]{\addtocounter{line}{1}%
+\put(1,-\value{line}){\blob}
+\put(-7.5,-\value{line}){\Large \arabic{line}}
+\put(-7,-\value{line}){\Large #1}}
 
 \NewDocumentEnvironment{MainGroup}{m m m}{
   \int_compare:nNnT {\thesection} > {0} {
     \clearpage%
   }
+
+  \fancypagestyle{plain}{
+    \fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
+    \fancyhead[RO]{\rblob{\tl_item:nn{#1}{1}}}
+    \fancyhead[LE]{\lblob{\tl_item:nn{#1}{1}}}
+    \fancyfoot{}
+  }
+  \pagestyle{plain}
+
   \titlespacing{\section}{0pt}{*4}{*0}
   \titleformat{\section}[hang]
   {%format
@@ -586,7 +617,6 @@
   \end{tcolorbox}
   \vspace{1em plus 1em minus 0.2em}
 }{%
-  \RestoreTitleFormat%
 }
 \newcommand{\PartHeader}[5]{%
   %\section[#1 #2 #3]{{\ltjsetparameter{jacharrange={-9}}#1}#2\MakeUppercase{#3}}%
