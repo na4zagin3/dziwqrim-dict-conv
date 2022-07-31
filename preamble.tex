@@ -471,12 +471,13 @@
   }
 }
 
-
-\pagestyle{fancy}
-\fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
-\fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
-\fancyhead[RO,LE]{\thepage}
-\fancyfoot{}
+\fancypagestyle{plain}{
+  \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
+  \fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
+  \fancyhead[RO,LE]{\thepage}
+  \fancyfoot{}
+}
+\pagestyle{plain}
 
 \NewDocumentCommand{\InvisiblePart}{m}{
   \clearpage
@@ -485,6 +486,8 @@
 }
 
 \counterwithin*{section}{part}
+\titleclass{\part}{top}
+\newcommand\partbreak{\clearpage}
 
 \NewDocumentCommand{\TitleFormatSectionWithNumber}{}{
   \titlespacing{\section}{0pt}{*4}{*1.5}
@@ -496,12 +499,12 @@
   }{%sep
   0.25em
   }{%before-code
-  \pagebreak[2]%
   }
 }
 
 \NewDocumentCommand{\RestoreTitleFormat}{}{
-  \titleformat{\part}[display]
+  \titlespacing{\part}{0pt}{-14pt}{0pt}
+  \titleformat{\part}[hang]
   {%format
   \sffamily\gtfamily\bfseries\large%
   }{%label
@@ -509,7 +512,6 @@
   }{%sep
   0pt
   }{%before-code
-  \clearpage
   }
   \titlespacing{\section}{0pt}{*4}{*1.5}
   \titleformat{\section}[hang]
@@ -520,7 +522,6 @@
   }{%sep
     0pt
   }{%before-code
-  \pagebreak[2]%
   }
   \titlespacing*{\subsection}{0pt}{0.25em plus 0.05em minus 0.05em}{0.125em plus 0.025em minus 0.025em}
   \titleformat{\subsection}[hang]
@@ -531,7 +532,6 @@
   }{%sep
   0pt
   }{%before-code
-  \pagebreak[2]%
   }
 }
 
