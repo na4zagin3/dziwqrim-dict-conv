@@ -31,8 +31,8 @@ import Lib.Row (ShapeVariant(..), ShapeVariants(..), Part(..))
 import Text.Printf (printf)
 
 data UnicodeBlock =
-  CJKUnified
-  | CJKUnifiedExtA
+    CJKUnifiedExtA
+  | CJKUnified
   | CJKUnifiedExtB
   | CJKUnifiedExtC
   | CJKUnifiedExtD
