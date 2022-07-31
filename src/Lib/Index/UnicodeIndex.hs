@@ -45,6 +45,7 @@ data UnicodeBlock =
 data UnicodeEntry = UnicodeEntry
   { sk_e_unicode :: ![Char]
   , sk_e_entry :: !Text
+  , sk_e_entry_font :: !(Maybe Text)
   , sk_e_label :: !Text
   , sk_e_sortKey :: !EntrySortKey
   , sk_e_headword :: !(Maybe Text)
@@ -61,10 +62,14 @@ unicodeEntryToTex :: UnicodeEntry -> Text
 unicodeEntryToTex UnicodeEntry
   { sk_e_unicode = sk
   , sk_e_entry = e
+  , sk_e_entry_font = font
   , sk_e_headword = hw
   , sk_e_label = l
   } = mconcat contents
   where
+    headword = fromMaybe e hw
+    Right entry = convIdsFull e
+    isConverted = entry /= e
     contents =
       [ "\\UnicodeEntry"
       , "{"
@@ -73,9 +78,16 @@ unicodeEntryToTex UnicodeEntry
       , "{"
       , T.intercalate " " $ map charToUnicodeNotations sk
       , "}"
-      , fromMaybe "" $ fmap (\x -> "[" <> x <> "]") hw
+      , if headword /= entry
+        then "[" <> headword <> "]"
+        else ""
       , "{"
-      , e
+      , fromMaybe "" font
+      , "{"
+      , if isConverted
+        then "\\fLastResort " <> entry
+        else entry
+      , "}"
       , "}"
       ]
 
@@ -121,6 +133,7 @@ entryToUnicodeEntries p e = concat $ concat
     indexUnicode z = UnicodeEntry
       { sk_e_unicode = T.unpack $ convIdsExc z
       , sk_e_entry = z
+      , sk_e_entry_font = Nothing
       , sk_e_label = label
       , sk_e_sortKey = entrySortKey e
       , sk_e_headword = Nothing
@@ -132,7 +145,8 @@ entryToUnicodeEntries p e = concat $ concat
       [indexUnicodeVariant com zp z]
     indexUnicodeVariant com zp z = UnicodeEntry
       { sk_e_unicode = T.unpack $ convIdsExc z
-      , sk_e_entry = mconcat [com, "{", z, "}"]
+      , sk_e_entry = z
+      , sk_e_entry_font = Just com
       , sk_e_label = label
       , sk_e_sortKey = entrySortKey e
       , sk_e_headword = Just zp
