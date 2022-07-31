@@ -12,6 +12,7 @@
 \usepackage{fancyhdr}
 \usepackage{hanging}
 \usepackage{ifthen}
+\usepackage{ifdraft}
 \usepackage{mfirstuc}
 \usepackage{multicol}
 \usepackage{pdfcomment}
@@ -533,7 +534,11 @@
 
 \NewDocumentCommand{\RestorePageLayout}{}{
   \fancypagestyle{plain}{
-    \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
+    \ifoptionfinal {
+      \fancyhead[C]{\small\ShowEntriesForPage{\value{page}}}
+    } {
+      \fancyhead[C]{\small DRAFT}
+    }
     \fancyhead[LO,RE]{\small\sffamily\gtfamily\leftmark}
     \fancyhead[RO,LE]{\thepage}
     \fancyfoot{}
