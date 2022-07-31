@@ -145,13 +145,13 @@ charToUnicodeNotations = charConv . Char.ord
 
 blockToHeader :: UnicodeBlock -> Text
 blockToHeader CJKUnified = "CJK\\linebreak[2]統合漢字"
-blockToHeader CJKUnifiedExtA = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張A"
-blockToHeader CJKUnifiedExtB = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張B"
-blockToHeader CJKUnifiedExtC = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張C"
-blockToHeader CJKUnifiedExtD = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張D"
-blockToHeader CJKUnifiedExtE = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張E"
-blockToHeader CJKUnifiedExtF = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張F"
-blockToHeader CJKUnifiedExtG = "CJK\\linebreak[2]統合漢字\\linebreak[1]拡張G"
+blockToHeader CJKUnifiedExtA = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張A"
+blockToHeader CJKUnifiedExtB = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張B"
+blockToHeader CJKUnifiedExtC = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張C"
+blockToHeader CJKUnifiedExtD = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張D"
+blockToHeader CJKUnifiedExtE = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張E"
+blockToHeader CJKUnifiedExtF = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張F"
+blockToHeader CJKUnifiedExtG = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張G"
 blockToHeader Other = "その他"
 
 stringToBlock :: String -> UnicodeBlock
