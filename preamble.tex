@@ -50,6 +50,40 @@
 \setfontfamily\fCyrilic{EB Garamond}
 \setfontfamily\fGreek{EB Garamond}
 \newjfontfamily\fLastResort{HanaMinB}
+\newjfontfamily\fPartRadix{Source Han Serif SC}[
+  AltFont={
+    {Range={
+      "200B9,
+      "200C9,
+      "20336,
+      "20479,
+      "2053C,
+      "20627,
+      "20674,
+      "20992,
+      "209EA,
+      "20A0D,
+      "20B1C,
+      "20B2A,
+      "221B6,
+      "233B3,
+      "233B5,
+      "2343A,
+      "239BC,
+      "2510E,
+      "25115,
+      "2574C,
+      "25F7F,
+      "268F9,
+      "268FB,
+      "26AF3,
+      "27BAB,
+      "28E85,
+      "29ACF
+    },
+    Font=HanaMinB}
+  }
+]
 
 % Noto
 %
@@ -875,6 +909,20 @@
   \str_set:Nn \l_zqdict_index_subsection_label_str {#2}
   #3 \hfill\pageref{entry-#1}
   \RecordEntryEnd{#2}%
+  \par
+}
+
+\NewDocumentEnvironment{PartRadicals}{}{
+  \setlength{\columnsep}{2.25em}
+  \setlength{\columnseprule}{0.4pt}
+  \begin{multicols}{6}
+}{
+  \vspace*{0pt plus 1fill}
+  \end{multicols}
+}
+\NewDocumentCommand{\PartRadicalEntry}{m m}{
+  \noindent
+  \hfill#2\hspace{1em}{\fPartRadix#1}
   \par
 }
 \ExplSyntaxOff
