@@ -144,14 +144,14 @@ charToUnicodeNotations = charConv . Char.ord
     charConv c = T.pack $ printf "%04X" c
 
 blockToHeader :: UnicodeBlock -> Text
-blockToHeader CJKUnified = "CJK\\linebreak[2]統合漢字"
-blockToHeader CJKUnifiedExtA = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張A"
-blockToHeader CJKUnifiedExtB = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張B"
-blockToHeader CJKUnifiedExtC = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張C"
-blockToHeader CJKUnifiedExtD = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張D"
-blockToHeader CJKUnifiedExtE = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張E"
-blockToHeader CJKUnifiedExtF = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張F"
-blockToHeader CJKUnifiedExtG = "CJK\\linebreak[2]統合漢字\\linebreak[1]擴張G"
+blockToHeader CJKUnified = "中日韓\\linebreak[2]統一漢字"
+blockToHeader CJKUnifiedExtA = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充A"
+blockToHeader CJKUnifiedExtB = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充B"
+blockToHeader CJKUnifiedExtC = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充C"
+blockToHeader CJKUnifiedExtD = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充D"
+blockToHeader CJKUnifiedExtE = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充E"
+blockToHeader CJKUnifiedExtF = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充F"
+blockToHeader CJKUnifiedExtG = "中日韓\\linebreak[2]統一漢字\\linebreak[2]擴充G"
 blockToHeader Other = "その他"
 
 stringToBlock :: String -> UnicodeBlock
