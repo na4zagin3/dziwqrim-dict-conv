@@ -307,7 +307,7 @@ rightIndexes is xs = map f $ zip [0..] xs
              | otherwise = Left x
 
 booksToTex :: NonEmpty Text -> Text
-booksToTex = mconcat . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
+booksToTex = T.intercalate "、" . NEL.toList . NEL.map (\b -> "\\Book{" <> b <> "}")
 
 
 -- | Parse a 反切 as TeX
