@@ -581,16 +581,17 @@
 
 % fancy-thumb
 \setlength{\unitlength}{16mm}
-\newcommand{\blob}{\rule[-.25\unitlength]{2\unitlength}{.5\unitlength}}
+\newcommand{\blob}{\rule[-.25\unitlength]{.8\unitlength}{.5\unitlength}}
+\newcommand{\blobLabel}[1]{{\normalsize\fontseries{eb}\sffamily\gtfamily\raisebox{-0.4em}[0pt][0pt]{\textcolor{white}{#1}}}}
 \newcommand\rblob[1]{\thepage
 \begin{picture}(0,0)
-\put(0.25,-\value{section}){\blob}
-\put(0.35,-\value{section}){\large\fontseries{eb}\sffamily\gtfamily\rlap{\raisebox{-0.4em}[0pt][0pt]{\textcolor{white}{#1}}}}
+\put(0.2,-\value{section}){\blob}
+\put(0.3,-\value{section}){\rlap{\blobLabel{#1}}}
 \end{picture}}
 \newcommand\lblob[1]{%
 \begin{picture}(0,0)
-\put(-2.25,-\value{section}){\blob}
-\put(-0.35,-\value{section}){\large\fontseries{eb}\sffamily\gtfamily\llap{\raisebox{-0.4em}[0pt][0pt]{\textcolor{white}{#1}}}}
+\put(-1.0,-\value{section}){\blob}
+\put(-0.3,-\value{section}){\llap{\blobLabel{#1}}}
 \end{picture}%
 \thepage}
 \newcounter{line}
